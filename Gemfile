@@ -1,12 +1,13 @@
 source 'https://rubygems.org'
+source 'http://systems.extension.org/rubygems/'
 
-gem 'rails', '3.2.2'
+gem 'rails', '~> 3.2.3'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 
-gem 'sqlite3'
-
+# data
+gem 'mysql2'
 
 # Gems used only for assets and not required
 # in production environments by default.
@@ -18,21 +19,46 @@ group :assets do
   # gem 'therubyracer'
 
   gem 'uglifier', '>= 1.0.3'
+  # files for bootstrap-in-asset-pipeline integration
+  gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
+  
 end
 
+# server settings
+gem "rails_config"
+
+# authentication
+gem 'omniauth', "~> 1.0"
+gem 'omniauth-openid'
+
+# jquery magick
 gem 'jquery-rails'
 
-# To use ActiveModel has_secure_password
-# gem 'bcrypt-ruby', '~> 3.0.0'
-
-# To use Jbuilder templates for JSON
-# gem 'jbuilder'
-
-# Use unicorn as the app server
-# gem 'unicorn'
+# pagination
+gem 'kaminari'
 
 # Deploy with Capistrano
-# gem 'capistrano'
+gem 'capistrano'
+#gem 'capatross'
 
-# To use debugger
-# gem 'ruby-debug19', :require => 'ruby-debug'
+# background jobs
+gem 'delayed_job_active_record'
+gem 'daemons'
+
+# google analytics retrieval
+gem 'garb'
+
+# command line tools
+gem 'thor'
+
+# csv output/import
+gem 'fastercsv'
+
+# campfire integration
+gem "tinder", "~> 1.8.0"
+
+group :development do
+  # require the powder gem
+  gem 'powder'
+  gem 'net-http-spy'
+end
