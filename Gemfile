@@ -39,14 +39,14 @@ gem 'kaminari'
 
 # Deploy with Capistrano
 gem 'capistrano'
-#gem 'capatross'
+gem 'capatross'
 
 # background jobs
 gem 'delayed_job_active_record'
 gem 'daemons'
 
 # google analytics retrieval
-gem 'garb'
+gem "garb" # garb for now until it breaks June 2012
 
 # command line tools
 gem 'thor'

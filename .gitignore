@@ -10,6 +10,7 @@
 # environment files
 /.rvmrc
 /.powenv
+/.tm_properties
 
 # Ignore the default SQLite database.
 /db/*.sqlite3
@@ -22,3 +23,4 @@
 /config/database.yml
 /config/settings.local.yml
 /capatross_logs
+/config/capatross.local.yml
