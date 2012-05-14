@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120511192435) do
+ActiveRecord::Schema.define(:version => 20120514140854) do
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -41,9 +41,11 @@ ActiveRecord::Schema.define(:version => 20120511192435) do
     t.integer  "exits"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "reduced_path"
   end
 
   add_index "raw_analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
+  add_index "raw_analytics", ["reduced_path"], :name => "path_ndx"
   add_index "raw_analytics", ["segment", "date"], :name => "analytic_ndx"
 
 end

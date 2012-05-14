@@ -12,7 +12,42 @@ class RawAnalytic < ActiveRecord::Base
     
   cattr_accessor :analytics_profile  
   before_create :set_recordsignature
-    
+  
+  
+  def self.make_reduced_path(analytics_url)
+    if(analytics_url =~ %r{^/pages/(\d+)\/})
+      "pages/#{$1}"
+    elsif(analytics_url =~ %r{^/pages/(\d+)$})
+      "pages/#{$1}"
+    elsif(analytics_url =~ %r{^/article/(\d+)})
+      "pages/#{$1}"
+    elsif(analytics_url =~ %r{^/faq/(\d+)})
+      "faq/#{$1}"
+    elsif(analytics_url=~ %r{^/events/(\d+)$} or analytics_url=~ %r{^/events/(\d+)\?})
+      "events/#{$1}"
+    elsif(analytics_url =~ %r{^/pages/(.+)} or analytics_url =~ %r{^/articles/(.+)})
+      title_to_lookup = self.mogrify_request_path($1)
+      "wiki/#{title_to_lookup}"
+    else
+      analytics_url
+    end
+  end
+  
+  def self.mogrify_request_path(ga_url)
+    if(!ga_url.index('?'))
+      request_uri = ga_url
+    elsif(ga_url[-1,1] == '?')
+      request_uri = ga_url
+    else
+      (request_uri,blah) = ga_url.split(%r{(.+)\?})[1,2]
+    end
+    title_to_lookup = CGI.unescape(request_uri)
+    if title_to_lookup =~ /\/print(\/)?$/
+      title_to_lookup.gsub!(/\/print(\/)?$/, '')
+    end
+    return title_to_lookup
+  end
+  
   def set_recordsignature
     options = {:analytics_url => self.analytics_url, :segment => self.segment, :date => self.date.to_s}
     self.analytics_url_hash = self.class.recordsignature(options)
@@ -84,6 +119,7 @@ class RawAnalytic < ActiveRecord::Base
         record_options[:unique_pageviews] = result.unique_pageviews
         record_options[:exits] = result.exits
         record_options[:time_on_page] = result.time_on_page
+        record_options[:reduced_path] = self.make_reduced_path(result.page_path)
   
         record_options
         
@@ -100,5 +136,10 @@ class RawAnalytic < ActiveRecord::Base
     end
     record_count
   end
+  
+  
+  
+  
+  
   
 end

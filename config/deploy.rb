@@ -20,7 +20,6 @@ set :bundle_dir, ''
 set :rails_env, "production" #added for delayed job  
 
 before "deploy", "deploy:web:disable"
-#after "deploy:update_code", "deploy:bundle_install"
 after "deploy:update_code", "deploy:update_maint_msg"
 after "deploy:update_code", "deploy:link_and_copy_configs"
 after "deploy:update_code", "deploy:cleanup"
