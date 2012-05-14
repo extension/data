@@ -42,6 +42,7 @@ class RawAnalytic < ActiveRecord::Base
       (request_uri,blah) = ga_url.split(%r{(.+)\?})[1,2]
     end
     title_to_lookup = CGI.unescape(request_uri)
+    return ga_url if !title_to_lookup.valid_encoding?
     if title_to_lookup =~ /\/print(\/)?$/
       title_to_lookup.gsub!(/\/print(\/)?$/, '')
     end
