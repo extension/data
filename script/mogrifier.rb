@@ -35,7 +35,7 @@ class GAImporter < Thor
     segments = options[:segments].split(%r{\s*,\s*})
     segments.each do |segment|
       puts "Getting GA data for segment #{segment} for #{date.to_s}-..." if options[:verbose]
-      records = RawAnalytic.import_analytics({:segment => segment, :date => date})
+      records = Analytic.import_analytics({:segment => segment, :date => date})
       puts "\t saved: #{records}" if options[:verbose]
     end
   end
@@ -54,7 +54,7 @@ class GAImporter < Thor
     start_date.upto(end_date) do |date|
       segments.each do |segment|
         puts "Getting GA data for segment #{segment} for #{date.to_s}-..." if options[:verbose]
-        records = RawAnalytic.import_analytics({:segment => segment, :date => date})
+        records = Analytic.import_analytics({:segment => segment, :date => date})
         puts "\t saved: #{records}" if options[:verbose]
       end
     end

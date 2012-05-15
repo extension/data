@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class RawAnalytic < ActiveRecord::Base
+class Analytic < ActiveRecord::Base
   extend Garb::Model
   metrics :entrances, :pageviews, :unique_pageviews, :exits, :time_on_page
   dimensions :page_path
@@ -18,10 +18,15 @@ class RawAnalytic < ActiveRecord::Base
   URL_MIGRATED_FAQ = 'faq'
   URL_MIGRATED_EVENT = 'event'
   URL_MIGRATED_WIKI = 'wiki'
+  URL_ROOT = 'root'
+  URL_SEARCH = 'search'
+  URL_ASK = 'ask'
   URL_OTHER = 'other'
   
   def set_url_type
-    if(analytics_url =~ %r{^/pages/(\d+)\/})
+    if(analytics_url == '/')
+      self.url_type = URL_ROOT
+    elsif(analytics_url =~ %r{^/pages/(\d+)\/})
       self.url_type = URL_PAGE
       self.url_page_id = $1
     elsif(analytics_url =~ %r{^/pages/(\d+)$})
@@ -52,8 +57,13 @@ class RawAnalytic < ActiveRecord::Base
       end      
       self.url_type = URL_MIGRATED_WIKI
       self.url_wiki_title = title_to_lookup
+    elsif(analytics_url =~ %r{^/ask/(\w+)})
+      self.url_widget_id = $1
+      self.url_type = URL_ASK
+    elsif(analytics_url =~ %r{^/main/search})
+      self.url_type = URL_SEARCH
     else
-      self.url_type = URL_OTHER      
+      self.url_type = URL_OTHER
     end
   end
   

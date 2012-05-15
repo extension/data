@@ -11,7 +11,30 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120515115629) do
+ActiveRecord::Schema.define(:version => 20120511192435) do
+
+  create_table "analytics", :force => true do |t|
+    t.integer  "page_id"
+    t.string   "segment",            :limit => 25
+    t.date     "date"
+    t.text     "analytics_url"
+    t.string   "url_type"
+    t.integer  "url_page_id"
+    t.integer  "url_migrated_id"
+    t.string   "url_wiki_title"
+    t.string   "url_widget_id"
+    t.string   "analytics_url_hash"
+    t.integer  "pageviews"
+    t.integer  "unique_pageviews"
+    t.integer  "entrances"
+    t.integer  "time_on_page"
+    t.integer  "exits"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
+  add_index "analytics", ["segment", "date"], :name => "analytic_ndx"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -28,26 +51,5 @@ ActiveRecord::Schema.define(:version => 20120515115629) do
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
-
-  create_table "raw_analytics", :force => true do |t|
-    t.string   "segment",            :limit => 25
-    t.date     "date"
-    t.text     "analytics_url"
-    t.string   "analytics_url_hash"
-    t.integer  "pageviews"
-    t.integer  "unique_pageviews"
-    t.integer  "entrances"
-    t.integer  "time_on_page"
-    t.integer  "exits"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "url_type"
-    t.integer  "url_page_id"
-    t.integer  "url_migrated_id"
-    t.string   "url_wiki_title"
-  end
-
-  add_index "raw_analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
-  add_index "raw_analytics", ["segment", "date"], :name => "analytic_ndx"
 
 end
