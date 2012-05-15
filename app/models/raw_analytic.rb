@@ -12,41 +12,49 @@ class RawAnalytic < ActiveRecord::Base
     
   cattr_accessor :analytics_profile  
   before_create :set_recordsignature
+  before_save   :set_url_type
   
+  URL_PAGE = 'page'
+  URL_MIGRATED_FAQ = 'faq'
+  URL_MIGRATED_EVENT = 'event'
+  URL_MIGRATED_WIKI = 'wiki'
+  URL_OTHER = 'other'
   
-  def self.make_reduced_path(analytics_url)
+  def set_url_type
     if(analytics_url =~ %r{^/pages/(\d+)\/})
-      "pages/#{$1}"
+      self.url_type = URL_PAGE
+      self.url_page_id = $1
     elsif(analytics_url =~ %r{^/pages/(\d+)$})
-      "pages/#{$1}"
+      self.url_type = URL_PAGE
+      self.url_page_id = $1
     elsif(analytics_url =~ %r{^/article/(\d+)})
-      "pages/#{$1}"
+      self.url_type = URL_PAGE
+      self.url_page_id = $1
     elsif(analytics_url =~ %r{^/faq/(\d+)})
-      "faq/#{$1}"
+      self.url_type = URL_MIGRATED_FAQ
+      self.url_migrated_id = $1
     elsif(analytics_url=~ %r{^/events/(\d+)$} or analytics_url=~ %r{^/events/(\d+)\?})
-      "events/#{$1}"
+      self.url_type = URL_MIGRATED_EVENT
+      self.url_migrated_id = $1
     elsif(analytics_url =~ %r{^/pages/(.+)} or analytics_url =~ %r{^/articles/(.+)})
-      title_to_lookup = self.mogrify_request_path($1)
-      "wiki/#{title_to_lookup}"
+      ga_url = $1
+      if(!ga_url.index('?'))
+        request_uri = ga_url
+      elsif(ga_url[-1,1] == '?')
+        request_uri = ga_url
+      else
+        (request_uri,blah) = ga_url.split(%r{(.+)\?})[1,2]
+      end
+      title_to_lookup = CGI.unescape(request_uri)
+      return ga_url if !title_to_lookup.valid_encoding?
+      if title_to_lookup =~ /\/print(\/)?$/
+        title_to_lookup.gsub!(/\/print(\/)?$/, '')
+      end      
+      self.url_type = URL_MIGRATED_WIKI
+      self.url_wiki_title = title_to_lookup
     else
-      analytics_url
+      self.url_type = URL_OTHER      
     end
-  end
-  
-  def self.mogrify_request_path(ga_url)
-    if(!ga_url.index('?'))
-      request_uri = ga_url
-    elsif(ga_url[-1,1] == '?')
-      request_uri = ga_url
-    else
-      (request_uri,blah) = ga_url.split(%r{(.+)\?})[1,2]
-    end
-    title_to_lookup = CGI.unescape(request_uri)
-    return ga_url if !title_to_lookup.valid_encoding?
-    if title_to_lookup =~ /\/print(\/)?$/
-      title_to_lookup.gsub!(/\/print(\/)?$/, '')
-    end
-    return title_to_lookup
   end
   
   def set_recordsignature
@@ -119,9 +127,7 @@ class RawAnalytic < ActiveRecord::Base
         record_options[:pageviews] = result.pageviews
         record_options[:unique_pageviews] = result.unique_pageviews
         record_options[:exits] = result.exits
-        record_options[:time_on_page] = result.time_on_page
-        record_options[:reduced_path] = self.make_reduced_path(result.page_path)
-  
+        record_options[:time_on_page] = result.time_on_page  
         record_options
         
         begin
