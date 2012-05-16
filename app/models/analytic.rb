@@ -50,13 +50,20 @@ class Analytic < ActiveRecord::Base
       else
         (request_uri,blah) = ga_url.split(%r{(.+)\?})[1,2]
       end
-      title_to_lookup = CGI.unescape(request_uri)
-      return ga_url if !title_to_lookup.valid_encoding?
-      if title_to_lookup =~ /\/print(\/)?$/
-        title_to_lookup.gsub!(/\/print(\/)?$/, '')
-      end      
-      self.url_type = URL_MIGRATED_WIKI
-      self.url_wiki_title = title_to_lookup
+      if(!request_uri.blank?)
+        title_to_lookup = CGI.unescape(request_uri)
+        if(!title_to_lookup.valid_encoding?)
+          self.url_type = URL_OTHER
+        else
+          if title_to_lookup =~ /\/print(\/)?$/
+            title_to_lookup.gsub!(/\/print(\/)?$/, '')
+          end
+          self.url_type = URL_MIGRATED_WIKI
+          self.url_wiki_title = title_to_lookup
+        end
+      else
+        self.url_type = URL_OTHER
+      end    
     elsif(analytics_url =~ %r{^/ask/(\w+)})
       self.url_widget_id = $1
       self.url_type = URL_ASK
