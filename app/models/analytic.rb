@@ -74,10 +74,32 @@ class Analytic < ActiveRecord::Base
     end
   end
   
+  def associate_with_page
+    case self.url_type
+    when URL_PAGE
+      page = Page.find_by_id(self.url_page_id)
+    when URL_MIGRATED_FAQ
+      page = Page.find_by_migrated_id(self.url_migrated_id)
+    when URL_MIGRATED_EVENT
+      page = Page.find_by_migrated_id(self.url_migrated_id)
+    when URL_MIGRATED_WIKI
+      page = Page.find_by_title_url(self.url_wiki_title)
+    else
+      # nothing
+    end
+    
+    if(page)
+      self.update_attribute(:page_id,page.id)
+    end
+  end
+      
+  
   def set_recordsignature
     options = {:analytics_url => self.analytics_url, :segment => self.segment, :date => self.date.to_s}
     self.analytics_url_hash = self.class.recordsignature(options)
   end
+  
+
   
   def self.recordsignature(options = {})
     keystring = []
