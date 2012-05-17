@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120516142917) do
+ActiveRecord::Schema.define(:version => 20120517123246) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(:version => 20120516142917) do
   end
 
   add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
-  add_index "analytics", ["segment", "date"], :name => "analytic_ndx"
+  add_index "analytics", ["segment", "date", "page_id"], :name => "analytic_ndx"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0

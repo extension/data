@@ -14,6 +14,8 @@ class Analytic < ActiveRecord::Base
   before_create :set_recordsignature
   before_save   :set_url_type
   
+  scope :bydate, lambda{|date| where(:date => date)}
+  
   URL_PAGE = 'page'
   URL_MIGRATED_FAQ = 'faq'
   URL_MIGRATED_EVENT = 'event'
