@@ -9,6 +9,7 @@ class Page < ActiveRecord::Base
   has_many :analytics
   has_many :page_taggings
   has_many :resource_tags, :through => :page_taggings
+  belongs_to :node
 
   # index settings
   NOT_INDEXED = 0
@@ -31,40 +32,42 @@ class Page < ActiveRecord::Base
   
   
   def self.rebuild
-    page_count = 0
-    page_list = DarmokPage.all
-    total_page_count = page_list.size
-    insert_values = []
-    page_list.each do |page|
-      insert_list = []
-      page_count += 1
-      insert_list << page.id
-      insert_list << (page.migrated_id.blank? ? 0 : page.migrated_id)
-      insert_list << ActiveRecord::Base.quote_value(page.datatype)
-      insert_list << ActiveRecord::Base.quote_value(page.title)
-      insert_list << ActiveRecord::Base.quote_value(page.url_title)
-      insert_list << (page.content_length.blank? ? 0 : page.content_length)
-      insert_list << (page.content_words.blank? ? 0 : page.content_words)
-      insert_list << ActiveRecord::Base.quote_value(page.source_created_at.to_s(:db))
-      insert_list << ActiveRecord::Base.quote_value(page.source_updated_at.to_s(:db))
-      insert_list << ActiveRecord::Base.quote_value(page.source)
-      insert_list << ActiveRecord::Base.quote_value(page.source_url)
-      insert_list << page.indexed
-      insert_list << (page.is_dpl? ? 1 : 0)
-      insert_list << ActiveRecord::Base.quote_value(page.created_at.to_s(:db))
-      insert_list << ActiveRecord::Base.quote_value(page.updated_at.to_s(:db))
-      links = page.link_counts
-      insert_list << links[:total]
-      insert_list << links[:external]
-      insert_list << links[:local]
-      insert_list << links[:internal]
-      insert_list << ActiveRecord::Base.quote_value(page.resource_tag_names.join(','))
-      insert_values << "(#{insert_list.join(',')})"
+    self.connection.execute("truncate table #{self.table_name};")    
+    DarmokPage.find_in_batches do |group|
+      insert_values = []
+      group.each do |page|
+        insert_list = []
+        insert_list << page.id
+        insert_list << (page.migrated_id.blank? ? 0 : page.migrated_id)
+        insert_list << ActiveRecord::Base.quote_value(page.datatype)
+        insert_list << ActiveRecord::Base.quote_value(page.title)
+        insert_list << ActiveRecord::Base.quote_value(page.url_title)
+        insert_list << (page.content_length.blank? ? 0 : page.content_length)
+        insert_list << (page.content_words.blank? ? 0 : page.content_words)
+        insert_list << ActiveRecord::Base.quote_value(page.source_created_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(page.source_updated_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(page.source)
+        insert_list << ActiveRecord::Base.quote_value(page.source_url)
+        insert_list << page.indexed
+        insert_list << (page.is_dpl? ? 1 : 0)
+        insert_list << ActiveRecord::Base.quote_value(page.created_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(page.updated_at.to_s(:db))
+        links = page.link_counts
+        insert_list << links[:total]
+        insert_list << links[:external]
+        insert_list << links[:local]
+        insert_list << links[:internal]
+        insert_list << ActiveRecord::Base.quote_value(page.resource_tag_names.join(','))
+        if(page.source = 'create' and page.source_url =~ %r{/node/(\d+)})
+          insert_list << $1.to_i
+        else
+          insert_list << 0
+        end
+        insert_values << "(#{insert_list.join(',')})"
+      end
+      insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"
+      self.connection.execute(insert_sql)
     end
-    insert_sql = "INSERT INTO pages VALUES #{insert_values.join(',')};"
-    self.connection.execute('truncate table pages;')
-    self.connection.execute(insert_sql)
-    
     PageTagging.rebuild
   end
   

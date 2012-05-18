@@ -57,6 +57,9 @@ gem 'fastercsv'
 # campfire integration
 gem "tinder", "~> 1.8.0"
 
+# legacy data support
+gem 'safe_attributes'
+
 group :development do
   # require the powder gem
   gem 'powder'

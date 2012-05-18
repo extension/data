@@ -11,7 +11,14 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120517123246) do
+ActiveRecord::Schema.define(:version => 20120518203056) do
+
+  create_table "aae_nodes", :force => true do |t|
+    t.integer "node_id"
+    t.integer "aae_id"
+  end
+
+  add_index "aae_nodes", ["node_id", "aae_id"], :name => "node_group_ndx"
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -52,6 +59,32 @@ ActiveRecord::Schema.define(:version => 20120517123246) do
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
+  create_table "groups", :force => true do |t|
+    t.integer  "create_gid"
+    t.string   "name"
+    t.boolean  "is_launched"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
+  add_index "groups", ["create_gid"], :name => "create_group_ndx"
+
+  create_table "node_groups", :force => true do |t|
+    t.integer  "node_id"
+    t.integer  "group_id"
+    t.datetime "created_at"
+  end
+
+  add_index "node_groups", ["node_id", "group_id"], :name => "create_group_ndx"
+
+  create_table "nodes", :force => true do |t|
+    t.integer  "revision_id"
+    t.string   "node_type"
+    t.string   "title"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
+
   create_table "page_taggings", :force => true do |t|
     t.integer  "page_id"
     t.integer  "resource_tag_id"
@@ -81,11 +114,13 @@ ActiveRecord::Schema.define(:version => 20120517123246) do
     t.integer  "internal_links"
     t.integer  "local_links"
     t.text     "resource_tag_names"
+    t.integer  "node_id"
   end
 
   add_index "pages", ["created_at", "datatype", "indexed"], :name => "page_type_ndx"
   add_index "pages", ["datatype"], :name => "index_pages_on_datatype"
   add_index "pages", ["migrated_id"], :name => "index_pages_on_migrated_id"
+  add_index "pages", ["node_id"], :name => "node_ndx"
   add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
 
   create_table "resource_tags", :force => true do |t|
@@ -95,5 +130,45 @@ ActiveRecord::Schema.define(:version => 20120517123246) do
   end
 
   add_index "resource_tags", ["name"], :name => "rt_ndx"
+
+  create_table "revisions", :force => true do |t|
+    t.integer  "node_id"
+    t.integer  "user_id"
+    t.text     "log"
+    t.datetime "created_at"
+  end
+
+  add_index "revisions", ["node_id"], :name => "node_ndx"
+  add_index "revisions", ["user_id"], :name => "user_ndx"
+
+  create_table "users", :force => true do |t|
+    t.string   "idstring",           :limit => 80,                    :null => false
+    t.string   "first_name"
+    t.string   "last_name"
+    t.string   "email",              :limit => 96
+    t.string   "title"
+    t.integer  "account_status"
+    t.datetime "last_login_at"
+    t.integer  "position_id",                      :default => 0
+    t.integer  "location_id",                      :default => 0
+    t.integer  "county_id",                        :default => 0
+    t.boolean  "retired",                          :default => false
+    t.boolean  "is_admin",                         :default => false
+    t.integer  "primary_account_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "workflow_events", :force => true do |t|
+    t.integer  "node_id"
+    t.integer  "workflow_state_id"
+    t.integer  "user_id"
+    t.integer  "node_revision_id"
+    t.integer  "event"
+    t.string   "event_description"
+    t.datetime "created_at"
+  end
+
+  add_index "workflow_events", ["node_id"], :name => "node_ndx"
 
 end
