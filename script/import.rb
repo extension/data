@@ -81,6 +81,45 @@ class GAImporter < Thor
       analytic.associate_with_page
     end
   end
+  
+  desc "all_the_rebuilds", "Rebuild/reimport data items from Darmok and Create"
+  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
+  def all_the_rebuilds
+    load_rails(options[:environment])
+    puts "Starting darmok page import (no progress will be shown)..." if options[:verbose]
+    Page.rebuild
+    puts "\t Finished darmok page import (no progress will be shown)..." if options[:verbose]
+   
+    puts "Starting darmok group import (no progress will be shown)..." if options[:verbose]
+    Group.rebuild
+    puts "\t Finished darmok group import (no progress will be shown)..." if options[:verbose]
+    
+    puts "Starting darmok user import (no progress will be shown)..." if options[:verbose]
+    User.rebuild
+    puts "\t Finished darmok user import (no progress will be shown)..." if options[:verbose]
+    
+    puts "Starting create node import (no progress will be shown)..." if options[:verbose]
+    Node.rebuild
+    puts "\t Finished create node import (no progress will be shown)..." if options[:verbose]
+    
+    puts "Starting create group node import (no progress will be shown)..." if options[:verbose]
+    NodeGroup.rebuild
+    puts "\t Finished create group node import (no progress will be shown)..." if options[:verbose]
+    
+    puts "Starting create revision import (no progress will be shown)..." if options[:verbose]
+    Revision.rebuild
+    puts "\t Finished create revision import (no progress will be shown)..." if options[:verbose]
+    
+    puts "Starting create aae node import (no progress will be shown)..." if options[:verbose]
+    AaeNode.rebuild
+    puts "\t Finished create aae node import (no progress will be shown)..." if options[:verbose]
+    
+    puts "Starting create workflow import (no progress will be shown)..." if options[:verbose]
+    WorkflowEvent.rebuild
+    puts "\t Finished create workflow import (no progress will be shown)..." if options[:verbose] 
+  end
+  
     
 end
 
