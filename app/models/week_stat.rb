@@ -73,7 +73,46 @@ class WeekStat < ActiveRecord::Base
     end
   
   end
-    
   
+  def self.mass_create_or_update_for_statable(statable)
+    analytics_by_year_week = {}
+    statable.analytics.sums_by_year_week.each do |analytic|
+      yearweek_string = analytic.yearweek.to_s
+      analytics_by_year_week[yearweek_string] = {}
+      analytics_by_year_week[yearweek_string][:pageviews] = analytic.pageviews
+      analytics_by_year_week[yearweek_string][:unique_pageviews] = analytic.unique_pageviews
+      analytics_by_year_week[yearweek_string][:entrances] = analytic.entrances
+      analytics_by_year_week[yearweek_string][:time_on_page] = analytic.time_on_page
+      analytics_by_year_week[yearweek_string][:exits] = analytic.exits
+    end
+    
+    statable.eligible_year_weeks.each do |year,week|
+      create_options = {}
+      
+      yearweek_string = "#{year}" + "%02d" % week 
+      if(!analytics_by_year_week[yearweek_string].blank?)
+        analytic = analytics_by_year_week[yearweek_string]
+        create_options[:pageviews] = analytic[:pageviews]
+        create_options[:unique_pageviews] = analytic[:unique_pageviews]
+        create_options[:entrances] = analytic[:entrances]
+        create_options[:time_on_page] = analytic[:time_on_page]
+        create_options[:exits] = analytic[:exits]
+      else
+        create_options[:pageviews] = 0
+        create_options[:unique_pageviews] = 0
+        create_options[:entrances] = 0
+        create_options[:time_on_page] = 0
+        create_options[:exits] = 0
+      end
+
+      begin
+        self.create(create_options.merge({:statable => statable, :year => year, :week => week}))
+      rescue ActiveRecord::RecordNotUnique
+        if(weekstat = statable.week_stats.where(:year => year).where(:week => week).first)
+          weekstat.update_attributes(create_options)
+        end
+      end
+    end
+  end
 
 end
