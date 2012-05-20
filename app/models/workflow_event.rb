@@ -18,6 +18,7 @@ class WorkflowEvent < ActiveRecord::Base
   ACTIVATED = 8
   READY_FOR_COPYEDIT = 9
   
+  scope :reviewed, where("event IN (#{READY_FOR_REVIEW},#{REVIEWED},#{READY_FOR_PUBLISH},#{READY_FOR_COPYEDIT})")
   
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    

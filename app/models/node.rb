@@ -12,6 +12,10 @@ class Node < ActiveRecord::Base
   has_many :workflow_events
   has_many :aae_nodes
   
+  scope :articles, where(:node_type => 'article')
+  scope :faqs,     where(:node_type => 'faq')
+  
+  
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    
     CreateNode.find_in_batches do |group|
@@ -31,4 +35,31 @@ class Node < ActiveRecord::Base
     end
   end
   
+  
+  def self.published_since(date)
+    where("nodes.created_at >= ?",date).joins(:workflow_events).where("workflow_events.event = #{WorkflowEvent::PUBLISHED}").select("distinct(nodes.id)")
+  end
+  
+  def self.published_workflow_stats_since_migration
+    published_workflow_stats_since_date(EpochDate::CREATE_FINAL_WIKI_MIGRATION)
+  end
+  
+  def self.published_workflow_stats_since_date(date)
+    articlelist = self.articles.published_since(date)
+    article_workflow_count = {}
+    articlelist.each do |a|
+      article_workflow_count[a.id] = a.workflow_events.reviewed.count
+    end
+    article_has_workflow = article_workflow_count.select{|k,v| v > 0 }
+    
+    faqlist = self.faqs.published_since(date)
+    faq_workflow_count = {}
+    faqlist.each do |f|
+      faq_workflow_count[f.id] = f.workflow_events.reviewed.count
+    end
+    faq_has_workflow = faq_workflow_count.select{|k,v| v > 0 }
+    
+    {:articles => [articlelist.size, article_has_workflow.size], :faqs => [faqlist.size, faq_has_workflow.size]}
+  end    
+
 end
