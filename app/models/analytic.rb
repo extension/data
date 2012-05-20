@@ -16,6 +16,13 @@ class Analytic < ActiveRecord::Base
   
   scope :bydate, lambda{|date| where(:date => date)}
   
+  scope :sums_by_year_week, select("YEARWEEK(date) as yearweek, SUM(pageviews) as pageviews, SUM(entrances) as entrances, SUM(unique_pageviews) as unique_pageviews, SUM(time_on_page) as time_on_page, SUM(exits) AS exits").group("YEARWEEK(date)")
+  scope :sums_for_year_week, lambda{|year,week|
+    yearweek_string = "#{year}" + "%02d" % week 
+    sums_by_year_week.where("YEARWEEK(date) = '#{yearweek_string}'")
+  }
+  
+  
   URL_PAGE = 'page'
   URL_MIGRATED_FAQ = 'faq'
   URL_MIGRATED_EVENT = 'event'
@@ -186,6 +193,9 @@ class Analytic < ActiveRecord::Base
   end
   
   
+  def self.latest_date
+    self.maximum(:date)
+  end
   
   
   

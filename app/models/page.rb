@@ -10,6 +10,7 @@ class Page < ActiveRecord::Base
   has_many :page_taggings
   has_many :resource_tags, :through => :page_taggings
   belongs_to :node
+  has_many :week_stats, :as => :statable
 
   # index settings
   NOT_INDEXED = 0
@@ -23,6 +24,23 @@ class Page < ActiveRecord::Base
   scope :news, :conditions => {:datatype => 'News'}
   scope :faqs, :conditions => {:datatype => 'Faq'}
   scope :events, :conditions => {:datatype => 'Event'}
+  
+  def first_yearweek
+    start_date = self.created_at.to_date+1.week
+    cweek = start_date.cweek
+    cwyear = start_date.cwyear
+    [cwyear,cweek]
+  end
+  
+  def eligible_weeks
+    eligible_year_weeks.size
+  end
+  
+  def eligible_year_weeks
+    start_date = self.created_at.to_date + 1.week
+    WeekStat.year_weeks_from_date(start_date)
+  end
+  
         
   def self.find_by_title_url(url)
    return nil unless url

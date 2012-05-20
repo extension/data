@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120518203056) do
+ActiveRecord::Schema.define(:version => 20120519202200) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -158,6 +158,22 @@ ActiveRecord::Schema.define(:version => 20120518203056) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "week_stats", :force => true do |t|
+    t.integer  "statable_id"
+    t.string   "statable_type"
+    t.integer  "year",             :default => 0
+    t.integer  "week",             :default => 0
+    t.integer  "pageviews"
+    t.integer  "unique_pageviews"
+    t.integer  "entrances"
+    t.integer  "time_on_page"
+    t.integer  "exits"
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+  end
+
+  add_index "week_stats", ["statable_id", "statable_type", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "workflow_events", :force => true do |t|
     t.integer  "node_id"
