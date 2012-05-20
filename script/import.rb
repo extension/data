@@ -120,9 +120,7 @@ class GAImporter < Thor
     end_date = (Date.today - 1)
     start_date.upto(end_date) do |date|
       get_analytics_for_date(date)      
-      if(options[:associate])
-        associate_analytics_for_date(date)
-      end
+      associate_analytics_for_date(date)
     end
   end
   
