@@ -27,7 +27,7 @@ class Page < ActiveRecord::Base
   
   def self.earliest_yearweek
     if(@yearweek.blank?)
-      earliest_date = self.minimum(created_at).to_date
+      earliest_date = self.minimum(:created_at).to_date
       @yearweek = [earliest_date.cwyear,earliest_date.cweek]
     end
     @yearweek
