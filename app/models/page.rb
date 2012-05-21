@@ -11,6 +11,7 @@ class Page < ActiveRecord::Base
   has_many :resource_tags, :through => :page_taggings
   belongs_to :node
   has_many :week_stats
+  has_one :page_total
 
   # index settings
   NOT_INDEXED = 0

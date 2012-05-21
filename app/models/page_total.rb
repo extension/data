@@ -7,7 +7,7 @@
 
 class PageTotal < ActiveRecord::Base
   attr_accessible :page_id, :eligible_weeks, :pageviews, :unique_pageviews, :year, :week, :entrances, :time_on_page, :exits
-  
+  belongs_to :page
 
   def self.rebuild
     select_statement = <<-END
