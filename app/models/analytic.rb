@@ -187,7 +187,7 @@ class Analytic < ActiveRecord::Base
   
   
   def self.latest_date
-    self.maximum(:date)
+    @latest_date ||= self.maximum(:date)
   end
   
   
