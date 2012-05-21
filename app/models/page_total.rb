@@ -20,8 +20,12 @@ class PageTotal < ActiveRecord::Base
     END
     
     (maxyear,maxweek) = WeekStat.max_yearweek    
-    yearweek_string = "#{maxyear}" + "%02d" % maxweek 
-    week_stats = WeekStat.select(select_statement).where("yearweek <= #{yearweek_string}").group("page_id")
+    yearweek_string = "#{maxyear}" + "%02d" % maxweek
+    
+    (minyear,minweek) = Page.earliest_yearweek    
+    min_yearweek_string = "#{minyear}" + "%02d" % minweek
+       
+    week_stats = WeekStat.select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("page_id")
 
     week_stats_by_page = {}
     week_stats.each do |ws|
