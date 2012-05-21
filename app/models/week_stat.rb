@@ -102,6 +102,9 @@ class WeekStat < ActiveRecord::Base
   end
   
   def self.mass_insert_from_analytics
+    # don't insert records earlier than first yearweek
+    (e_year,e_week) = Page.earliest_yearweek
+    earliest_yearweek_string = "#{e_year}" + "%02d" % e_week   
     insert_columns = ['page_id','yearweek','year','week','pageviews','entrances','unique_pageviews','time_on_page','exits','created_at','updated_at']
     select_statement = <<-END
     page_id,
@@ -116,7 +119,7 @@ class WeekStat < ActiveRecord::Base
     NOW() as created_at,
     NOW() as updated_at
     END
-    where_clause = "page_id IS NOT NULL"
+    where_clause = "YEARWEEK(date) >= #{earliest_yearweek_string} AND page_id IS NOT NULL"
     group_by = "page_id,YEARWEEK(date)"
     sql_statement = "INSERT INTO #{self.table_name} (#{insert_columns.join(', ')}) SELECT #{select_statement} FROM #{Analytic.table_name} WHERE #{where_clause} GROUP BY #{group_by}"
     self.connection.execute(sql_statement)

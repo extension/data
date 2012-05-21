@@ -25,6 +25,14 @@ class Page < ActiveRecord::Base
   scope :faqs, :conditions => {:datatype => 'Faq'}
   scope :events, :conditions => {:datatype => 'Event'}
   
+  def self.earliest_yearweek
+    if(@yearweek.blank?)
+      earliest_date = self.minimum(created_at).to_date
+      @yearweek = [earliest_date.cwyear,earliest_date.cweek]
+    end
+    @yearweek
+  end      
+      
   def first_yearweek
     start_date = self.created_at.to_date+1.week
     cweek = start_date.cweek

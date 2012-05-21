@@ -96,14 +96,14 @@ ActiveRecord::Schema.define(:version => 20120521023210) do
 
   create_table "page_totals", :force => true do |t|
     t.integer  "page_id"
-    t.integer  "eligible_weeks",   :default => 0
+    t.float    "eligible_weeks",   :default => 0.0
     t.integer  "pageviews"
     t.integer  "unique_pageviews"
     t.integer  "entrances"
     t.integer  "time_on_page"
     t.integer  "exits"
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.datetime "created_at",                        :null => false
+    t.datetime "updated_at",                        :null => false
   end
 
   add_index "page_totals", ["page_id"], :name => "page_ndx", :unique => true
