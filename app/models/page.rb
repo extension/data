@@ -40,8 +40,12 @@ class Page < ActiveRecord::Base
     [cwyear,cweek]
   end
   
-  def eligible_weeks
-    eligible_year_weeks.size
+  def eligible_weeks(fractional = false)
+    if(fractional)
+      eligible_year_weeks.size + ((7-self.created_at.to_date.cwday) / 7)
+    else
+      eligible_year_weeks.size
+    end
   end
   
   def eligible_year_weeks

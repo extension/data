@@ -38,7 +38,7 @@ class PageTotal < ActiveRecord::Base
     end
 
     Page.find_each do |page|
-      create_options = {:eligible_weeks => page.eligible_weeks}
+      create_options = {:eligible_weeks => page.eligible_weeks(true)}
       if(week_stats_by_page[page.id])
         week_stat = week_stats_by_page[page.id]
         create_options[:pageviews] = week_stat[:pageviews]
