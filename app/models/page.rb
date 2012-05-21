@@ -10,7 +10,7 @@ class Page < ActiveRecord::Base
   has_many :page_taggings
   has_many :resource_tags, :through => :page_taggings
   belongs_to :node
-  has_many :week_stats, :as => :statable
+  has_many :week_stats
 
   # index settings
   NOT_INDEXED = 0

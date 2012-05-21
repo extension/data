@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120519202200) do
+ActiveRecord::Schema.define(:version => 20120521023210) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -94,6 +94,20 @@ ActiveRecord::Schema.define(:version => 20120519202200) do
 
   add_index "page_taggings", ["page_id", "resource_tag_id"], :name => "pt_ndx"
 
+  create_table "page_totals", :force => true do |t|
+    t.integer  "page_id"
+    t.integer  "eligible_weeks",   :default => 0
+    t.integer  "pageviews"
+    t.integer  "unique_pageviews"
+    t.integer  "entrances"
+    t.integer  "time_on_page"
+    t.integer  "exits"
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+  end
+
+  add_index "page_totals", ["page_id"], :name => "page_ndx", :unique => true
+
   create_table "pages", :force => true do |t|
     t.integer  "migrated_id"
     t.string   "datatype"
@@ -160,8 +174,8 @@ ActiveRecord::Schema.define(:version => 20120519202200) do
   end
 
   create_table "week_stats", :force => true do |t|
-    t.integer  "statable_id"
-    t.string   "statable_type"
+    t.integer  "page_id"
+    t.integer  "yearweek"
     t.integer  "year",             :default => 0
     t.integer  "week",             :default => 0
     t.integer  "pageviews"
@@ -173,7 +187,23 @@ ActiveRecord::Schema.define(:version => 20120519202200) do
     t.datetime "updated_at",                      :null => false
   end
 
-  add_index "week_stats", ["statable_id", "statable_type", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "week_stats", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
+
+  create_table "week_totals", :force => true do |t|
+    t.integer  "resource_tag_id"
+    t.integer  "year",             :default => 0
+    t.integer  "week",             :default => 0
+    t.integer  "pages",            :default => 0
+    t.integer  "pageviews"
+    t.integer  "unique_pageviews"
+    t.integer  "entrances"
+    t.integer  "time_on_page"
+    t.integer  "exits"
+    t.datetime "created_at",                      :null => false
+    t.datetime "updated_at",                      :null => false
+  end
+
+  add_index "week_totals", ["resource_tag_id", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "workflow_events", :force => true do |t|
     t.integer  "node_id"
