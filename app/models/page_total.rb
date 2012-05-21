@@ -9,6 +9,7 @@ class PageTotal < ActiveRecord::Base
   attr_accessible :page_id, :eligible_weeks, :pageviews, :unique_pageviews, :year, :week, :entrances, :time_on_page, :exits
   belongs_to :page
 
+
   def self.rebuild
     select_statement = <<-END
     page_id,
@@ -38,7 +39,12 @@ class PageTotal < ActiveRecord::Base
     end
 
     Page.find_each do |page|
-      create_options = {:eligible_weeks => page.eligible_weeks(true)}
+      eligible_weeks = page.eligible_weeks(true)
+      # adjust for weeks > 223 since we don't include the first fractional week of data due to yearweek >= #{min_yearweek_string}
+      if(eligible_weeks > 223)
+        eligible_weeks = 223
+      end
+      create_options = {:eligible_weeks => eligible_weeks}
       if(week_stats_by_page[page.id])
         week_stat = week_stats_by_page[page.id]
         create_options[:pageviews] = week_stat[:pageviews]
