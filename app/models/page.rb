@@ -25,6 +25,8 @@ class Page < ActiveRecord::Base
   scope :news, :conditions => {:datatype => 'News'}
   scope :faqs, :conditions => {:datatype => 'Faq'}
   scope :events, :conditions => {:datatype => 'Event'}
+  scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
+  scope :from_create, where(:source => 'create')
   
   def self.earliest_yearweek
     if(@yearweek.blank?)

@@ -36,7 +36,7 @@ class Node < ActiveRecord::Base
   end
   
   
-  def self.published_since(date)
+  def self.created_and_published_since(date)
     where("nodes.created_at >= ?",date).joins(:workflow_events).where("workflow_events.event = #{WorkflowEvent::PUBLISHED}").select("distinct(nodes.id)")
   end
   
@@ -45,14 +45,14 @@ class Node < ActiveRecord::Base
   end
   
   def self.published_workflow_stats_since_date(date)
-    articlelist = self.articles.published_since(date)
+    articlelist = self.articles.created_and_published_since(date)
     article_workflow_count = {}
     articlelist.each do |a|
       article_workflow_count[a.id] = a.workflow_events.reviewed.count
     end
     article_has_workflow = article_workflow_count.select{|k,v| v > 0 }
     
-    faqlist = self.faqs.published_since(date)
+    faqlist = self.faqs.created_and_published_since(date)
     faq_workflow_count = {}
     faqlist.each do |f|
       faq_workflow_count[f.id] = f.workflow_events.reviewed.count
