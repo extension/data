@@ -106,7 +106,7 @@ class Page < ActiveRecord::Base
   
   def self.pagecount_for_yearweek(year,week)
     yearweek_string = "#{year}" + "%02d" % week
-    Page.where("YEARWEEK(created_at) <= ?",yearweek_string).count
+    Page.where("YEARWEEK(created_at,3) <= ?",yearweek_string).count
   end
 
   

@@ -72,7 +72,7 @@ class WeekStat < ActiveRecord::Base
   
   def self.mass_create_or_update_for_pages(year,week)
     select_statement = <<-END
-    page_id,YEARWEEK(date) as yearweek, 
+    page_id,YEARWEEK(date,3) as yearweek, 
     SUM(pageviews) as pageviews, 
     SUM(entrances) as entrances, 
     SUM(unique_pageviews) as unique_pageviews, 
@@ -81,7 +81,7 @@ class WeekStat < ActiveRecord::Base
     END
         
     yearweek_string = "#{year}" + "%02d" % week 
-    analytics = Analytic.select(select_statement).where('page_id IS NOT NULL').where("YEARWEEK(date) = '#{yearweek_string}'").group("page_id,YEARWEEK(date)")
+    analytics = Analytic.select(select_statement).where('page_id IS NOT NULL').where("YEARWEEK(date,3) = '#{yearweek_string}'").group("page_id,YEARWEEK(date,3)")
 
     analytics.each do |analytic|
       create_options = {}
@@ -109,9 +109,9 @@ class WeekStat < ActiveRecord::Base
     insert_columns = ['page_id','yearweek','year','week','pageviews','entrances','unique_pageviews','time_on_page','exits','created_at','updated_at']
     select_statement = <<-END
     page_id,
-    YEARWEEK(date) as yearweek, 
-    substring(YEARWEEK(date),1,4) as year, 
-    substring(YEARWEEK(date),5,2) as week,
+    YEARWEEK(date,3) as yearweek, 
+    substring(YEARWEEK(date,3),1,4) as year, 
+    substring(YEARWEEK(date,3),5,2) as week,
     SUM(pageviews) as pageviews, 
     SUM(entrances) as entrances, 
     SUM(unique_pageviews) as unique_pageviews, 
@@ -120,8 +120,8 @@ class WeekStat < ActiveRecord::Base
     NOW() as created_at,
     NOW() as updated_at
     END
-    where_clause = "YEARWEEK(date) >= #{earliest_yearweek_string} AND page_id IS NOT NULL"
-    group_by = "page_id,YEARWEEK(date)"
+    where_clause = "YEARWEEK(date,3) >= #{earliest_yearweek_string} AND page_id IS NOT NULL"
+    group_by = "page_id,YEARWEEK(date,3)"
     sql_statement = "INSERT INTO #{self.table_name} (#{insert_columns.join(', ')}) SELECT #{select_statement} FROM #{Analytic.table_name} WHERE #{where_clause} GROUP BY #{group_by}"
     self.connection.execute(sql_statement)
   end
