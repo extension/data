@@ -8,8 +8,7 @@
 class WeekStat < ActiveRecord::Base
   belongs_to :page
   attr_accessible :page_id, :yearweek, :pageviews, :unique_pageviews, :year, :week, :entrances, :time_on_page, :exits
-  
-  
+    
   def self.date_pair_for_year_week(year,week)
     # no exception catching, going to let it blow up if year,week is invalid
     [Date.commercial(year,week,1),Date.commercial(year,week,7)]
@@ -147,6 +146,30 @@ class WeekStat < ActiveRecord::Base
     
     with_scope do
       select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("year,week")
+    end
+  end
+  
+
+  def self.sums_by_yearweek_by_datatype
+    select_statement = <<-END
+    pages.datatype as datatype,
+    year,
+    week,
+    SUM(pageviews) as pageviews, 
+    SUM(entrances) as entrances, 
+    SUM(unique_pageviews) as unique_pageviews, 
+    SUM(time_on_page) as time_on_page, 
+    SUM(exits) AS exits
+    END
+    
+    (maxyear,maxweek) = self.max_yearweek    
+    yearweek_string = "#{maxyear}" + "%02d" % maxweek
+    
+    (minyear,minweek) = Page.earliest_yearweek    
+    min_yearweek_string = "#{minyear}" + "%02d" % minweek
+    
+    with_scope do
+      joins(:page).select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("pages.datatype,year,week")
     end
   end
 

@@ -19,14 +19,15 @@ class Page < ActiveRecord::Base
   NOT_GOOGLE_INDEXED = 2
 
 
-  scope :not_ignored, :conditions =>["indexed != ?",NOT_INDEXED]  
-  scope :indexed, :conditions => {:indexed => INDEXED}
-  scope :articles, :conditions => {:datatype => 'Article'}
-  scope :news, :conditions => {:datatype => 'News'}
-  scope :faqs, :conditions => {:datatype => 'Faq'}
-  scope :events, :conditions => {:datatype => 'Event'}
+  scope :not_ignored, where("indexed != ?",NOT_INDEXED )
+  scope :indexed, where(:indexed => INDEXED)
+  scope :articles, where(:datatype => 'Article')
+  scope :news, where(:datatype => 'News')
+  scope :faqs, where(:datatype => 'Faq')
+  scope :events, where(:datatype => 'Event')
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
+  scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
   
   def self.earliest_yearweek
     if(@yearweek.blank?)
@@ -106,7 +107,13 @@ class Page < ActiveRecord::Base
   
   def self.pagecount_for_yearweek(year,week)
     yearweek_string = "#{year}" + "%02d" % week
-    Page.where("YEARWEEK(created_at,3) <= ?",yearweek_string).count
+    with_scope do
+      self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek_string).count
+    end
+  end
+  
+  def self.datatypes
+    self.group(:datatype).pluck(:datatype)
   end
 
   
