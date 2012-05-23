@@ -33,38 +33,61 @@ class GAImporter < Thor
     def darmok_rebuilds
       puts "Starting darmok page import (no progress will be shown)..." if options[:verbose]
       Page.rebuild
-      puts "\t Finished darmok page import (no progress will be shown)..." if options[:verbose]
+      puts "\t Finished darmok page import" if options[:verbose]
    
       puts "Starting darmok group import (no progress will be shown)..." if options[:verbose]
       Group.rebuild
-      puts "\t Finished darmok group import (no progress will be shown)..." if options[:verbose]
+      puts "\t Finished darmok group import" if options[:verbose]
     
       puts "Starting darmok user import (no progress will be shown)..." if options[:verbose]
       User.rebuild
-      puts "\t Finished darmok user import (no progress will be shown)..." if options[:verbose]
+      puts "\t Finished darmok user import" if options[:verbose]
     end
     
     def create_rebuilds
       puts "Starting create node import (no progress will be shown)..." if options[:verbose]
       Node.rebuild
-      puts "\t Finished create node import (no progress will be shown)..." if options[:verbose]
+      puts "\t Finished create node import" if options[:verbose]
     
       puts "Starting create group node import (no progress will be shown)..." if options[:verbose]
       NodeGroup.rebuild
-      puts "\t Finished create group node import (no progress will be shown)..." if options[:verbose]
+      puts "\t Finished create group node import" if options[:verbose]
     
       puts "Starting create revision import (no progress will be shown)..." if options[:verbose]
       Revision.rebuild
-      puts "\t Finished create revision import (no progress will be shown)..." if options[:verbose]
+      puts "\t Finished create revision import" if options[:verbose]
     
       puts "Starting create aae node import (no progress will be shown)..." if options[:verbose]
       AaeNode.rebuild
-      puts "\t Finished create aae node import (no progress will be shown)..." if options[:verbose]
+      puts "\t Finished create aae node import" if options[:verbose]
     
       puts "Starting create workflow import (no progress will be shown)..." if options[:verbose]
       WorkflowEvent.rebuild
-      puts "\t Finished create workflow import (no progress will be shown)..." if options[:verbose] 
+      puts "\t Finished create workflow import" if options[:verbose] 
     end
+    
+    def internal_rebuilds
+      puts "Starting week stat rebuild (no progress will be shown)..." if options[:verbose]
+      WeekStat.mass_rebuild_from_analytics
+      puts "\t Finished week stat rebuild" if options[:verbose] 
+      
+      
+      puts "Starting page totals rebuild (no progress will be shown)..." if options[:verbose]
+      PageTotal.rebuild
+      puts "\t Finished page totals  rebuild" if options[:verbose] 
+      
+      puts "Starting week total rebuild (no progress will be shown)..." if options[:verbose]
+      WeekTotal.rebuild_all
+      puts "\t Finished week stat rebuild" if options[:verbose] 
+      
+      ResourceTag.all.each do |tag|
+        puts "Starting week total rebuild for tag: #{tag.name} (no progress will be shown)..." if options[:verbose]
+        WeekTotal.rebuild_for_tag(tag)
+        puts "\t Finished week total rebuild for tag: #{tag.name}" if options[:verbose] 
+      end
+      
+   end
+      
       
   end
   
@@ -105,7 +128,7 @@ class GAImporter < Thor
     load_rails(options[:environment])
     puts "Starting darmok page import (no progress will be shown)..." if options[:verbose]
     Page.rebuild
-    puts "\t Finished darmok page import (no progress will be shown)..." if options[:verbose]
+    puts "\t Finished darmok page import" if options[:verbose]
   end
     
   desc "all_the_things", "Import data items from Darmok, Create, and GA"
@@ -122,6 +145,9 @@ class GAImporter < Thor
       get_analytics_for_date(date)      
       associate_analytics_for_date(date)
     end
+    
+    # internal data
+    internal_rebuilds
   end
   
     
