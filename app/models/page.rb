@@ -104,4 +104,11 @@ class Page < ActiveRecord::Base
     PageTagging.rebuild
   end
   
+  def self.pagecount_for_yearweek(year,week)
+    yearweek_string = "#{year}" + "%02d" % week
+    Page.where("YEARWEEK(created_at) <= ?",yearweek_string).count
+  end
+
+  
+  
 end

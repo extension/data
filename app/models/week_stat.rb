@@ -101,7 +101,8 @@ class WeekStat < ActiveRecord::Base
     end
   end
   
-  def self.mass_insert_from_analytics
+  def self.mass_rebuild_from_analytics
+    self.connection.execute("truncate table #{self.table_name};")
     # don't insert records earlier than first yearweek
     (e_year,e_week) = Page.earliest_yearweek
     earliest_yearweek_string = "#{e_year}" + "%02d" % e_week   
@@ -125,7 +126,30 @@ class WeekStat < ActiveRecord::Base
     self.connection.execute(sql_statement)
   end
     
+
+
+  def self.sums_by_yearweek
+    select_statement = <<-END
+    year,
+    week,
+    SUM(pageviews) as pageviews, 
+    SUM(entrances) as entrances, 
+    SUM(unique_pageviews) as unique_pageviews, 
+    SUM(time_on_page) as time_on_page, 
+    SUM(exits) AS exits
+    END
     
+    (maxyear,maxweek) = self.max_yearweek    
+    yearweek_string = "#{maxyear}" + "%02d" % maxweek
+    
+    (minyear,minweek) = Page.earliest_yearweek    
+    min_yearweek_string = "#{minyear}" + "%02d" % minweek
+    
+    with_scope do
+      select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("year,week")
+    end
+  end
+
     
 
 end
