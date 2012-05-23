@@ -51,9 +51,6 @@ gem "garb" # garb for now until it breaks June 2012
 # command line tools
 gem 'thor'
 
-# csv output/import
-gem 'fastercsv'
-
 # campfire integration
 gem "tinder", "~> 1.8.0"
 

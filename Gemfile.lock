@@ -70,7 +70,6 @@ GEM
       rack (~> 1.1)
     faraday_middleware (0.7.0)
       faraday (~> 0.7.3)
-    fastercsv (1.5.4)
     garb (0.9.1)
       activesupport (>= 2.2.0)
       crack (>= 0.1.6)
@@ -200,7 +199,6 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   daemons
   delayed_job_active_record
-  fastercsv
   garb
   jquery-rails
   kaminari
