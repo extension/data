@@ -8,7 +8,14 @@
 class WeekStat < ActiveRecord::Base
   belongs_to :page
   attr_accessible :page_id, :yearweek, :pageviews, :unique_pageviews, :year, :week, :entrances, :time_on_page, :exits
-    
+  
+  
+  def self.previous_yearweek(year,week)
+    (sow,eow) = self.date_pair_for_year_week(year,week)
+    previous = sow - 1.day
+    [previous.cwyear,previous.cweek]
+  end
+  
   def self.date_pair_for_year_week(year,week)
     # no exception catching, going to let it blow up if year,week is invalid
     [Date.commercial(year,week,1),Date.commercial(year,week,7)]

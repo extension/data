@@ -11,6 +11,7 @@ class Page < ActiveRecord::Base
   has_many :resource_tags, :through => :page_taggings
   belongs_to :node
   has_many :week_stats
+  has_many :week_diffs
   has_one :page_total
 
   # index settings
@@ -46,13 +47,13 @@ class Page < ActiveRecord::Base
   
   def eligible_weeks(fractional = false)
     if(fractional)
-      eligible_year_weeks.size + ((7-self.created_at.to_date.cwday) / 7)
+      eligible_yearweeks.size + ((7-self.created_at.to_date.cwday) / 7)
     else
-      eligible_year_weeks.size
+      eligible_yearweeks.size
     end
   end
   
-  def eligible_year_weeks
+  def eligible_yearweeks
     start_date = self.created_at.to_date + 1.week
     WeekStat.year_weeks_from_date(start_date)
   end

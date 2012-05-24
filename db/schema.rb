@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120523125854) do
+ActiveRecord::Schema.define(:version => 20120524020558) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -172,6 +172,20 @@ ActiveRecord::Schema.define(:version => 20120523125854) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "week_diffs", :force => true do |t|
+    t.integer  "page_id"
+    t.integer  "year",           :default => 0
+    t.integer  "week",           :default => 0
+    t.integer  "previous_upv"
+    t.integer  "current_upv"
+    t.float    "pct_difference"
+    t.float    "pct_change"
+    t.datetime "created_at",                    :null => false
+    t.datetime "updated_at",                    :null => false
+  end
+
+  add_index "week_diffs", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "week_stats", :force => true do |t|
     t.integer  "page_id"
