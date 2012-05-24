@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120524020558) do
+ActiveRecord::Schema.define(:version => 20120524180342) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -154,6 +154,22 @@ ActiveRecord::Schema.define(:version => 20120524020558) do
 
   add_index "revisions", ["node_id"], :name => "node_ndx"
   add_index "revisions", ["user_id"], :name => "user_ndx"
+
+  create_table "total_diffs", :force => true do |t|
+    t.integer  "resource_tag_id"
+    t.string   "datatype",                       :null => false
+    t.integer  "year",            :default => 0
+    t.integer  "week",            :default => 0
+    t.integer  "pages",           :default => 0
+    t.integer  "previous_upv"
+    t.integer  "current_upv"
+    t.float    "pct_difference"
+    t.float    "pct_change"
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+  end
+
+  add_index "total_diffs", ["resource_tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "users", :force => true do |t|
     t.string   "idstring",           :limit => 80,                    :null => false

@@ -180,6 +180,26 @@ class WeekStat < ActiveRecord::Base
     end
   end
 
+
+  def self.sum_upv_by_yearweek_by_datatype
+    select_statement = <<-END
+    pages.datatype as datatype,
+    year,
+    week,
+    SUM(unique_pageviews) as unique_pageviews
+    END
+    
+    (maxyear,maxweek) = self.max_yearweek    
+    yearweek_string = "#{maxyear}" + "%02d" % maxweek
+    
+    (minyear,minweek) = Page.earliest_yearweek    
+    min_yearweek_string = "#{minyear}" + "%02d" % minweek
+    
+    with_scope do
+      joins(:page).select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("pages.datatype,year,week")
+    end
+  end
+
     
 
 end
