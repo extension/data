@@ -67,5 +67,15 @@ class PageTotal < ActiveRecord::Base
       end
     end
   end
+  
+  def self.percentile(percentile)
+    with_scope do
+      averages = self.where("#{self.table_name}.eligible_weeks > 0").pluck("(#{self.table_name}.unique_pageviews/#{self.table_name}.eligible_weeks)")
+      averages.sort[(percentile * averages.length).ceil - 1]
+    end
+  end
+  
+  
+  
 
 end
