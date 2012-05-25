@@ -41,39 +41,74 @@ class TotalDiff < ActiveRecord::Base
     yearweeks = WeekStat.year_weeks_from_date(start_date)
     datatypes.each do |datatype|
       yearweeks.each do |year,week|
+        
         key_string = "#{year}-#{week}-#{datatype}"
         (previous_year,previous_week) = WeekStat.previous_yearweek(year,week)
         previous_key_string = "#{previous_year}-#{previous_week}-#{datatype}"
     
-        previous_upv = (week_stats_by_yearweek[previous_key_string] ? week_stats_by_yearweek[previous_key_string] : 0)
+        pages = (tag.nil?) ? Page.by_datatype(datatype).pagecount_for_yearweek(year,week) : tag.pages.by_datatype(datatype).pagecount_for_yearweek(year,week)
+        previous_pages = (tag.nil?) ? Page.by_datatype(datatype).pagecount_for_yearweek(previous_year,previous_week) : tag.pages.by_datatype(datatype).pagecount_for_yearweek(previous_year,previous_week)
+    
+        
+        previous_upv = (week_stats_by_yearweek[previous_key_string] ? week_stats_by_yearweek[previous_key_string] : 0)        
         current_upv = (week_stats_by_yearweek[key_string] ? week_stats_by_yearweek[key_string] : 0)
+        
+        previous_avg_upv = (previous_pages == 0) ? 0 : (previous_upv / previous_pages)
+        current_avg_upv = (pages == 0) ? 0 : (current_upv / pages)
       
         
         insert_list = []
         insert_list << tag_id
+        insert_list << ActiveRecord::Base.quote_value(datatype)
         insert_list << year
         insert_list << week
-        insert_list << ActiveRecord::Base.quote_value(datatype)
+        insert_list << Date.commercial(year,week,7)
+        insert_list << previous_pages
+        insert_list << pages
         insert_list << previous_upv
         insert_list << current_upv
+        # pct_upv_difference
         if((current_upv + previous_upv) == 0)
           insert_list << 0
         else
           insert_list << (current_upv - previous_upv) / ((current_upv + previous_upv) / 2)
         end
+        # pct_upv_change
         if(previous_upv == 0)
           insert_list << 'NULL'
         else
           insert_list << (current_upv - previous_upv) / previous_upv
         end
+        
+        insert_list << previous_avg_upv
+        insert_list << current_avg_upv
+        
+        
+        # pct_avg_upv_difference
+        if((current_avg_upv + previous_avg_upv) == 0)
+          insert_list << 0
+        else
+          
+          insert_list << (current_avg_upv - previous_avg_upv) / ((current_avg_upv + previous_avg_upv) / 2)
+        end
+        # pct_avg_upv_change
+        if(previous_avg_upv == 0)
+          insert_list << 'NULL'
+        else
+          insert_list << (current_avg_upv - previous_avg_upv) / previous_avg_upv
+        end
+            
+        
         insert_list << 'NOW()'
         insert_list << 'NOW()'
+                
         
         insert_values << "(#{insert_list.join(',')})"
       end # year-week
     end # datatypes    
     if(!insert_values.blank?)
-      insert_sql = "INSERT INTO #{self.table_name} (resource_tag_id,year,week,datatype,previous_upv,current_upv,pct_difference,pct_change,created_at,updated_at) VALUES #{insert_values.join(',')};"
+      columns = self.column_names.reject{|n| n == "id"}
+      insert_sql = "INSERT INTO #{self.table_name} (#{columns.join(',')}) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end      
   end

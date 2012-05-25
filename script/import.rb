@@ -76,25 +76,29 @@ class GAImporter < Thor
       PageTotal.rebuild
       puts "\t Finished page totals  rebuild" if options[:verbose] 
       
-      puts "Starting week total rebuild (no progress will be shown)..." if options[:verbose]
-      WeekTotal.rebuild_all
-      puts "\t Finished week total rebuild" if options[:verbose] 
+      puts "Starting week upv totals rebuild (no progress will be shown)..." if options[:verbose]
+      TotalDiff.rebuild_all
+      puts "\t Finished week upv totals rebuild" if options[:verbose] 
       
-      puts "Starting week total by datatype rebuild (no progress will be shown)..." if options[:verbose]
-      WeekTotal.rebuild_by_datatype
-      puts "\t Finished rebuild of week totals by datatype" if options[:verbose] 
-      
-      
-      
-      ResourceTag.all.each do |tag|
-        puts "Starting week total rebuild for tag: #{tag.name} (no progress will be shown)..." if options[:verbose]
-        WeekTotal.rebuild_all(:tag  => tag)
-        puts "\t Finished week total rebuild for tag: #{tag.name}" if options[:verbose] 
-      
-        puts "Starting week total rebuild for tag: #{tag.name} by datatype (no progress will be shown)..." if options[:verbose]
-        WeekTotal.rebuild_by_datatype(:tag  => tag)
-        puts "\t Finished week total rebuild for tag: #{tag.name} by datatype" if options[:verbose] 
-      end
+      # puts "Starting week total rebuild (no progress will be shown)..." if options[:verbose]
+      # WeekTotal.rebuild_all
+      # puts "\t Finished week total rebuild" if options[:verbose] 
+      # 
+      # puts "Starting week total by datatype rebuild (no progress will be shown)..." if options[:verbose]
+      # WeekTotal.rebuild_by_datatype
+      # puts "\t Finished rebuild of week totals by datatype" if options[:verbose] 
+      # 
+      # 
+      # 
+      # ResourceTag.all.each do |tag|
+      #   puts "Starting week total rebuild for tag: #{tag.name} (no progress will be shown)..." if options[:verbose]
+      #   WeekTotal.rebuild_all(:tag  => tag)
+      #   puts "\t Finished week total rebuild for tag: #{tag.name}" if options[:verbose] 
+      # 
+      #   puts "Starting week total rebuild for tag: #{tag.name} by datatype (no progress will be shown)..." if options[:verbose]
+      #   WeekTotal.rebuild_by_datatype(:tag  => tag)
+      #   puts "\t Finished week total rebuild for tag: #{tag.name} by datatype" if options[:verbose] 
+      # end
       
    end
       
