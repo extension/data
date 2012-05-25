@@ -62,7 +62,7 @@ class TotalDiff < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(datatype)
         insert_list << year
         insert_list << week
-        insert_list << Date.commercial(year,week,7)
+        insert_list << ActiveRecord::Base.quote_value(Date.commercial(year,week,7))
         insert_list << previous_pages
         insert_list << pages
         insert_list << previous_upv
