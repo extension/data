@@ -14,7 +14,10 @@ class Node < ActiveRecord::Base
   
   scope :articles, where(:node_type => 'article')
   scope :faqs,     where(:node_type => 'faq')
+  scope :news,     where(:node_type => 'news')
   
+  scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
+    
   
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    
@@ -35,31 +38,69 @@ class Node < ActiveRecord::Base
     end
   end
   
-  
-  def self.created_and_published_since(date)
-    where("nodes.created_at >= ?",date).joins(:workflow_events).where("workflow_events.event = #{WorkflowEvent::PUBLISHED}").select("distinct(nodes.id)")
+  def self.published_since(date)
+    joins(:workflow_events).where("workflow_events.event = #{WorkflowEvent::PUBLISHED}").where("workflow_events.created_at > ?",date).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
   end
+  
   
   def self.published_workflow_stats_since_migration
     published_workflow_stats_since_date(EpochDate::CREATE_FINAL_WIKI_MIGRATION)
   end
   
-  def self.published_workflow_stats_since_date(date)
-    articlelist = self.articles.created_and_published_since(date)
-    article_workflow_count = {}
-    articlelist.each do |a|
-      article_workflow_count[a.id] = a.workflow_events.reviewed.count
+  # def self.published_workflow_stats_since_date(date)
+  #   articlelist = self.articles.created_and_published_since(date)
+  #   article_workflow_count = {}
+  #   articlelist.each do |a|
+  #     article_workflow_count[a.id] = a.workflow_events.reviewed.count
+  #   end
+  #   article_has_workflow = article_workflow_count.select{|k,v| v > 0 }
+  #   
+  #   faqlist = self.faqs.created_and_published_since(date)
+  #   faq_workflow_count = {}
+  #   faqlist.each do |f|
+  #     faq_workflow_count[f.id] = f.workflow_events.reviewed.count
+  #   end
+  #   faq_has_workflow = faq_workflow_count.select{|k,v| v > 0 }
+  #   
+  #   {:articles => [articlelist.size, article_has_workflow.size], :faqs => [faqlist.size, faq_has_workflow.size]}
+  # end    
+  
+  
+  def self.published_workflow_stats_since_date(date,rawnodecounts=false)
+    nodelist = []
+    with_scope do
+      nodelist = self.published_since(date)
     end
-    article_has_workflow = article_workflow_count.select{|k,v| v > 0 }
-    
-    faqlist = self.faqs.created_and_published_since(date)
-    faq_workflow_count = {}
-    faqlist.each do |f|
-      faq_workflow_count[f.id] = f.workflow_events.reviewed.count
+    nodecounts = {}
+    nodelist.each do |node|
+      published_count = 0
+      reviewed_counts = []
+      reviews = 0
+      node.workflow_events.created_since(date).each do |wfe|
+        if(wfe.event == WorkflowEvent::PUBLISHED)
+          published_count += 1
+          reviewed_counts << reviews
+          reviews = 0
+        elsif(wfe.is_reviewed_event?)
+          reviews += 1
+        end
+      end
+      nodecounts[node.id] = {:published => published_count, :reviewed => reviewed_counts.select{|i| i> 0}.size}
     end
-    faq_has_workflow = faq_workflow_count.select{|k,v| v > 0 }
-    
-    {:articles => [articlelist.size, article_has_workflow.size], :faqs => [faqlist.size, faq_has_workflow.size]}
-  end    
+    if(rawnodecounts)
+      nodecounts
+    else
+      stats = {:total => 0, :reviewed => 0, :publish_count => 0, :review_count => 0}
+      nodecounts.each do |node_id,counts|
+        stats[:total] += 1
+        stats[:reviewed] += 1 if counts[:reviewed] > 0
+        stats[:publish_count] += counts[:published]
+        stats[:review_count] += counts[:reviewed]
+      end
+      stats
+    end
+  end
+  
+
 
 end

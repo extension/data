@@ -19,6 +19,8 @@ class WorkflowEvent < ActiveRecord::Base
   READY_FOR_COPYEDIT = 9
   
   scope :reviewed, where("event IN (#{READY_FOR_REVIEW},#{REVIEWED},#{READY_FOR_PUBLISH},#{READY_FOR_COPYEDIT})")
+  scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
+  
   
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    
@@ -39,6 +41,10 @@ class WorkflowEvent < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
+  end
+  
+  def is_reviewed_event?
+    [READY_FOR_REVIEW,REVIEWED,READY_FOR_PUBLISH,READY_FOR_COPYEDIT].include?(self.event)
   end
 	
 end	
