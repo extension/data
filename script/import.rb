@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'rubygems'
 require 'thor'
-require 'faster_csv'
+require 'benchmark'
 
 class GAImporter < Thor
   include Thor::Actions
@@ -18,88 +18,54 @@ class GAImporter < Thor
     end
         
     def associate_analytics_for_date(date)
-      Analytic.bydate(date).each do |analytic|
-        puts "Setting page data for analytic #{analytic.id} ..." if options[:verbose]
-        analytic.associate_with_page
+      benchmark = Benchmark.measure do      
+        Analytic.bydate(date).each do |analytic|
+          puts "Setting page data for analytic #{analytic.id} ..." if options[:verbose]
+          analytic.associate_with_page
+        end
       end
+      UpdateTime.log("AnalyticAssociate",benchmark.real,{:operation => 'associate',:date => date})
     end
     
     def get_analytics_for_date(date)
       puts "Getting GA data for #{date.to_s}-..." if options[:verbose]
-      records = Analytic.import_analytics({:segment => 'all', :date => date})
+      records = 0
+      benchmark = Benchmark.measure do      
+        records = Analytic.import_analytics({:segment => 'all', :date => date})
+      end
+      UpdateTime.log("AnalyticImport",benchmark.real,{:operation => 'import',:date => date, :records => records})
       puts "\t saved: #{records}" if options[:verbose]
     end
     
-    def darmok_rebuilds
-      puts "Starting darmok page import (no progress will be shown)..." if options[:verbose]
-      Page.rebuild
-      puts "\t Finished darmok page import" if options[:verbose]
-   
-      puts "Starting darmok group import (no progress will be shown)..." if options[:verbose]
-      Group.rebuild
-      puts "\t Finished darmok group import" if options[:verbose]
-    
-      puts "Starting darmok user import (no progress will be shown)..." if options[:verbose]
-      User.rebuild
-      puts "\t Finished darmok user import" if options[:verbose]
+    def run_and_log(object,method,output)
+      puts "Starting #{output}..." if options[:verbose]
+      
+      benchmark = Benchmark.measure do
+        object.send(method)
+      end
+      UpdateTime.log(object.name,benchmark.real)
+      
+      puts "\t Finished #{output}" if options[:verbose]
+    end
+      
+    def darmok_rebuilds    
+      run_and_log(Page,'rebuild','darmok page import')
+      run_and_log(Group,'rebuild','darmok group import')
+      run_and_log(User,'rebuild','darmok user import')
     end
     
     def create_rebuilds
-      puts "Starting create node import (no progress will be shown)..." if options[:verbose]
-      Node.rebuild
-      puts "\t Finished create node import" if options[:verbose]
-    
-      puts "Starting create group node import (no progress will be shown)..." if options[:verbose]
-      NodeGroup.rebuild
-      puts "\t Finished create group node import" if options[:verbose]
-    
-      puts "Starting create revision import (no progress will be shown)..." if options[:verbose]
-      Revision.rebuild
-      puts "\t Finished create revision import" if options[:verbose]
-    
-      puts "Starting create aae node import (no progress will be shown)..." if options[:verbose]
-      AaeNode.rebuild
-      puts "\t Finished create aae node import" if options[:verbose]
-    
-      puts "Starting create workflow import (no progress will be shown)..." if options[:verbose]
-      WorkflowEvent.rebuild
-      puts "\t Finished create workflow import" if options[:verbose] 
+      run_and_log(Node,'rebuild','create node import')
+      run_and_log(NodeGroup,'rebuild','create group node import')
+      run_and_log(Revision,'rebuild','create revision import')
+      run_and_log(AaeNode,'rebuild','create aae node import')
+      run_and_log(WorkflowEvent,'rebuild','create workflow import')
     end
     
     def internal_rebuilds
-      puts "Starting week stat rebuild (no progress will be shown)..." if options[:verbose]
-      WeekStat.mass_rebuild_from_analytics
-      puts "\t Finished week stat rebuild" if options[:verbose] 
-      
-      
-      puts "Starting page totals rebuild (no progress will be shown)..." if options[:verbose]
-      PageTotal.rebuild
-      puts "\t Finished page totals  rebuild" if options[:verbose] 
-      
-      puts "Starting week upv totals rebuild (no progress will be shown)..." if options[:verbose]
-      TotalDiff.rebuild_all
-      puts "\t Finished week upv totals rebuild" if options[:verbose] 
-      
-      # puts "Starting week total rebuild (no progress will be shown)..." if options[:verbose]
-      # WeekTotal.rebuild_all
-      # puts "\t Finished week total rebuild" if options[:verbose] 
-      # 
-      # puts "Starting week total by datatype rebuild (no progress will be shown)..." if options[:verbose]
-      # WeekTotal.rebuild_by_datatype
-      # puts "\t Finished rebuild of week totals by datatype" if options[:verbose] 
-      # 
-      # 
-      # 
-      # ResourceTag.all.each do |tag|
-      #   puts "Starting week total rebuild for tag: #{tag.name} (no progress will be shown)..." if options[:verbose]
-      #   WeekTotal.rebuild_all(:tag  => tag)
-      #   puts "\t Finished week total rebuild for tag: #{tag.name}" if options[:verbose] 
-      # 
-      #   puts "Starting week total rebuild for tag: #{tag.name} by datatype (no progress will be shown)..." if options[:verbose]
-      #   WeekTotal.rebuild_by_datatype(:tag  => tag)
-      #   puts "\t Finished week total rebuild for tag: #{tag.name} by datatype" if options[:verbose] 
-      # end
-      
+      run_and_log(WeekStat,'mass_rebuild_from_analytics','week stat rebuild')
+      run_and_log(PageTotal,'rebuild','page totals rebuild')
+      run_and_log(TotalDiff,'rebuild_all','week upv totals rebuild')      
    end
       
       
