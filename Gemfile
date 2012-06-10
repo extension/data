@@ -61,4 +61,5 @@ group :development do
   # require the powder gem
   gem 'powder'
   gem 'net-http-spy'
+  gem 'pry'
 end
