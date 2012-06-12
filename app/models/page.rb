@@ -93,7 +93,7 @@ class Page < ActiveRecord::Base
         insert_list << links[:local]
         insert_list << links[:internal]
         insert_list << ActiveRecord::Base.quote_value(page.resource_tag_names.join(','))
-        if(page.source = 'create' and page.source_url =~ %r{/node/(\d+)})
+        if(page.source == 'create' and page.source_url =~ %r{/node/(\d+)})
           insert_list << $1.to_i
         else
           insert_list << 0
