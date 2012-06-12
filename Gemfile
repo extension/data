@@ -51,10 +51,6 @@ gem "garb" # garb for now until it breaks June 2012
 # command line tools
 gem 'thor'
 
-# moar advanced stats
-gem 'gsl', :git => 'git://github.com/30robots/rb-gsl.git'
-gem 'statsample-optimization', :require => 'statsample'
-
 # campfire integration
 gem "tinder", "~> 1.8.0"
 
@@ -66,4 +62,9 @@ group :development do
   gem 'powder'
   gem 'net-http-spy'
   gem 'pry'
+  
+  # moar advanced stats in dev only
+  gem 'gsl', :git => 'git://github.com/30robots/rb-gsl.git'
+  gem 'statsample-optimization', :require => 'statsample'
+  
 end
