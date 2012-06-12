@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120607214710) do
+ActiveRecord::Schema.define(:version => 20120612181755) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -81,9 +81,12 @@ ActiveRecord::Schema.define(:version => 20120607214710) do
     t.integer  "revision_id"
     t.string   "node_type"
     t.string   "title"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                     :null => false
+    t.datetime "updated_at",                     :null => false
+    t.boolean  "has_page",    :default => false
   end
+
+  add_index "nodes", ["has_page"], :name => "page_flag_ndx"
 
   create_table "page_taggings", :force => true do |t|
     t.integer  "page_id"

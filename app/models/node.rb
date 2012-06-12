@@ -36,6 +36,11 @@ class Node < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} (id,revision_id,node_type,title,created_at,updated_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
+    
+    # set page flag
+    update_sql = "UPDATE #{self.table_name},#{Page.table_name} SET #{self.table_name}.has_page = 1 WHERE #{self.table_name}.id = #{Page.table_name}.node_id and #{Page.table_name}.source = 'create'"
+    self.connection.execute(update_sql)
+    
   end
   
   def self.published_since(date)
