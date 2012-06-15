@@ -6,34 +6,25 @@
 #  see LICENSE file
 
 class PageTagging < ActiveRecord::Base
-  belongs_to :resource_tag
+  belongs_to :tag
   belongs_to :page
 
 
   def self.rebuild
     self.connection.execute('truncate table page_taggings;')
-    tagging_database = self.connection.instance_variable_get("@config")[:database]      
-    page_count = 0
-    insert_values = []
-    now = Time.now.utc.to_s(:db)
-    resource_tags = {}
-    ResourceTag.all.map{|tag| resource_tags[tag.name] = tag.id}
-    Page.all.each do |page|
-      page_count += 1
-      if(!page.resource_tag_names.blank?)
-        tagarray = page.resource_tag_names.split(',')
-        tagarray.each do |tagname|
-          if(resource_tags[tagname])
-            resource_tag_id = resource_tags[tagname]
-          else
-            resource_tag_id = ResourceTag.find_or_create_by_name(tagname).id
-          end
-          insert_values << "(#{page.id},#{resource_tag_id},#{ActiveRecord::Base.quote_value(now)},#{ActiveRecord::Base.quote_value(now)})"
-        end
+    DarmokTagging.page_content.find_in_batches do |group|
+      insert_values = []
+      group.each do |tagging|
+        insert_list = []
+        insert_list << tagging.taggable_id
+        insert_list << tagging.tag_id
+        insert_list << ActiveRecord::Base.quote_value(tagging.created_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(tagging.updated_at.to_s(:db))
+        insert_values << "(#{insert_list.join(',')})"
       end
+      insert_sql = "INSERT INTO #{self.table_name} (page_id,tag_id,created_at,updated_at) VALUES #{insert_values.join(',')};"
+      self.connection.execute(insert_sql)
     end
-    insert_sql = "INSERT INTO page_taggings (page_id,resource_tag_id,created_at,updated_at) VALUES #{insert_values.join(',')}"
-    self.connection.execute(insert_sql)
   end
   
 end

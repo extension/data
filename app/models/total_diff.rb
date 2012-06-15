@@ -6,13 +6,13 @@
 #  see LICENSE file
 
 class TotalDiff < ActiveRecord::Base
-  belongs_to :resource_tag
+  belongs_to :tag
   
   
   def self.rebuild_all
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
     self.rebuild_by_datatype
-    ResourceTag.all.each do |tag|
+    Tag.grouptags.all.each do |tag|
       self.rebuild_by_datatype(:tag => tag)
     end
   end

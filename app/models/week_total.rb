@@ -6,8 +6,8 @@
 #  see LICENSE file
 
 class WeekTotal < ActiveRecord::Base
-  belongs_to :resource_tag
-  attr_accessible :resource_tag, :resource_tag_id, :pages, :pageviews, :unique_pageviews, :datatype, :year, :week, :entrances, :time_on_page, :exits
+  belongs_to :tag
+  attr_accessible :tag, :tag_id, :pages, :pageviews, :unique_pageviews, :datatype, :year, :week, :entrances, :time_on_page, :exits
 
   
   def self.rebuild_all(options = {})
@@ -56,9 +56,9 @@ class WeekTotal < ActiveRecord::Base
       end
       
       begin
-        self.create(create_options.merge({:resource_tag_id => tag_id, :year => year, :week => week, :datatype => 'all'}))
+        self.create(create_options.merge({:tag_id => tag_id, :year => year, :week => week, :datatype => 'all'}))
       rescue ActiveRecord::RecordNotUnique
-        if(weektotal = WeekTotal.where(:resource_tag_id => tag_id).where(:datatype => 'all').where(:year => year).where(:week => week).first)
+        if(weektotal = WeekTotal.where(:tag_id => tag_id).where(:datatype => 'all').where(:year => year).where(:week => week).first)
           weektotal.update_attributes(create_options)
         end
       end
@@ -113,9 +113,9 @@ class WeekTotal < ActiveRecord::Base
         end
       
         begin
-          self.create(create_options.merge({:resource_tag_id => tag_id, :year => year, :week => week, :datatype => datatype}))
+          self.create(create_options.merge({:tag_id => tag_id, :year => year, :week => week, :datatype => datatype}))
         rescue ActiveRecord::RecordNotUnique
-          if(weektotal = WeekTotal.where(:resource_tag_id => tag_id).where(:datatype => datatype).where(:year => year).where(:week => week).first)
+          if(weektotal = WeekTotal.where(:tag_id => tag_id).where(:datatype => datatype).where(:year => year).where(:week => week).first)
             weektotal.update_attributes(create_options)
           end
         end

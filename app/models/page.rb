@@ -8,7 +8,7 @@
 class Page < ActiveRecord::Base
   has_many :analytics
   has_many :page_taggings
-  has_many :resource_tags, :through => :page_taggings
+  has_many :tags, :through => :page_taggings
   belongs_to :node
   has_many :week_stats
   has_many :week_diffs
@@ -64,8 +64,7 @@ class Page < ActiveRecord::Base
    real_title = url.gsub(/_/, ' ')
    self.find_by_title(real_title)
   end
-  
-  
+
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    
     DarmokPage.find_in_batches do |group|
@@ -92,7 +91,6 @@ class Page < ActiveRecord::Base
         insert_list << links[:external]
         insert_list << links[:local]
         insert_list << links[:internal]
-        insert_list << ActiveRecord::Base.quote_value(page.resource_tag_names.join(','))
         if(page.source == 'create' and page.source_url =~ %r{/node/(\d+)})
           insert_list << $1.to_i
         else
@@ -103,7 +101,6 @@ class Page < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
-    PageTagging.rebuild
   end
   
   def self.pagecount_for_yearweek(year,week)

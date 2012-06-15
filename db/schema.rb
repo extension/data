@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120612181755) do
+ActiveRecord::Schema.define(:version => 20120615171220) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -90,12 +90,12 @@ ActiveRecord::Schema.define(:version => 20120612181755) do
 
   create_table "page_taggings", :force => true do |t|
     t.integer  "page_id"
-    t.integer  "resource_tag_id"
+    t.integer  "tag_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
-  add_index "page_taggings", ["page_id", "resource_tag_id"], :name => "pt_ndx"
+  add_index "page_taggings", ["page_id", "tag_id"], :name => "pt_ndx"
 
   create_table "page_totals", :force => true do |t|
     t.integer  "page_id"
@@ -115,22 +115,21 @@ ActiveRecord::Schema.define(:version => 20120612181755) do
     t.integer  "migrated_id"
     t.string   "datatype"
     t.text     "title"
-    t.string   "url_title",          :limit => 101
-    t.integer  "content_length",                    :default => 0
-    t.integer  "content_words",                     :default => 0
+    t.string   "url_title",         :limit => 101
+    t.integer  "content_length",                   :default => 0
+    t.integer  "content_words",                    :default => 0
     t.datetime "source_created_at"
     t.datetime "source_updated_at"
     t.string   "source"
     t.text     "source_url"
-    t.integer  "indexed",                           :default => 1
-    t.boolean  "is_dpl",                            :default => false
+    t.integer  "indexed",                          :default => 1
+    t.boolean  "is_dpl",                           :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
     t.integer  "total_links"
     t.integer  "external_links"
     t.integer  "internal_links"
     t.integer  "local_links"
-    t.text     "resource_tag_names"
     t.integer  "node_id"
   end
 
@@ -139,14 +138,6 @@ ActiveRecord::Schema.define(:version => 20120612181755) do
   add_index "pages", ["migrated_id"], :name => "index_pages_on_migrated_id"
   add_index "pages", ["node_id"], :name => "node_ndx"
   add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
-
-  create_table "resource_tags", :force => true do |t|
-    t.string   "name"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "resource_tags", ["name"], :name => "rt_ndx"
 
   create_table "revisions", :force => true do |t|
     t.integer  "node_id"
@@ -158,8 +149,17 @@ ActiveRecord::Schema.define(:version => 20120612181755) do
   add_index "revisions", ["node_id"], :name => "node_ndx"
   add_index "revisions", ["user_id"], :name => "user_ndx"
 
+  create_table "tags", :force => true do |t|
+    t.string   "name",                      :null => false
+    t.integer  "group_id",   :default => 0
+    t.datetime "created_at"
+  end
+
+  add_index "tags", ["group_id"], :name => "group_ndx"
+  add_index "tags", ["name"], :name => "name_idx", :unique => true
+
   create_table "total_diffs", :force => true do |t|
-    t.integer  "resource_tag_id"
+    t.integer  "tag_id"
     t.string   "datatype",                              :null => false
     t.integer  "year",                   :default => 0
     t.integer  "week",                   :default => 0
@@ -178,7 +178,7 @@ ActiveRecord::Schema.define(:version => 20120612181755) do
     t.datetime "updated_at",                            :null => false
   end
 
-  add_index "total_diffs", ["resource_tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "total_diffs", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "update_times", :force => true do |t|
     t.string   "item"
@@ -238,7 +238,7 @@ ActiveRecord::Schema.define(:version => 20120612181755) do
   add_index "week_stats", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "week_totals", :force => true do |t|
-    t.integer  "resource_tag_id"
+    t.integer  "tag_id"
     t.integer  "year",             :default => 0
     t.integer  "week",             :default => 0
     t.integer  "pages",            :default => 0
@@ -252,7 +252,7 @@ ActiveRecord::Schema.define(:version => 20120612181755) do
     t.string   "datatype",                        :null => false
   end
 
-  add_index "week_totals", ["resource_tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "week_totals", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "workflow_events", :force => true do |t|
     t.integer  "node_id"
