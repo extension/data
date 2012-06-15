@@ -16,6 +16,7 @@ class Node < ActiveRecord::Base
   scope :faqs,     where(:node_type => 'faq')
   scope :news,     where(:node_type => 'news')
   
+  scope :has_page, where(:has_page => true)
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
     
   
