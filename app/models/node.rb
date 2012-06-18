@@ -9,7 +9,6 @@ class Node < ActiveRecord::Base
   has_one :page
   has_many :node_groups
   has_many :nodes, :through => :node_groups
-  has_many :workflow_events
   has_many :aae_nodes
   has_many :node_events
   
@@ -46,32 +45,13 @@ class Node < ActiveRecord::Base
   end
   
   def self.published_since(date)
-    joins(:workflow_events).where("workflow_events.event = #{WorkflowEvent::PUBLISHED}").where("workflow_events.created_at > ?",date).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
+    joins(:node_events).where("node_events.event = #{NodeEvent::PUBLISHED}").where("node_events.created_at > ?",date).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
   end
   
   
   def self.published_workflow_stats_since_migration
     published_workflow_stats_since_date(EpochDate::CREATE_FINAL_WIKI_MIGRATION)
   end
-  
-  # def self.published_workflow_stats_since_date(date)
-  #   articlelist = self.articles.created_and_published_since(date)
-  #   article_workflow_count = {}
-  #   articlelist.each do |a|
-  #     article_workflow_count[a.id] = a.workflow_events.reviewed.count
-  #   end
-  #   article_has_workflow = article_workflow_count.select{|k,v| v > 0 }
-  #   
-  #   faqlist = self.faqs.created_and_published_since(date)
-  #   faq_workflow_count = {}
-  #   faqlist.each do |f|
-  #     faq_workflow_count[f.id] = f.workflow_events.reviewed.count
-  #   end
-  #   faq_has_workflow = faq_workflow_count.select{|k,v| v > 0 }
-  #   
-  #   {:articles => [articlelist.size, article_has_workflow.size], :faqs => [faqlist.size, faq_has_workflow.size]}
-  # end    
-  
   
   def self.published_workflow_stats_since_date(date,rawnodecounts=false)
     nodelist = []
@@ -83,8 +63,8 @@ class Node < ActiveRecord::Base
       published_count = 0
       reviewed_counts = []
       reviews = 0
-      node.workflow_events.created_since(date).each do |wfe|
-        if(wfe.event == WorkflowEvent::PUBLISHED)
+      node.node_events.created_since(date).each do |wfe|
+        if(wfe.event == NodeEvent::PUBLISHED)
           published_count += 1
           reviewed_counts << reviews
           reviews = 0

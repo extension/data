@@ -12,7 +12,7 @@ class DataQuestion
     nodes = Node.created_and_published_since(EpochDate::CREATE_FINAL_WIKI_MIGRATION)
     workflow_count = {}
     nodes.each do |n|
-      workflow_count[n.id] = n.workflow_events.reviewed.count
+      workflow_count[n.id] = n.node_events.reviewed.count
       page = n.page
       if(!page.blank?)
         page = n.page
