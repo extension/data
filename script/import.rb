@@ -29,6 +29,7 @@ class GAImporter < Thor
               
     def associate_analytics_for_year_week(year,week)
       puts "Associating GA data to pages for #{year.to_s}-#{week.to_s}..." if options[:verbose]
+      records = 0
       benchmark = Benchmark.measure do      
         records = Analytic.associate_with_pages_for_year_week(year,week)
       end
