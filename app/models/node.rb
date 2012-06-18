@@ -11,6 +11,7 @@ class Node < ActiveRecord::Base
   has_many :nodes, :through => :node_groups
   has_many :workflow_events
   has_many :aae_nodes
+  has_many :node_events
   
   scope :articles, where(:node_type => 'article')
   scope :faqs,     where(:node_type => 'faq')

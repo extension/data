@@ -72,6 +72,7 @@ class GAImporter < Thor
       run_and_log(Revision,'rebuild','create revision import')
       run_and_log(AaeNode,'rebuild','create aae node import')
       run_and_log(WorkflowEvent,'rebuild','create workflow import')
+      run_and_log(NodeEvent,'rebuild','create node events import')
     end
     
     def internal_rebuilds
@@ -138,7 +139,6 @@ class GAImporter < Thor
   desc "all_the_things", "Import data items from Darmok, Create, and GA"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
-  method_option :force_analytics_update,:default => false, :aliases => "-f", :desc => "Force weekly analytics update"
   def all_the_things
     load_rails(options[:environment])
     darmok_rebuilds
@@ -163,6 +163,24 @@ class GAImporter < Thor
     # internal data
     internal_rebuilds
   end
+  
+  desc "darmok", "All Darmok Rebuilds"
+  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
+  def darmok
+    load_rails(options[:environment])
+    darmok_rebuilds
+  end
+  
+  desc "create", "All Create Rebuilds"
+  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
+  def create
+    load_rails(options[:environment])
+    create_rebuilds
+  end
+  
+  
   
     
 end

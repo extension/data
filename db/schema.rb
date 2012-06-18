@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120618021404) do
+ActiveRecord::Schema.define(:version => 20120618204836) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -71,6 +71,17 @@ ActiveRecord::Schema.define(:version => 20120618021404) do
   end
 
   add_index "groups", ["create_gid"], :name => "create_group_ndx"
+
+  create_table "node_events", :force => true do |t|
+    t.integer  "node_id"
+    t.integer  "user_id"
+    t.integer  "node_revision_id"
+    t.integer  "event"
+    t.text     "log"
+    t.datetime "created_at"
+  end
+
+  add_index "node_events", ["node_id"], :name => "node_ndx"
 
   create_table "node_groups", :force => true do |t|
     t.integer  "node_id"
