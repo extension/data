@@ -17,7 +17,7 @@ class Node < ActiveRecord::Base
   scope :news,     where(:node_type => 'news')
   
   scope :has_page, where(:has_page => true)
-  scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
+  scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date).order("#{self.table_name}.created_at")}
     
   
   def self.rebuild
