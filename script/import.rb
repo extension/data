@@ -142,14 +142,23 @@ class GAImporter < Thor
     load_rails(options[:environment])
     darmok_rebuilds
     create_rebuilds
+    
     # analytics
-    start_date = Analytic.latest_date + 1
-    end_date = (Date.today - 1)
-    start_date.upto(end_date) do |date|
-      get_analytics_for_date(date)      
-      associate_analytics_for_date(date)
+    latest_year_week = Analytic._latest_year_week
+    if(latest_year_week.nil?)
+      yearweeks = Analytic.all_year_weeks
+    else
+      next_year_week = Analytic.next_year_week(latest_year_week[0],latest_year_week[1])
+      start_date = Analytic.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
+      end_date = Date.today
+      yearweeks = Analytic.year_weeks_between_dates(start_date,end_date)
     end
     
+    yearweeks.each do |year,week|
+      get_analytics_for_year_week(year,week)      
+      associate_analytics_for_year_week(year,week)
+    end
+
     # internal data
     internal_rebuilds
   end
