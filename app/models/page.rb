@@ -30,7 +30,7 @@ class Page < ActiveRecord::Base
   scope :from_create, where(:source => 'create')
   scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
   
-  def self.earliest_yearweek
+  def self.earliest_year_week
     if(@yearweek.blank?)
       earliest_date = self.minimum(:created_at).to_date
       @yearweek = [earliest_date.cwyear,earliest_date.cweek]
@@ -38,13 +38,6 @@ class Page < ActiveRecord::Base
     @yearweek
   end      
       
-  def first_yearweek
-    start_date = self.created_at.to_date+1.week
-    cweek = start_date.cweek
-    cwyear = start_date.cwyear
-    [cwyear,cweek]
-  end
-  
   def eligible_weeks(fractional = false)
     if(fractional)
       eligible_yearweeks.size + ((7-self.created_at.to_date.cwday) / 7)
@@ -84,8 +77,6 @@ class Page < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(page.source_url)
         insert_list << page.indexed
         insert_list << (page.is_dpl? ? 1 : 0)
-        insert_list << ActiveRecord::Base.quote_value(page.created_at.to_s(:db))
-        insert_list << ActiveRecord::Base.quote_value(page.updated_at.to_s(:db))
         links = page.link_counts
         insert_list << links[:total]
         insert_list << links[:external]
@@ -96,6 +87,8 @@ class Page < ActiveRecord::Base
         else
           insert_list << 0
         end
+        insert_list << ActiveRecord::Base.quote_value(page.created_at.to_s(:db))
+        insert_list << ActiveRecord::Base.quote_value(page.updated_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
       insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"

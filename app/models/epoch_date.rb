@@ -57,4 +57,5 @@ class EpochDate
   
   # all copwiki content migrated to create
   CREATE_FINAL_WIKI_MIGRATION   = Date.parse('2011-07-09')
+    
 end

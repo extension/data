@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120615171220) do
+ActiveRecord::Schema.define(:version => 20120618021404) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -22,8 +22,9 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
-    t.string   "segment",            :limit => 25
-    t.date     "date"
+    t.integer  "yearweek"
+    t.integer  "year"
+    t.integer  "week"
     t.text     "analytics_url"
     t.string   "url_type"
     t.integer  "url_page_id"
@@ -36,12 +37,14 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
     t.integer  "entrances"
     t.integer  "time_on_page"
     t.integer  "exits"
+    t.integer  "visitors"
+    t.integer  "new_visits"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
 
   add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
-  add_index "analytics", ["segment", "date", "page_id"], :name => "analytic_ndx"
+  add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority",   :default => 0
@@ -81,9 +84,9 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
     t.integer  "revision_id"
     t.string   "node_type"
     t.string   "title"
+    t.boolean  "has_page",    :default => false
     t.datetime "created_at",                     :null => false
     t.datetime "updated_at",                     :null => false
-    t.boolean  "has_page",    :default => false
   end
 
   add_index "nodes", ["has_page"], :name => "page_flag_ndx"
@@ -105,6 +108,8 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
     t.integer  "entrances"
     t.integer  "time_on_page"
     t.integer  "exits"
+    t.integer  "visitors"
+    t.integer  "new_visits"
     t.datetime "created_at",                        :null => false
     t.datetime "updated_at",                        :null => false
   end
@@ -124,13 +129,13 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
     t.text     "source_url"
     t.integer  "indexed",                          :default => 1
     t.boolean  "is_dpl",                           :default => false
-    t.datetime "created_at"
-    t.datetime "updated_at"
     t.integer  "total_links"
     t.integer  "external_links"
     t.integer  "internal_links"
     t.integer  "local_links"
     t.integer  "node_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   add_index "pages", ["created_at", "datatype", "indexed"], :name => "page_type_ndx"
@@ -182,6 +187,7 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
 
   create_table "update_times", :force => true do |t|
     t.string   "item"
+    t.string   "operation"
     t.float    "run_time"
     t.text     "additionaldata"
     t.datetime "created_at"
@@ -231,6 +237,8 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
     t.integer  "entrances"
     t.integer  "time_on_page"
     t.integer  "exits"
+    t.integer  "visitors"
+    t.integer  "new_visits"
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
   end
@@ -239,6 +247,7 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
 
   create_table "week_totals", :force => true do |t|
     t.integer  "tag_id"
+    t.string   "datatype",                        :null => false
     t.integer  "year",             :default => 0
     t.integer  "week",             :default => 0
     t.integer  "pages",            :default => 0
@@ -247,9 +256,10 @@ ActiveRecord::Schema.define(:version => 20120615171220) do
     t.integer  "entrances"
     t.integer  "time_on_page"
     t.integer  "exits"
+    t.integer  "visitors"
+    t.integer  "new_visits"
     t.datetime "created_at",                      :null => false
     t.datetime "updated_at",                      :null => false
-    t.string   "datatype",                        :null => false
   end
 
   add_index "week_totals", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true

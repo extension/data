@@ -7,14 +7,15 @@
 
 class Analytic < ActiveRecord::Base
   extend Garb::Model
-  metrics :entrances, :pageviews, :unique_pageviews, :exits, :time_on_page
+  extend YearWeek
+  metrics :entrances, :pageviews, :unique_pageviews, :exits, :time_on_page, :visitors, :new_visits
   dimensions :page_path
     
   cattr_accessor :analytics_profile  
   before_create :set_recordsignature
   before_save   :set_url_type
   
-  scope :bydate, lambda{|date| where(:date => date)}
+  scope :by_year_week, lambda {|year,week| {:conditions => ["year = ? and week= ?",year,week] } }
   
   URL_PAGE = 'page'
   URL_MIGRATED_FAQ = 'faq'
@@ -92,12 +93,15 @@ class Analytic < ActiveRecord::Base
     
     if(page)
       self.update_attribute(:page_id,page.id)
+      return true
+    else
+      return false
     end
   end
       
   
   def set_recordsignature
-    options = {:analytics_url => self.analytics_url, :segment => self.segment, :date => self.date.to_s}
+    options = {:analytics_url => self.analytics_url, :year => self.year, :week => self.week}
     self.analytics_url_hash = self.class.recordsignature(options)
   end
   
@@ -142,40 +146,37 @@ class Analytic < ActiveRecord::Base
     return_results
   end
   
-  
-  def self.import_analytics(options = {})
-    segmentlabel = options[:segment_label] || 'all'
-    if(segmentlabel != 'all')
-      if(!segment_id = Settings.googleapps_search_segments.send('segmentlabel'))
-        return 0
-      end
+
+
+  def self.import_analytics_for_year_week(year,week)
+    if(year.nil? or week.nil?)
+      0
     end
-    
-    date = options[:date]
+        
+    (start_date,end_date) = self.date_pair_for_year_week(year,week)
             
     # get the records
-    request_options = {:start_date => date, :end_date => date}
-    if(options[:segment_id])
-      request_options.merge!({:segment_id => options[:segment_id]})
-    end
+    request_options = {:start_date => start_date, :end_date => end_date}
     results = self.request_google_analytics_data(request_options)
     record_count = 0
     if(!results.blank?)
       results.each do |result|
-        record_options = {:date => date, :segment => segmentlabel}
+        record_options = {:year => year, :week => week, :yearweek => self.yearweek_string(year,week)}
         record_options[:analytics_url] = result.page_path
         record_options[:entrances] = result.entrances
         record_options[:pageviews] = result.pageviews
         record_options[:unique_pageviews] = result.unique_pageviews
         record_options[:exits] = result.exits
         record_options[:time_on_page] = result.time_on_page  
+        record_options[:visitors] = result.visitors  
+        record_options[:new_visits] = result.new_visits  
         record_options
         
         begin
           self.create(record_options)
           record_count += 1
         rescue ActiveRecord::RecordNotUnique
-          options = {:segment => segmentlabel,:analytics_url => result.page_path, :date => date}
+          options = {:analytics_url => result.page_path, :year => year, :week => week}
           if(record = self.find_by_recordsignature(options))
             record.update_attributes(record_options)
           end
@@ -185,12 +186,11 @@ class Analytic < ActiveRecord::Base
     record_count
   end
   
-  
-  def self.latest_date
-    @latest_date ||= self.maximum(:date)
+  def self.associate_with_pages_for_year_week(year,week)
+    pagecount = 0
+    self.by_year_week(year,week).each do |analytic|
+      pagecount +=1 if analytic.associate_with_page
+    end
+    pagecount
   end
-  
-  
-  
-  
 end

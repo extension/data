@@ -5,6 +5,11 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class ApplicationController < ActionController::Base
-  protect_from_forgery
+class PagesController < ApplicationController
+  
+  def index
+  end
+  
+  
+
 end
