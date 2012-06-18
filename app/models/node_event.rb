@@ -7,7 +7,6 @@
 
 class NodeEvent < ActiveRecord::Base
   belongs_to :node
-  default_scope :order => 'created_at ASC'
   
   
   DRAFT = 1
