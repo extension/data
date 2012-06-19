@@ -93,7 +93,7 @@ class GAImporter < Thor
     load_rails(options[:environment])
     year = options[:year]
     week = options[:week]
-    get_analytics_for_date(date)
+    get_analytics_for_year_week(year,week)      
     if(options[:associate])
       associate_analytics_for_year_week(year,week)
     end
