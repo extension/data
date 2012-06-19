@@ -20,7 +20,7 @@ class WeekDiff < ActiveRecord::Base
       end
       
       insert_values = []
-      page.eligible_yearweeks.each do |year,week|
+      page.eligible_year_weeks.each do |year,week|
         key_string = "#{year}-#{week}"
         (previous_year,previous_week) = Analytic.previous_year_week(year,week)
         previous_key_string = "#{previous_year}-#{previous_week}"

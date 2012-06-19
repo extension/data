@@ -4,7 +4,10 @@
     <title><%= @page_title %></title>
     <%= stylesheet_link_tag    "application" %>
     <%= javascript_include_tag "application" %>
+    <script src='http://www.google.com/jsapi'></script>
     <%= csrf_meta_tags %>
+    
+    <%= render(:partial => 'shared/google_tracking') %>
   </head>
   <body>
 
@@ -12,6 +15,7 @@
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
+            <%= render(:partial => 'shared/navbar') %>
           </div> 
         </div> 
       </div>
