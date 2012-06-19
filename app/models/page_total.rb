@@ -20,7 +20,7 @@ class PageTotal < ActiveRecord::Base
     SUM(exits) AS exits
     END
     
-    (maxyear,maxweek) = WeekStat.max_yearweek    
+    (maxyear,maxweek) = Analytic.latest_year_week    
     yearweek_string = "#{maxyear}" + "%02d" % maxweek
     
     (minyear,minweek) = Page.earliest_year_week    

@@ -22,7 +22,7 @@ class WeekDiff < ActiveRecord::Base
       insert_values = []
       page.eligible_yearweeks.each do |year,week|
         key_string = "#{year}-#{week}"
-        (previous_year,previous_week) = WeekStat.previous_yearweek(year,week)
+        (previous_year,previous_week) = Analytic.previous_year_week(year,week)
         previous_key_string = "#{previous_year}-#{previous_week}"
     
         previous_upv = (week_stats_by_yearweek[previous_key_string] ? week_stats_by_yearweek[previous_key_string] : 0)

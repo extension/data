@@ -33,7 +33,7 @@ class WeekTotal < ActiveRecord::Base
     
     
     start_date = Page.minimum(:created_at).to_date
-    yearweeks = WeekStat.year_weeks_from_date(start_date)
+    yearweeks = Analytic.year_weeks_from_date(start_date)
     yearweeks.each do |year,week|
       
       pages = (tag.nil?) ? Page.pagecount_for_yearweek(year,week) : tag.pages.pagecount_for_yearweek(year,week)
@@ -90,7 +90,7 @@ class WeekTotal < ActiveRecord::Base
     
     
     start_date = Page.minimum(:created_at).to_date
-    yearweeks = WeekStat.year_weeks_from_date(start_date)
+    yearweeks = Analytic.year_weeks_from_date(start_date)
     yearweeks.each do |year,week|
       datatypes.each do |datatype|
         pages = (tag.nil?) ? Page.by_datatype(datatype).pagecount_for_yearweek(year,week) : tag.pages.by_datatype(datatype).pagecount_for_yearweek(year,week)

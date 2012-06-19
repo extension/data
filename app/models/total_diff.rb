@@ -38,12 +38,12 @@ class TotalDiff < ActiveRecord::Base
     
     insert_values = []
     start_date = Page.minimum(:created_at).to_date
-    yearweeks = WeekStat.year_weeks_from_date(start_date)
+    yearweeks = Analytic.year_weeks_from_date(start_date)
     datatypes.each do |datatype|
       yearweeks.each do |year,week|
         
         key_string = "#{year}-#{week}-#{datatype}"
-        (previous_year,previous_week) = WeekStat.previous_yearweek(year,week)
+        (previous_year,previous_week) = Analytic.previous_year_week(year,week)
         previous_key_string = "#{previous_year}-#{previous_week}-#{datatype}"
     
         pages = (tag.nil?) ? Page.by_datatype(datatype).pagecount_for_yearweek(year,week) : tag.pages.by_datatype(datatype).pagecount_for_yearweek(year,week)

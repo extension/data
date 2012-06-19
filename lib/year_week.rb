@@ -20,6 +20,13 @@ module YearWeek
     [date.cwyear,date.cweek]
   end
   
+  def self.previous_year_week(year,week)
+    (sow,eow) = self.date_pair_for_year_week(year,week)
+    previous = sow - 1.day
+    [previous.cwyear,previous.cweek]
+  end
+  
+  
   def next_year_week(year,week)
     (start_date,end_date) = self.date_pair_for_year_week(year,week)
     next_date = end_date + 1

@@ -48,7 +48,7 @@ class Page < ActiveRecord::Base
   
   def eligible_yearweeks
     start_date = self.created_at.to_date + 1.week
-    WeekStat.year_weeks_from_date(start_date)
+    Analytic.year_weeks_from_date(start_date)
   end
   
         
