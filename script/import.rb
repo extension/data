@@ -91,8 +91,8 @@ class GAImporter < Thor
   method_option :associate,:default => true, :aliases => "-a", :desc => "Associate analytic with page (run Page.rebuild prior!)"
   def analytics_for_year_week
     load_rails(options[:environment])
-    year = options[:year]
-    week = options[:week]
+    year = options[:year].to_i
+    week = options[:week].to_i
     get_analytics_for_year_week(year,week)      
     if(options[:associate])
       associate_analytics_for_year_week(year,week)
