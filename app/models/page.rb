@@ -103,6 +103,13 @@ class Page < ActiveRecord::Base
     end
   end
   
+  def self.page_counts_by_yearweek
+    with_scope do
+      self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
+    end
+  end
+    
+  
   def self.datatypes
     self.group(:datatype).pluck(:datatype)
   end

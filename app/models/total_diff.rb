@@ -7,6 +7,7 @@
 
 class TotalDiff < ActiveRecord::Base
   belongs_to :tag
+  extend YearWeek
   
   
   def self.rebuild_all
@@ -40,15 +41,17 @@ class TotalDiff < ActiveRecord::Base
     start_date = Page.minimum(:created_at).to_date
     yearweeks = Analytic.year_weeks_from_date(start_date)
     datatypes.each do |datatype|
+      
+      pagecounts = (tag.nil?) ? Page.by_datatype(datatype).page_counts_by_yearweek : tag.pages.by_datatype(datatype).page_counts_by_yearweek
+      
       yearweeks.each do |year,week|
         
         key_string = "#{year}-#{week}-#{datatype}"
         (previous_year,previous_week) = Analytic.previous_year_week(year,week)
         previous_key_string = "#{previous_year}-#{previous_week}-#{datatype}"
     
-        pages = (tag.nil?) ? Page.by_datatype(datatype).pagecount_for_yearweek(year,week) : tag.pages.by_datatype(datatype).pagecount_for_yearweek(year,week)
-        previous_pages = (tag.nil?) ? Page.by_datatype(datatype).pagecount_for_yearweek(previous_year,previous_week) : tag.pages.by_datatype(datatype).pagecount_for_yearweek(previous_year,previous_week)
-    
+        pages = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum
+        previous_pages = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year,previous_week)}.values.sum  
         
         previous_upv = (week_stats_by_yearweek[previous_key_string] ? week_stats_by_yearweek[previous_key_string] : 0)        
         current_upv = (week_stats_by_yearweek[key_string] ? week_stats_by_yearweek[key_string] : 0)
