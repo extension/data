@@ -128,7 +128,7 @@ class WeekStat < ActiveRecord::Base
     SUM(unique_pageviews) as unique_pageviews
     END
     
-    (maxyear,maxweek) = self.max_yearweek    
+    (maxyear,maxweek) = Analytic.latest_year_week    
     yearweek_string = "#{maxyear}" + "%02d" % maxweek
     
     (minyear,minweek) = Page.earliest_year_week    
