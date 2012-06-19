@@ -1,14 +1,28 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Positronic</title>
-  <%= stylesheet_link_tag    "application", :media => "all" %>
-  <%= javascript_include_tag "application" %>
-  <%= csrf_meta_tags %>
-</head>
-<body>
+  <head>
+    <title><%= @page_title %></title>
+    <%= stylesheet_link_tag    "application" %>
+    <%= javascript_include_tag "application" %>
+    <%= csrf_meta_tags %>
+  </head>
+  <body>
 
-<%= yield %>
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <div class="nav-collapse">
+          </div> 
+        </div> 
+      </div>
+    </div>
 
-</body>
+    <div class="container-fluid">
+      <div id="flash">
+        <%= render(:partial => 'shared/flashmessages') %>
+        
+      </div>
+      <%= yield %>
+    </div>    
+  </body>
 </html>

@@ -1,0 +1,102 @@
+<% @page_title = "Details for Page ##{@page.id}" %>
+<div class="page-header">
+  <h1><%= @page.title %></h1>
+</div>  
+
+
+<div class="row-fluid">
+  <div class="span12">
+	  <h3>Stuff</h3>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+	 <h3>Page Details</h3>
+	<table class="table table-bordered">
+ 
+	  <tbody>
+      <tr>
+        <td>View Published Page</td>
+        <td><%= link_to("http://www.extension.org/pages/#{@page.id}/#{@page.url_title}","http://www.extension.org/pages/#{@page.id}/#{@page.url_title}")%></td>
+      </tr>
+      <tr>
+        <td>Internal Page ID</td>
+        <td><%= @page.id %></td>
+      </tr>
+      <tr>
+        <td>Groups</td>
+        <td>ToDo</td>
+      </tr>
+      <tr>
+      <tr>
+        <td>Page Type</td>
+        <td><%= @page.datatype %></td>
+      </tr>
+      <tr>
+        <td>Index status</td>
+        <td>
+        <%- if @page.indexed == 1 -%>
+          Indexed. Page can be indexed by all search engines.
+        <%- elsif @page.indexed == 2 -%>
+          Google asked to not index. Page can be indexed by other search engines.
+        <%- else -%>
+          All search engines asked to not index.
+        <%- end -%>
+        </td>
+      </tr>
+      <tr>
+        <td>Words</td>
+        <td><%= number_with_delimiter(@page.content_words) %></td>
+      </tr>
+      <tr>
+        <td>Source URL</td>
+        <td><%= link_to(@page.source_url,@page.source_url)%></td>
+      </tr>
+      <tr>
+        <td>Source Published At</td>
+        <td><%= @page.source_created_at %></td>
+      </tr>      
+      <tr>
+        <td>Source Updated At</td>
+        <td><%= @page.source_updated_at %></td>
+      </tr>
+        <td>More Information</td>
+        <td><%= link_to("http://www.extension.org/pageinfo/#{@page.id}","http://www.extension.org/pageinfo/#{@page.id}")%></td>
+      </tr>
+	  </tbody>
+	</table>
+  </div>
+</div>
+
+<div class="row-fluid">
+  <div class="span12">
+	  <h3>Node Event History</h3>
+	    <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>What</th>
+            <th>Who</th>
+          </tr>
+        </thead>
+        <tbody>
+          <%- @page.node.node_events.order("created_at DESC").each do |ne| -%>
+          <tr>
+            <td><%= ne.created_at.to_s %></td>
+            <td><%= ne.event_to_s %></td>
+            <td><%= ne.user.fullname %></td>
+          </tr>
+          <%- end -%>
+        </tbody>
+      </table>
+  </div>
+</div>
+
+
+
+
+
+
+
+

@@ -7,6 +7,7 @@
 
 class NodeEvent < ActiveRecord::Base
   belongs_to :node
+  belongs_to :user
   
   
   DRAFT = 1
@@ -22,8 +23,32 @@ class NodeEvent < ActiveRecord::Base
   EDIT = 101
   COMMENT = 102
   
+  
+  EVENT_STRINGS = {
+    DRAFT => 'moved to draft',
+    READY_FOR_REVIEW => 'marked ready for review',
+    REVIEWED => 'reviewed',
+    READY_FOR_PUBLISH => 'marked ready for publishing',
+    PUBLISHED => 'published',
+    UNPUBLISHED => 'unpublished',
+    INACTIVATED => 'marked inactive',
+    ACTIVATED => 'marked as active',
+    READY_FOR_COPYEDIT => 'marked ready for copy editing',
+    EDIT => 'edited',
+    COMMENT => 'added comment'
+  }
+  
   scope :reviewed, where("event IN (#{READY_FOR_REVIEW},#{REVIEWED},#{READY_FOR_PUBLISH},#{READY_FOR_COPYEDIT})")
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
+  
+  def event_to_s
+    if(EVENT_STRINGS[self.event])
+      EVENT_STRINGS[self.event]
+    else
+      'unknown'
+    end
+  end
+  
   
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    

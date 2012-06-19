@@ -5,13 +5,9 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class PagesController < ApplicationController
+class HomeController < ApplicationController
   
   def index
   end
   
-  def show
-    @page = Page.includes(:node).find(params[:id])
-  end
-
 end

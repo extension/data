@@ -6,6 +6,11 @@
 #  see LICENSE file
 
 class User < ActiveRecord::Base
+  has_many :node_events
+
+  def fullname 
+    "#{self.first_name} #{self.last_name}"
+  end
 
 
   def self.rebuild
