@@ -40,9 +40,9 @@ class Page < ActiveRecord::Base
       
   def eligible_weeks(fractional = false)
     if(fractional)
-      eligible_yearweeks.size + ((7-self.created_at.to_date.cwday) / 7)
+      eligible_year_weeks.size + ((7-self.created_at.to_date.cwday) / 7)
     else
-      eligible_yearweeks.size
+      eligible_year_weeks.size
     end
   end
   
@@ -108,7 +108,7 @@ class Page < ActiveRecord::Base
       self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
     end
   end
-    
+  
   
   def self.datatypes
     self.group(:datatype).pluck(:datatype)
