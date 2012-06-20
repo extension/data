@@ -46,66 +46,67 @@ class TotalDiff < ActiveRecord::Base
       
       yearweeks.each do |year,week|
         
-        key_string = "#{year}-#{week}-#{datatype}"
+        current_key_string = "#{year}-#{week}-#{datatype}"
+        previous_year_key_string ="#{year-1}-#{week}-#{datatype}"
         (previous_year,previous_week) = Analytic.previous_year_week(year,week)
-        previous_key_string = "#{previous_year}-#{previous_week}-#{datatype}"
+        previous_week_key_string = "#{previous_year}-#{previous_week}-#{datatype}"
+    
     
         pages = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum
-        previous_pages = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year,previous_week)}.values.sum  
+        pages_previous_week = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year,previous_week)}.values.sum  
+        pages_previous_year = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year-1,week)}.values.sum  
         
-        previous_upv = (week_stats_by_yearweek[previous_key_string] ? week_stats_by_yearweek[previous_key_string] : 0)        
-        current_upv = (week_stats_by_yearweek[key_string] ? week_stats_by_yearweek[key_string] : 0)
-        
-        previous_avg_upv = (previous_pages == 0) ? 0 : (previous_upv / previous_pages)
-        current_avg_upv = (pages == 0) ? 0 : (current_upv / pages)
-      
-        
+        total_views = (week_stats_by_yearweek[current_key_string] ? week_stats_by_yearweek[current_key_string] : 0)
+        total_views_previous_week = (week_stats_by_yearweek[previous_week_key_string] ? week_stats_by_yearweek[previous_week_key_string] : 0)        
+        total_views_previous_year = (week_stats_by_yearweek[previous_year_key_string] ? week_stats_by_yearweek[previous_year_key_string] : 0)        
+
+        views = (pages == 0) ? 0 : (total_views / pages)
+        views_previous_week = (pages_previous_week == 0) ? 0 : (total_views_previous_week / pages_previous_week)
+        views_previous_year = (pages_previous_year == 0) ? 0 : (total_views_previous_year / pages_previous_year)
+
+        # pct_difference
+        if((views + views_previous_week) == 0)
+           pct_difference_week = 0
+        else
+           pct_difference_week = (views - views_previous_week) / ((views + views_previous_week) / 2)
+        end   
+        if((views + views_previous_year) == 0)
+           pct_difference_year = 0
+        else
+           pct_difference_year = (views - views_previous_year) / ((views + views_previous_year) / 2)
+        end
+        # pct_change
+        if(views_previous_week == 0)
+          pct_change_week = 'NULL'
+        else
+          pct_change_week = (views - views_previous_week) / views_previous_week
+        end
+        if(views_previous_year == 0)
+          pct_change_year = 'NULL'
+        else
+          pct_change_year = (views - views_previous_year) / views_previous_year
+        end
+              
         insert_list = []
         insert_list << tag_id
         insert_list << ActiveRecord::Base.quote_value(datatype)
         insert_list << year
         insert_list << week
         insert_list << ActiveRecord::Base.quote_value(Date.commercial(year,week,7))
-        insert_list << previous_pages
         insert_list << pages
-        insert_list << previous_upv
-        insert_list << current_upv
-        # pct_upv_difference
-        if((current_upv + previous_upv) == 0)
-          insert_list << 0
-        else
-          insert_list << (current_upv - previous_upv) / ((current_upv + previous_upv) / 2)
-        end
-        # pct_upv_change
-        if(previous_upv == 0)
-          insert_list << 'NULL'
-        else
-          insert_list << (current_upv - previous_upv) / previous_upv
-        end
-        
-        insert_list << previous_avg_upv
-        insert_list << current_avg_upv
-        
-        
-        # pct_avg_upv_difference
-        if((current_avg_upv + previous_avg_upv) == 0)
-          insert_list << 0
-        else
-          
-          insert_list << (current_avg_upv - previous_avg_upv) / ((current_avg_upv + previous_avg_upv) / 2)
-        end
-        # pct_avg_upv_change
-        if(previous_avg_upv == 0)
-          insert_list << 'NULL'
-        else
-          insert_list << (current_avg_upv - previous_avg_upv) / previous_avg_upv
-        end
-            
-        
-        insert_list << 'NOW()'
-        insert_list << 'NOW()'
-                
-        
+        insert_list << pages_previous_week
+        insert_list << pages_previous_year
+        insert_list << total_views
+        insert_list << total_views_previous_week
+        insert_list << total_views_previous_year
+        insert_list << views
+        insert_list << views_previous_week
+        insert_list << views_previous_year
+        insert_list << pct_difference_week
+        insert_list << pct_difference_year
+        insert_list << pct_change_week
+        insert_list << pct_change_year
+        insert_list << 'NOW()'        
         insert_values << "(#{insert_list.join(',')})"
       end # year-week
     end # datatypes    

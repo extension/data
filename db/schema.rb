@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120618212724) do
+ActiveRecord::Schema.define(:version => 20120620165357) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -102,6 +102,22 @@ ActiveRecord::Schema.define(:version => 20120618212724) do
 
   add_index "nodes", ["has_page"], :name => "page_flag_ndx"
 
+  create_table "page_diffs", :force => true do |t|
+    t.integer  "page_id"
+    t.integer  "year",                :default => 0
+    t.integer  "week",                :default => 0
+    t.integer  "views"
+    t.integer  "views_previous_week"
+    t.integer  "views_previous_year"
+    t.float    "pct_difference_week"
+    t.float    "pct_difference_year"
+    t.float    "pct_change_week"
+    t.float    "pct_change_year"
+    t.datetime "created_at",                         :null => false
+  end
+
+  add_index "page_diffs", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
+
   create_table "page_taggings", :force => true do |t|
     t.integer  "page_id"
     t.integer  "tag_id"
@@ -176,22 +192,24 @@ ActiveRecord::Schema.define(:version => 20120618212724) do
 
   create_table "total_diffs", :force => true do |t|
     t.integer  "tag_id"
-    t.string   "datatype",                              :null => false
-    t.integer  "year",                   :default => 0
-    t.integer  "week",                   :default => 0
+    t.string   "datatype",                                   :null => false
+    t.integer  "year",                      :default => 0
+    t.integer  "week",                      :default => 0
     t.date     "yearweek_date"
-    t.integer  "previous_pages",         :default => 0
-    t.integer  "current_pages",          :default => 0
-    t.integer  "previous_upv"
-    t.integer  "current_upv"
-    t.float    "pct_upv_difference"
-    t.float    "pct_upv_change"
-    t.float    "previous_avg_upv"
-    t.float    "current_avg_upv"
-    t.float    "pct_avg_upv_difference"
-    t.float    "pct_avg_upv_change"
-    t.datetime "created_at",                            :null => false
-    t.datetime "updated_at",                            :null => false
+    t.integer  "pages",                     :default => 0
+    t.integer  "pages_previous_week",       :default => 0
+    t.integer  "pages_previous_year",       :default => 0
+    t.integer  "total_views",               :default => 0
+    t.integer  "total_views_previous_week", :default => 0
+    t.integer  "total_views_previous_year", :default => 0
+    t.integer  "views",                     :default => 0
+    t.integer  "views_previous_week",       :default => 0
+    t.integer  "views_previous_year",       :default => 0
+    t.float    "pct_difference_week",       :default => 0.0
+    t.float    "pct_difference_year",       :default => 0.0
+    t.float    "pct_change_week",           :default => 0.0
+    t.float    "pct_change_year",           :default => 0.0
+    t.datetime "created_at",                                 :null => false
   end
 
   add_index "total_diffs", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
@@ -223,20 +241,6 @@ ActiveRecord::Schema.define(:version => 20120618212724) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
-
-  create_table "week_diffs", :force => true do |t|
-    t.integer  "page_id"
-    t.integer  "year",           :default => 0
-    t.integer  "week",           :default => 0
-    t.integer  "previous_upv"
-    t.integer  "current_upv"
-    t.float    "pct_difference"
-    t.float    "pct_change"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
-  end
-
-  add_index "week_diffs", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "week_stats", :force => true do |t|
     t.integer  "page_id"

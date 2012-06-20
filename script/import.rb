@@ -77,7 +77,8 @@ class GAImporter < Thor
     def internal_rebuilds
       run_and_log(WeekStat,'mass_rebuild_from_analytics','week stat rebuild')
       run_and_log(PageTotal,'rebuild','page totals rebuild')
-      run_and_log(TotalDiff,'rebuild_all','week upv totals rebuild')      
+      run_and_log(PageDiff,'rebuild','page weekly differences rebuild')
+      run_and_log(TotalDiff,'rebuild_all','total weekly differences rebuild')      
    end
       
       
