@@ -10,6 +10,9 @@ class TotalDiff < ActiveRecord::Base
   extend YearWeek
   
   
+  
+  
+  
   def self.rebuild_all
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
     self.rebuild_by_datatype
@@ -90,6 +93,7 @@ class TotalDiff < ActiveRecord::Base
         insert_list = []
         insert_list << tag_id
         insert_list << ActiveRecord::Base.quote_value(datatype)
+        insert_list << self.yearweek(year,week)
         insert_list << year
         insert_list << week
         insert_list << ActiveRecord::Base.quote_value(Date.commercial(year,week,7))

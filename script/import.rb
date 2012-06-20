@@ -180,6 +180,14 @@ class GAImporter < Thor
     create_rebuilds
   end
   
+  desc "internal", "All Internal Rebuilds"
+  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
+  def internal
+    load_rails(options[:environment])
+    internal_rebuilds
+  end
+  
   
   
     

@@ -7,6 +7,7 @@
 
 class PageDiff < ActiveRecord::Base
   belongs_to :page
+  extend YearWeek
   
   
   def self.rebuild
@@ -34,6 +35,7 @@ class PageDiff < ActiveRecord::Base
       
         insert_list = []
         insert_list << page.id
+        insert_list << self.yearweek(year,week)
         insert_list << year
         insert_list << week
         insert_list << views

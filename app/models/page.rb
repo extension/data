@@ -23,6 +23,8 @@ class Page < ActiveRecord::Base
   scope :not_ignored, where("indexed != ?",NOT_INDEXED )
   scope :indexed, where(:indexed => INDEXED)
   scope :articles, where(:datatype => 'Article')
+  scope :articles2, conditions: { :datatype => 'Article' }
+
   scope :news, where(:datatype => 'News')
   scope :faqs, where(:datatype => 'Faq')
   scope :events, where(:datatype => 'Event')

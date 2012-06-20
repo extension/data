@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120620165357) do
+ActiveRecord::Schema.define(:version => 20120620201852) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -104,6 +104,7 @@ ActiveRecord::Schema.define(:version => 20120620165357) do
 
   create_table "page_diffs", :force => true do |t|
     t.integer  "page_id"
+    t.integer  "yearweek",            :default => 0
     t.integer  "year",                :default => 0
     t.integer  "week",                :default => 0
     t.integer  "views"
@@ -193,6 +194,7 @@ ActiveRecord::Schema.define(:version => 20120620165357) do
   create_table "total_diffs", :force => true do |t|
     t.integer  "tag_id"
     t.string   "datatype",                                   :null => false
+    t.integer  "yearweek",                  :default => 0
     t.integer  "year",                      :default => 0
     t.integer  "week",                      :default => 0
     t.date     "yearweek_date"
