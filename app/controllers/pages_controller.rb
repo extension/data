@@ -43,5 +43,15 @@ class PagesController < ApplicationController
     @chart = GoogleVisualr::Interactive::LineChart.new(data_table, options)
     return render(:layout => false)
   end
+  
+  def panda_impact_summary
+    if(!params[:weeks].nil?)
+      @panda_comparison_weeks =  params[:weeks].to_i
+    else
+      @panda_comparison_weeks = 3
+    end
+    @diffs = TotalDiff.panda_impacts(@panda_comparison_weeks)
+  end
+  
 
 end

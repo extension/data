@@ -20,6 +20,8 @@ class Page < ActiveRecord::Base
   NOT_GOOGLE_INDEXED = 2
 
 
+  DATATYPES = ['Article','Event','Faq','News']
+
   scope :not_ignored, where("indexed != ?",NOT_INDEXED )
   scope :indexed, where(:indexed => INDEXED)
   scope :articles, where(:datatype => 'Article')

@@ -121,4 +121,49 @@ class TotalDiff < ActiveRecord::Base
     end      
   end
   
+  
+  def self.panda_impacts(panda_comparison_weeks = 3)
+    panda_epoch_date = EpochDate.panda_epoch_date
+    prior_panda_yearweeks = panda_epoch_date.previous_yearweeks(panda_comparison_weeks)
+    post_panda_yearweeks =  panda_epoch_date.next_yearweeks(panda_comparison_weeks)
+    prior_diffs = TotalDiff.where("yearweek IN (#{prior_panda_yearweeks.join(',')})").group("tag_id,datatype").select("tag_id,datatype,SUM(views) as sum_views")
+    post_diffs = TotalDiff.where("yearweek IN (#{post_panda_yearweeks.join(',')})").group("tag_id,datatype").select("tag_id,datatype,SUM(views) as sum_views")
+      
+    prior_views = {}
+    prior_diffs.each do |pd|
+      prior_views[pd.tag_id] ||= {}
+      prior_views[pd.tag_id][pd.datatype] = (pd.sum_views / panda_comparison_weeks)
+    end
+    
+    post_views = {}
+    post_diffs.each do |pd|
+      post_views[pd.tag_id] ||= {}
+      post_views[pd.tag_id][pd.datatype] = (pd.sum_views / panda_comparison_weeks)
+    end
+    
+    
+    views_change_by_tag = {}
+    prior_views.each do |tag_id,data|
+      views_change_by_tag[tag_id] ||= {}
+      
+      Page::DATATYPES.each do |datatype|
+        prior_view_count =  (data[datatype].nil? ? nil : data[datatype])
+        if(post_views[tag_id])
+          post_view_count =  (post_views[tag_id][datatype].nil? ? nil : post_views[tag_id][datatype])
+        end
+          
+        raw_change = 'n/a'
+        pct_change = 'n/a'
+      
+        if((!prior_view_count.nil? and  (prior_view_count > 0)) and !post_view_count.nil?)
+          raw_change = (post_view_count - prior_view_count)
+          pct_change = raw_change / prior_view_count
+        end
+        
+        views_change_by_tag[tag_id][datatype] = {:raw_change => raw_change, :pct_change => pct_change}
+      end   
+    end
+    views_change_by_tag    
+  end
+  
 end

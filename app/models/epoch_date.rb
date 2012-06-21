@@ -6,6 +6,10 @@
 #  see LICENSE file
 
 class EpochDate
+  extend YearWeek
+  
+  attr_accessor :date
+  
   # earliest google analytics data
   GA_START                      = Date.parse('2007-02-23')
   
@@ -24,7 +28,7 @@ class EpochDate
 
   # the day after Google's "panda" search algorithm change
   # was released.
-  POST_PANDA                    = Date.parse('2011-02-28')
+  POST_PANDA                    = Date.parse('2011-02-24')
   
   # www faq/article/news/event urls modified to be 
   # all /pages/id/seo-friendly-title
@@ -57,5 +61,65 @@ class EpochDate
   
   # all copwiki content migrated to create
   CREATE_FINAL_WIKI_MIGRATION   = Date.parse('2011-07-09')
-    
+
+
+  def initialize(date)
+    @date = date
+  end
+  
+  def year_week
+    self.class.year_week_for_date(@date)
+  end
+  
+  def yearweek
+    (year,week) = self.year_week
+    self.class.yearweek(year,week)
+  end
+  
+  def previous_year_week
+    (year,week) = self.year_week
+    (sow,eow) = self.class.date_pair_for_year_week(year,week)
+    previous = sow - 1.day
+    [previous.cwyear,previous.cweek]
+  end
+  
+  
+  def next_year_week
+    (year,week) = self.year_week
+    (sow,eow) = self.date_pair_for_year_week(year,week)
+    next_date = eow + 1
+    self.class.year_week_for_date(next_date)
+  end
+  
+  def previous_year_weeks(count)
+    (year,week) = self.year_week
+    (sow,eow) = self.class.date_pair_for_year_week(year,week)
+    previous_date_end = sow - 1.day
+    previous_date_start = (previous_date_end - count.week) + 1.day
+    self.class.year_weeks_between_dates(previous_date_start,previous_date_end)
+  end
+  
+  
+  def next_year_weeks(count)
+    (year,week) = self.year_week
+    (sow,eow) = self.class.date_pair_for_year_week(year,week)
+    next_date_start = eow + 1.day
+    next_date_end = (next_date_start + count.week) - 1.day
+    self.class.year_weeks_between_dates(next_date_start,next_date_end)
+  end
+  
+  def previous_yearweeks(count)
+    year_weeks = previous_year_weeks(count)
+    year_weeks.map{|(year,week)|  self.class.yearweek(year,week)}
+  end
+  
+  def next_yearweeks(count)
+    year_weeks = next_year_weeks(count)
+    year_weeks.map{|(year,week)|  self.class.yearweek(year,week)}
+  end
+  
+  
+  def self.panda_epoch_date
+    self.new(POST_PANDA)
+  end
 end
