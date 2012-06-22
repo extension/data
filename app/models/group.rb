@@ -8,6 +8,13 @@
 class Group < ActiveRecord::Base
   has_many :node_groups
   has_many :nodes, :through => :node_groups
+  has_many :tags
+  has_many :pages, :through => :tags
+  has_many :analytics, :through => :tags
+  has_many :week_stats, :through => :tags  
+  has_many :week_diffs, :through => :tags
+  
+  scope :launched, where(:is_launched => true)  
   
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};") 

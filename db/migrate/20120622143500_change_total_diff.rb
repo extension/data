@@ -1,10 +1,14 @@
-class ReworkTotalDiffs < ActiveRecord::Migration
+class ChangeTotalDiff < ActiveRecord::Migration
+  
   def up
+
+    # having to drop and recreate again because of the integer/float - and it's just easier
     drop_table("total_diffs")
     
     create_table "total_diffs", :force => true do |t|
-      t.integer  "tag_id"
+      t.integer  "group_id"
       t.string   "datatype",                              :null => false
+      t.integer  "yearweek",                  :default => 0
       t.integer  "year",                      :default => 0
       t.integer  "week",                      :default => 0
       t.date     "yearweek_date"
@@ -24,10 +28,9 @@ class ReworkTotalDiffs < ActiveRecord::Migration
       t.datetime "created_at",                :null => false
     end
 
-    add_index "total_diffs", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
+    add_index "total_diffs", ["group_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
     
+
   end
 
-  def down
-  end
 end

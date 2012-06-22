@@ -17,7 +17,11 @@ module PagesHelper
   
   def percentage_if_applicable(value)
     if(value.is_a?(Numeric))
-      number_to_percentage(value * 100, :precision => 2)
+      if(value > 0)
+        "<span class='label label-success'>#{number_to_percentage(value * 100, :precision => 2)}</span>".html_safe
+      else
+        "<span class='label label-important'>#{number_to_percentage(value * 100, :precision => 2)}</span>".html_safe
+      end
     else
       value
     end

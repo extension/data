@@ -10,16 +10,24 @@
           <tr>
             <th>Tag</th>
             <%- Page::DATATYPES.each do |datatype| -%>
-              <th><%= datatype.pluralize %></th>
+              <th colspan='2'><%= datatype.pluralize %></th>
+            <%- end -%>
+          </tr>
+          <tr>
+            <th>&nbsp;</th>
+            <%- Page::DATATYPES.each do |datatype| -%>
+              <th>% Change (Post/Pre)</th>
+              <th>% Change (Year)</th>
             <%- end -%>
           </tr>
         </thead>
         <tbody>
-          <%- @diffs.sort.each do |tag_id,data| -%>
+          <%- Group.launched.each do |group| %>
           <tr>
-            <td><%= link_to_tag_with_id(tag_id) %></td>
+            <td><%= group.name %></td>
             <%- Page::DATATYPES.each do |datatype| -%>
-            <td><%= percentage_if_applicable(data[datatype][:pct_change]) %></td>
+            <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change]) %></td>
+            <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change_year]) %></td>
             <%- end -%>
           </tr>
           <%- end -%>

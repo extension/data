@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class TotalDiff < ActiveRecord::Base
-  belongs_to :tag
+  belongs_to :group
   extend YearWeek
   
   
@@ -16,8 +16,8 @@ class TotalDiff < ActiveRecord::Base
   def self.rebuild_all
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
     self.rebuild_by_datatype
-    Tag.grouptags.all.each do |tag|
-      self.rebuild_by_datatype(:tag => tag)
+    Group.launched.each do |group|
+      self.rebuild_by_datatype(:group => group)
     end
   end
   
@@ -25,13 +25,13 @@ class TotalDiff < ActiveRecord::Base
   def self.rebuild_by_datatype(options = {})
     
     datatypes = Page.datatypes
-    tag = options[:tag]
-    if(tag.nil?)
-      tag_id = 0
+    group = options[:group]
+    if(group.nil?)
+      group_id = 0
       week_stats = WeekStat.sum_upv_by_yearweek_by_datatype
     else
-      tag_id = tag.id
-      week_stats = tag.week_stats.sum_upv_by_yearweek_by_datatype
+      group_id = group.id
+      week_stats = group.week_stats.sum_upv_by_yearweek_by_datatype
     end
     
     week_stats_by_yearweek = {}
@@ -45,7 +45,7 @@ class TotalDiff < ActiveRecord::Base
     yearweeks = Analytic.year_weeks_from_date(start_date)
     datatypes.each do |datatype|
       
-      pagecounts = (tag.nil?) ? Page.by_datatype(datatype).page_counts_by_yearweek : tag.pages.by_datatype(datatype).page_counts_by_yearweek
+      pagecounts = (group.nil?) ? Page.by_datatype(datatype).page_counts_by_yearweek : group.pages.by_datatype(datatype).page_counts_by_yearweek
       
       yearweeks.each do |year,week|
         
@@ -63,9 +63,9 @@ class TotalDiff < ActiveRecord::Base
         total_views_previous_week = (week_stats_by_yearweek[previous_week_key_string] ? week_stats_by_yearweek[previous_week_key_string] : 0)        
         total_views_previous_year = (week_stats_by_yearweek[previous_year_key_string] ? week_stats_by_yearweek[previous_year_key_string] : 0)        
 
-        views = (pages == 0) ? 0 : (total_views / pages)
-        views_previous_week = (pages_previous_week == 0) ? 0 : (total_views_previous_week / pages_previous_week)
-        views_previous_year = (pages_previous_year == 0) ? 0 : (total_views_previous_year / pages_previous_year)
+        views = ((pages == 0) ? 0 : (total_views / pages))
+        views_previous_week = ((pages_previous_week == 0) ? 0 : (total_views_previous_week / pages_previous_week))
+        views_previous_year = ((pages_previous_year == 0) ? 0 : (total_views_previous_year / pages_previous_year))
 
         # pct_difference
         if((views + views_previous_week) == 0)
@@ -91,7 +91,7 @@ class TotalDiff < ActiveRecord::Base
         end
               
         insert_list = []
-        insert_list << tag_id
+        insert_list << group_id
         insert_list << ActiveRecord::Base.quote_value(datatype)
         insert_list << self.yearweek(year,week)
         insert_list << year
@@ -126,44 +126,75 @@ class TotalDiff < ActiveRecord::Base
     panda_epoch_date = EpochDate.panda_epoch_date
     prior_panda_yearweeks = panda_epoch_date.previous_yearweeks(panda_comparison_weeks)
     post_panda_yearweeks =  panda_epoch_date.next_yearweeks(panda_comparison_weeks)
-    prior_diffs = TotalDiff.where("yearweek IN (#{prior_panda_yearweeks.join(',')})").group("tag_id,datatype").select("tag_id,datatype,SUM(views) as sum_views")
-    post_diffs = TotalDiff.where("yearweek IN (#{post_panda_yearweeks.join(',')})").group("tag_id,datatype").select("tag_id,datatype,SUM(views) as sum_views")
+    
+    post_panda_prior_yearweeks = []
+    post_panda_year_weeks = panda_epoch_date.next_year_weeks(panda_comparison_weeks)
+    post_panda_year_weeks.each do |year,week|
+      post_panda_prior_yearweeks << EpochDate.yearweek(year-1,week)
+    end
+    
+    prior_diffs = TotalDiff.where("yearweek IN (#{prior_panda_yearweeks.join(',')})").group("group_id,datatype").select("group_id,datatype,SUM(views) as sum_views")
+    post_diffs = TotalDiff.where("yearweek IN (#{post_panda_yearweeks.join(',')})").group("group_id,datatype").select("group_id,datatype,SUM(views) as sum_views")
+    post_diffs_prior_year = TotalDiff.where("yearweek IN (#{post_panda_prior_yearweeks.join(',')})").group("group_id,datatype").select("group_id,datatype,SUM(views) as sum_views")
       
     prior_views = {}
     prior_diffs.each do |pd|
-      prior_views[pd.tag_id] ||= {}
-      prior_views[pd.tag_id][pd.datatype] = (pd.sum_views / panda_comparison_weeks)
+      prior_views[pd.group_id] ||= {}
+      prior_views[pd.group_id][pd.datatype] = (pd.sum_views / panda_comparison_weeks)
     end
     
     post_views = {}
     post_diffs.each do |pd|
-      post_views[pd.tag_id] ||= {}
-      post_views[pd.tag_id][pd.datatype] = (pd.sum_views / panda_comparison_weeks)
+      post_views[pd.group_id] ||= {}
+      post_views[pd.group_id][pd.datatype] = (pd.sum_views / panda_comparison_weeks)
+    end
+    
+    post_views_prior_year = {}
+    post_diffs_prior_year.each do |pd|
+      post_views_prior_year[pd.group_id] ||= {}
+      post_views_prior_year[pd.group_id][pd.datatype] = (pd.sum_views / panda_comparison_weeks)
     end
     
     
-    views_change_by_tag = {}
-    prior_views.each do |tag_id,data|
-      views_change_by_tag[tag_id] ||= {}
+    
+    views_change_by_group = {}
+    post_views.each do |group_id,data|
+      views_change_by_group[group_id] ||= {}
       
       Page::DATATYPES.each do |datatype|
-        prior_view_count =  (data[datatype].nil? ? nil : data[datatype])
-        if(post_views[tag_id])
-          post_view_count =  (post_views[tag_id][datatype].nil? ? nil : post_views[tag_id][datatype])
+        post_view_count =  (data[datatype].nil? ? nil : data[datatype])
+        if(prior_views[group_id])
+          prior_view_count =  (prior_views[group_id][datatype].nil? ? nil : prior_views[group_id][datatype])
         end
+        
+        if(post_views_prior_year[group_id])
+          post_view_prior_year_count =  (post_views_prior_year[group_id][datatype].nil? ? nil : post_views_prior_year[group_id][datatype])
+        end
+        
+        
           
         raw_change = 'n/a'
         pct_change = 'n/a'
+        
+        raw_change_year = 'n/a'
+        pct_change_year = 'n/a'
+        
       
         if((!prior_view_count.nil? and  (prior_view_count > 0)) and !post_view_count.nil?)
           raw_change = (post_view_count - prior_view_count)
           pct_change = raw_change / prior_view_count
         end
         
-        views_change_by_tag[tag_id][datatype] = {:raw_change => raw_change, :pct_change => pct_change}
+        if((!post_view_prior_year_count.nil? and  (post_view_prior_year_count > 0)) and !post_view_count.nil?)
+          raw_change_year = (post_view_count - post_view_prior_year_count)
+          pct_change_year = raw_change_year / post_view_prior_year_count
+        end
+        
+        
+        views_change_by_group[group_id][datatype] = {:raw_change => raw_change, :pct_change => pct_change, :raw_change_year => raw_change_year, :pct_change_year => pct_change_year}
       end   
     end
-    views_change_by_tag    
+    views_change_by_group    
   end
   
 end

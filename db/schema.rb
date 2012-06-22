@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120620201852) do
+ActiveRecord::Schema.define(:version => 20120622143500) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -192,7 +192,7 @@ ActiveRecord::Schema.define(:version => 20120620201852) do
   add_index "tags", ["name"], :name => "name_idx", :unique => true
 
   create_table "total_diffs", :force => true do |t|
-    t.integer  "tag_id"
+    t.integer  "group_id"
     t.string   "datatype",                                   :null => false
     t.integer  "yearweek",                  :default => 0
     t.integer  "year",                      :default => 0
@@ -204,9 +204,9 @@ ActiveRecord::Schema.define(:version => 20120620201852) do
     t.integer  "total_views",               :default => 0
     t.integer  "total_views_previous_week", :default => 0
     t.integer  "total_views_previous_year", :default => 0
-    t.integer  "views",                     :default => 0
-    t.integer  "views_previous_week",       :default => 0
-    t.integer  "views_previous_year",       :default => 0
+    t.float    "views",                     :default => 0.0
+    t.float    "views_previous_week",       :default => 0.0
+    t.float    "views_previous_year",       :default => 0.0
     t.float    "pct_difference_week",       :default => 0.0
     t.float    "pct_difference_year",       :default => 0.0
     t.float    "pct_change_week",           :default => 0.0
@@ -214,7 +214,7 @@ ActiveRecord::Schema.define(:version => 20120620201852) do
     t.datetime "created_at",                                 :null => false
   end
 
-  add_index "total_diffs", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "total_diffs", ["group_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "update_times", :force => true do |t|
     t.string   "item"
