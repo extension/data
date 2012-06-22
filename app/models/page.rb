@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class Page < ActiveRecord::Base
+  extend YearWeek
   has_many :analytics
   has_many :page_taggings
   has_many :tags, :through => :page_taggings
@@ -101,7 +102,7 @@ class Page < ActiveRecord::Base
   end
   
   def self.pagecount_for_yearweek(year,week)
-    yearweek_string = "#{year}" + "%02d" % week
+    yearweek_string = self.yearweek_string(year,week)
     with_scope do
       self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek_string).count
     end
@@ -117,6 +118,42 @@ class Page < ActiveRecord::Base
   def self.datatypes
     self.group(:datatype).pluck(:datatype)
   end
+  
+  def self.percentiles_for_year_week(year,week, options = {})
+    percentiles = options[:percentiles] || Settings.default_percentiles
+    seenonly = options[:seenonly].nil? ? false : options[:seenonly]
+    yearweek_string = self.yearweek_string(year,week)
+    
+    returnpercentiles = {}
+    with_scope do
+      pagecount = self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek_string).count
+      weekstats = self.joins(:week_stats).where("week_stats.year = ?",year).where("week_stats.week = ?",week).pluck("week_stats.unique_pageviews")
+      if((pagecount > weekstats.length) and !seenonly)
+        emptyset = Array.new((pagecount - weekstats.length),0)
+        statsarray = (weekstats + emptyset).sort
+      else
+        statsarray = weekstats.sort
+      end
+      returnpercentiles[:count] = statsarray.length
+      percentiles.each do |percentile|
+        returnpercentiles[percentile] = statsarray[((percentile / 100) * statsarray.length).ceil - 1]
+      end
+    end
+    returnpercentiles
+  end
+  
+  def self.percentiles(options = {})
+    earliest_date = self.minimum(:created_at).to_date
+    year_weeks = Analytic.year_weeks_from_date(earliest_date)
+    percentiles = {}
+    year_weeks.each do |year,week|
+      yearweek = self.yearweek(year,week)
+      percentiles[yearweek] = self.percentiles_for_year_week(year,week,options)
+    end
+    percentiles
+  end
+  
+      
 
   
   
