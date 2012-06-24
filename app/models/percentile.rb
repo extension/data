@@ -40,15 +40,15 @@ class Percentile < ActiveRecord::Base
         insert_list << self.yearweek(year,week)
         insert_list << year
         insert_list << week
-        insert_list << percentiles[:total]
-        insert_list << percentiles[:seen]
-        insert_list << percentiles[99]
-        insert_list << percentiles[95]
-        insert_list << percentiles[90]
-        insert_list << percentiles[75]
-        insert_list << percentiles[50]
-        insert_list << percentiles[25]
-        insert_list << percentiles[10]
+        insert_list << (percentiles[:total] || 'NULL')
+        insert_list << (percentiles[:seen] || 'NULL')
+        insert_list << (percentiles[99] || 'NULL')
+        insert_list << (percentiles[95] || 'NULL')
+        insert_list << (percentiles[90] || 'NULL')
+        insert_list << (percentiles[75] || 'NULL')
+        insert_list << (percentiles[50] || 'NULL')
+        insert_list << (percentiles[25] || 'NULL')
+        insert_list << (percentiles[10] || 'NULL')
         insert_list << 'NOW()'        
         insert_values << "(#{insert_list.join(',')})"
       end # year-week
