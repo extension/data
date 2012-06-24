@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120622143500) do
+ActiveRecord::Schema.define(:version => 20120624171952) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -171,6 +171,26 @@ ActiveRecord::Schema.define(:version => 20120622143500) do
   add_index "pages", ["migrated_id"], :name => "index_pages_on_migrated_id"
   add_index "pages", ["node_id"], :name => "node_ndx"
   add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
+
+  create_table "percentiles", :force => true do |t|
+    t.integer  "group_id"
+    t.string   "datatype",                  :null => false
+    t.integer  "yearweek",   :default => 0
+    t.integer  "year",       :default => 0
+    t.integer  "week",       :default => 0
+    t.integer  "total",      :default => 0
+    t.integer  "seen",       :default => 0
+    t.integer  "pct_99",     :default => 0
+    t.integer  "pct_95",     :default => 0
+    t.integer  "pct_90",     :default => 0
+    t.integer  "pct_75",     :default => 0
+    t.integer  "pct_50",     :default => 0
+    t.integer  "pct_25",     :default => 0
+    t.integer  "pct_10",     :default => 0
+    t.datetime "created_at",                :null => false
+  end
+
+  add_index "percentiles", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
 
   create_table "revisions", :force => true do |t|
     t.integer  "node_id"

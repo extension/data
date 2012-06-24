@@ -9,11 +9,7 @@ class TotalDiff < ActiveRecord::Base
   belongs_to :group
   extend YearWeek
   
-  
-  
-  
-  
-  def self.rebuild_all
+  def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
     self.rebuild_by_datatype
     Group.launched.each do |group|
