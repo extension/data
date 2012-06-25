@@ -49,7 +49,7 @@ module YearWeek
     cwyear = start_date.cwyear
     loop_week_eow = Date.commercial(cwyear,cweek,7)
     yearweeks = []
-    while(loop_week_eow <= end_date)
+    while(loop_week_eow < end_date)
       yearweeks << [loop_week_eow.cwyear,loop_week_eow.cweek]
       loop_week_eow += 1.week
     end

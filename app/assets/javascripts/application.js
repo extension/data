@@ -13,4 +13,6 @@
 //= require jquery
 //= require jquery_ujs
 //= require bootstrap
+//= require jqplot
+//= require jqplot/plugins/categoryAxisRenderer
 //= require_tree .

@@ -27,5 +27,8 @@ module PagesHelper
     end
   end
   
+  def jqplot_page_traffic_data(page)
+    page.week_stats_data.to_json.html_safe
+  end
   
 end

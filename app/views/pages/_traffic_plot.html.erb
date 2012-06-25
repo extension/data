@@ -1,0 +1,26 @@
+  <div id="traffic_plot_<%= page.id %>" style="height:160px; width:600px;"></div> 
+  <script class="code" type="text/javascript">
+    $(document).ready(function(){
+      setTimeout(function(){
+      var data = <%= jqplot_page_traffic_data(page) %>;
+      var plot1 = jQuery.jqplot ("traffic_plot_<%= page.id %>", [data], 
+        {
+          series:[
+            {showMarker: false}
+            ],
+          axes: {
+            xaxis: {
+              renderer: $.jqplot.CategoryAxisRenderer,
+              showTicks: false,
+              tickOptions: {
+                show: false,
+                showLabel: false,
+                showMark: false
+              }
+            } 
+          }
+        }
+      );
+    }, 100);
+    });
+  </script>

@@ -154,6 +154,25 @@ class Page < ActiveRecord::Base
     percentiles
   end
   
+  def week_stats_data
+    returndata = []
+    week_stats = {}
+    self.week_stats.order('yearweek').map do |ws|
+      yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
+      week_stats[yearweek_string] = ws.unique_pageviews
+    end
+    
+    year_weeks = self.eligible_year_weeks
+    
+    row_count = 0
+    year_weeks.each do |year,week|
+      yearweek_string = "#{year}-" + "%02d" % week 
+      upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
+      returndata << [yearweek_string,upv]
+    end
+    returndata
+  end
+
       
 
   

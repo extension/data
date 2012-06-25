@@ -60,6 +60,9 @@ gem 'safe_attributes'
 # google visualization api integration
 gem "google_visualr", ">= 2.1"
 
+# jqplot
+gem 'jqplot-rails', :git => 'git://github.com/extension/jqplot-rails.git'
+
 group :development do
   # require the powder gem
   gem 'powder'

@@ -20,7 +20,7 @@ class PagesController < ApplicationController
     
     data_table = GoogleVisualr::DataTable.new    
     data_table.new_column('string', 'Week')
-    data_table.new_column('number', 'UniquePageviews')
+    data_table.new_column('number', 'Views')
     
     week_stats = {}
     @page.week_stats.order('yearweek').map do |ws|
@@ -28,14 +28,12 @@ class PagesController < ApplicationController
       week_stats[yearweek_string] = ws.unique_pageviews
     end
     
-    year_weeks = @page.eligible_year_weeks
-    data_table.add_rows(year_weeks.size)
+    week_stats_data = @page.week_stats_data
+    data_table.add_rows(week_stats_data.size)
     row_count = 0
-    year_weeks.each do |year,week|
-      yearweek_string = "#{year}-" + "%02d" % week 
-      data_table.set_cell(row_count,0,yearweek_string)
-      upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
-      data_table.set_cell(row_count,1,upv)
+    week_stats_data.each do |label,value|
+      data_table.set_cell(row_count,0,label)
+      data_table.set_cell(row_count,1,value)
       row_count += 1
     end
   
