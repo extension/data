@@ -30,6 +30,22 @@ module YearWeek
     [previous.cwyear,previous.cweek]
   end
   
+  def previous_year_weeks(year,week,count)
+    (sow,eow) = self.date_pair_for_year_week(year,week)
+    previous_date_end = sow - 1.day
+    previous_date_start = (previous_date_end - count.week) + 1.day
+    self.year_weeks_between_dates(previous_date_start,previous_date_end)
+  end
+  
+  
+  def next_year_weeks(year,week,count)
+    (sow,eow) = self.date_pair_for_year_week(year,week)
+    next_date_start = eow + 1.day
+    next_date_end = (next_date_start + count.week) - 1.day
+    self.year_weeks_between_dates(next_date_start,next_date_end)
+  end
+  
+  
   
   def next_year_week(year,week)
     (start_date,end_date) = self.date_pair_for_year_week(year,week)
@@ -49,7 +65,7 @@ module YearWeek
     cwyear = start_date.cwyear
     loop_week_eow = Date.commercial(cwyear,cweek,7)
     yearweeks = []
-    while(loop_week_eow < end_date)
+    while(loop_week_eow <= end_date)
       yearweeks << [loop_week_eow.cwyear,loop_week_eow.cweek]
       loop_week_eow += 1.week
     end

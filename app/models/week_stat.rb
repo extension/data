@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class WeekStat < ActiveRecord::Base
+  extend YearWeek
   belongs_to :page
   attr_accessible :page_id, :pageviews, :unique_pageviews, :year, :week, :entrances, :time_on_page, :exits, :visitors, :new_visits
       
@@ -138,6 +139,16 @@ class WeekStat < ActiveRecord::Base
       joins(:page).select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("pages.datatype,year,week")
     end
   end
+  
+  def self.last_year_week_stats
+    (lastyear,lastweek) = self.last_year_week
+    with_scope do
+      where(:year => lastyear).where(:week => lastweek)
+    end
+  end
+  
+  
+  
 
     
 
