@@ -114,7 +114,7 @@ class GAImporter < Thor
     else
       next_year_week = Analytic.next_year_week(latest_year_week[0],latest_year_week[1])
       start_date = Analytic.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
-      end_date = Date.today
+      end_date = (Date.today - 1)
       yearweeks = Analytic.year_weeks_between_dates(start_date,end_date)
     end
     
@@ -152,7 +152,7 @@ class GAImporter < Thor
     else
       next_year_week = Analytic.next_year_week(latest_year_week[0],latest_year_week[1])
       start_date = Analytic.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
-      end_date = Date.today
+      end_date = (Date.today - 1)
       yearweeks = Analytic.year_weeks_between_dates(start_date,end_date)
     end
     
