@@ -5,6 +5,14 @@ GIT
     gsl (1.14.7)
       narray (>= 0.5.9)
 
+GIT
+  remote: git://github.com/extension/jqplot-rails.git
+  revision: 8e1feb2fa3c553761612c3e5de3c65f68ef325aa
+  specs:
+    jqplot-rails (0.1)
+      railties (~> 3.0)
+      thor (~> 0.14)
+
 GEM
   remote: https://rubygems.org/
   remote: http://systems.extension.org/rubygems/
@@ -266,6 +274,7 @@ DEPENDENCIES
   garb
   google_visualr (>= 2.1)
   gsl!
+  jqplot-rails!
   jquery-rails
   kaminari
   mysql2
