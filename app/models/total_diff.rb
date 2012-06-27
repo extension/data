@@ -43,6 +43,9 @@ class TotalDiff < ActiveRecord::Base
       
       pagecounts = (group.nil?) ? Page.by_datatype(datatype).page_counts_by_yearweek : group.pages.by_datatype(datatype).page_counts_by_yearweek
       
+      running_change = []
+      running_difference = []
+      
       yearweeks.each do |year,week|
         
         current_key_string = "#{year}-#{week}-#{datatype}"
@@ -85,6 +88,35 @@ class TotalDiff < ActiveRecord::Base
         else
           pct_change_year = (views - views_previous_year) / views_previous_year
         end
+        
+        if(pct_change_week != 'NULL')
+          running_change.push(pct_change_week)
+          if(running_change.size > Settings.recent_weeks)
+            running_change.shift
+            recent_pct_change = running_change.sum
+          elsif(running_change.size == Settings.recent_weeks)
+            recent_pct_change = running_change.sum
+          else
+            recent_pct_change = 'NULL'
+          end
+        else
+          recent_pct_change = 'NULL'
+        end
+        
+        if(pct_difference_week != 'NULL')  
+          running_difference.push(pct_difference_week)
+          if(running_difference.size > Settings.recent_weeks)
+            running_difference.shift
+            recent_pct_difference = running_difference.sum
+          elsif(running_difference.size == Settings.recent_weeks)
+            recent_pct_difference = running_difference.sum
+          else
+            recent_pct_difference = 'NULL'
+          end
+        else
+          recent_pct_difference = 'NULL'
+        end
+        
               
         insert_list = []
         insert_list << group_id
@@ -104,8 +136,10 @@ class TotalDiff < ActiveRecord::Base
         insert_list << views_previous_year
         insert_list << pct_difference_week
         insert_list << pct_difference_year
+        insert_list << recent_pct_difference
         insert_list << pct_change_week
         insert_list << pct_change_year
+        insert_list << recent_pct_change
         insert_list << 'NOW()'        
         insert_values << "(#{insert_list.join(',')})"
       end # year-week
