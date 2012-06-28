@@ -9,6 +9,10 @@ class TotalDiff < ActiveRecord::Base
   belongs_to :group
   extend YearWeek
   
+  
+  scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
+  
+  
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
     self.rebuild_by_datatype

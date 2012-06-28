@@ -12,7 +12,7 @@ class Group < ActiveRecord::Base
   has_many :pages, :through => :tags
   has_many :analytics, :through => :tags
   has_many :week_stats, :through => :tags  
-  has_many :week_diffs, :through => :tags
+  has_many :total_diffs
   
   scope :launched, where(:is_launched => true)  
   
@@ -31,6 +31,12 @@ class Group < ActiveRecord::Base
     end
     insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
+  end
+  
+  def stats_for_week
+    (year,week) = self.class.last_year_week
+    pd = self.total_diffs.by_year_week(year,week).first
+    {:views => pd.views, :change_week => pd.pct_change_week, :change_year => pd.pct_change_year, :recent_change => (pd.recent_pct_change / Settings.recent_weeks) }
   end
   
 end

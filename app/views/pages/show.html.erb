@@ -6,7 +6,9 @@
 
 <div class="row-fluid">
   <div class="span4">
-	  <h3>Stuff</h3>
+    <h3>Last Week</h3>
+    <p><%= date_range_for_last_week %></p>
+    <%= page_views_information(@page)%>
   </div>
   <div class="span8">
     <div id="graph"></div>
@@ -80,29 +82,7 @@
   </div>
 </div>
 
-<div class="row-fluid">
-  <div class="span12">
-	  <h3>Node Event History</h3>
-	    <table class="table table-bordered">
-        <thead>
-          <tr>
-            <th>When</th>
-            <th>What</th>
-            <th>Who</th>
-          </tr>
-        </thead>
-        <tbody>
-          <%- @page.node.node_events.order("created_at DESC").each do |ne| -%>
-          <tr>
-            <td><%= ne.created_at.to_s %></td>
-            <td><%= ne.event_to_s %></td>
-            <td><%= ne.user.fullname %></td>
-          </tr>
-          <%- end -%>
-        </tbody>
-      </table>
-  </div>
-</div>
+
 
 
 

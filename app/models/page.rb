@@ -176,7 +176,13 @@ class Page < ActiveRecord::Base
   def stats_for_week
     (year,week) = self.class.last_year_week
     pd = self.page_diffs.by_year_week(year,week).first
-    {:views => pd.views, :change_week => pd.pct_change_week, :change_year => pd.pct_change_year, :recent_change => (pd.recent_pct_change / Settings.recent_weeks) }
+    recent = pd.recent_pct_change.nil? ? nil : pd.recent_pct_change / Settings.recent_weeks
+    if(total_views = self.page_total.unique_pageviews and eligible_weeks = self.page_total.eligible_weeks)
+      average = (total_views / eligible_weeks)
+    else
+      average = nil
+    end
+    {:views => pd.views, :change_week => pd.pct_change_week, :change_year => pd.pct_change_year, :recent_change => recent, :average => average, :weeks => eligible_weeks.round }
   end
 
   

@@ -14,7 +14,7 @@ class PageDiff < ActiveRecord::Base
   
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
-    Page.find_each do |page|
+    Page.where(:id => 40106).each do |page|
       week_stats = page.week_stats
       week_stats_by_yearweek = {}
       page.week_stats.each do |ws|
@@ -100,9 +100,9 @@ class PageDiff < ActiveRecord::Base
         insert_list << views_previous_year
         insert_list << pct_difference_week
         insert_list << pct_difference_year
+        insert_list << recent_pct_difference
         insert_list << pct_change_week
         insert_list << pct_change_year
-        insert_list << recent_pct_difference
         insert_list << recent_pct_change
         insert_list << 'NOW()'
         insert_values << "(#{insert_list.join(',')})"
