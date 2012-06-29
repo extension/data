@@ -95,6 +95,7 @@ class PageDiff < ActiveRecord::Base
         insert_list << self.yearweek(year,week)
         insert_list << year
         insert_list << week
+        insert_list << ActiveRecord::Base.quote_value(Date.commercial(year,week,7))
         insert_list << views
         insert_list << views_previous_week
         insert_list << views_previous_year

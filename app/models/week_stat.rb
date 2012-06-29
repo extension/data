@@ -50,12 +50,13 @@ class WeekStat < ActiveRecord::Base
     # don't insert records earlier than first yearweek
     (e_year,e_week) = Page.earliest_year_week
     earliest_year_week_string = Analytic.yearweek_string(e_year,e_week)
-    insert_columns = ['page_id','yearweek','year','week','pageviews','entrances','unique_pageviews','time_on_page','exits','visitors','new_visits','created_at','updated_at']
+    insert_columns = ['page_id','yearweek','year','week','yearweek_date','pageviews','entrances','unique_pageviews','time_on_page','exits','visitors','new_visits','created_at','updated_at']
     select_statement = <<-END
     page_id,
     yearweek,
     year, 
     week,
+    STR_TO_DATE(CONCAT(yearweek,' Sunday'), '%X%V %W'),
     SUM(pageviews) as pageviews, 
     SUM(entrances) as entrances, 
     SUM(unique_pageviews) as unique_pageviews, 
@@ -71,8 +72,6 @@ class WeekStat < ActiveRecord::Base
     sql_statement = "INSERT INTO #{self.table_name} (#{insert_columns.join(', ')}) SELECT #{select_statement} FROM #{Analytic.table_name} WHERE #{where_clause} GROUP BY #{group_by}"
     self.connection.execute(sql_statement)
   end
-    
-
 
   def self.sums_by_yearweek
     select_statement = <<-END

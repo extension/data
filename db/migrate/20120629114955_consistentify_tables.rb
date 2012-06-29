@@ -1,42 +1,35 @@
-class ReworkAllMigrations < ActiveRecord::Migration
+class ConsistentifyTables < ActiveRecord::Migration
   def change
-    
-    create_table "aae_nodes", :force => true do |t|
-      t.integer "node_id"
-      t.integer "aae_id"
-    end
-
-    add_index "aae_nodes", ["node_id", "aae_id"], :name => "node_group_ndx"
-
-    create_table "analytics", :force => true do |t|
-      t.integer  "page_id"
-      t.integer  "yearweek"
-      t.integer  "year"
-      t.integer  "week"
-      t.text     "analytics_url"
-      t.string   "url_type"
-      t.integer  "url_page_id"
-      t.integer  "url_migrated_id"
-      t.string   "url_wiki_title"
-      t.string   "url_widget_id"
-      t.string   "analytics_url_hash"
-      t.integer  "pageviews"
-      t.integer  "unique_pageviews"
-      t.integer  "entrances"
-      t.integer  "time_on_page"
-      t.integer  "exits"
-      t.integer  "visitors"
-      t.integer  "new_visits"
-      t.datetime "created_at"
-      t.datetime "updated_at"
-    end
-
-    add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
-    add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
+    # NOTE! does not include the "analytics table" - because I didn't want to recreate that data!
+    # create_table "analytics", :force => true do |t|
+    #   t.integer  "page_id"
+    #   t.integer  "yearweek"
+    #   t.integer  "year"
+    #   t.integer  "week"
+    #   t.text     "analytics_url"
+    #   t.string   "url_type"
+    #   t.integer  "url_page_id"
+    #   t.integer  "url_migrated_id"
+    #   t.string   "url_wiki_title"
+    #   t.string   "url_widget_id"
+    #   t.string   "analytics_url_hash"
+    #   t.integer  "pageviews"
+    #   t.integer  "unique_pageviews"
+    #   t.integer  "entrances"
+    #   t.integer  "time_on_page"
+    #   t.integer  "exits"
+    #   t.integer  "visitors"
+    #   t.integer  "new_visits"
+    #   t.datetime "created_at"
+    #   t.datetime "updated_at"
+    # end
+    # 
+    # add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
+    # add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
     create_table "delayed_jobs", :force => true do |t|
-      t.integer  "priority",   :default => 0
-      t.integer  "attempts",   :default => 0
+      t.integer  "priority"
+      t.integer  "attempts"
       t.text     "handler"
       t.text     "last_error"
       t.datetime "run_at"
@@ -50,6 +43,13 @@ class ReworkAllMigrations < ActiveRecord::Migration
 
     add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
+    create_table "aae_nodes", :force => true do |t|
+      t.integer "node_id"
+      t.integer "aae_id"
+    end
+
+    add_index "aae_nodes", ["node_id", "aae_id"], :name => "node_group_ndx"
+
     create_table "groups", :force => true do |t|
       t.integer  "create_gid"
       t.string   "name"
@@ -59,6 +59,17 @@ class ReworkAllMigrations < ActiveRecord::Migration
     end
 
     add_index "groups", ["create_gid"], :name => "create_group_ndx"
+
+    create_table "node_events", :force => true do |t|
+      t.integer  "node_id"
+      t.integer  "user_id"
+      t.integer  "node_revision_id"
+      t.integer  "event"
+      t.text     "log"
+      t.datetime "created_at"
+    end
+
+    add_index "node_events", ["node_id"], :name => "node_ndx"
 
     create_table "node_groups", :force => true do |t|
       t.integer  "node_id"
@@ -90,14 +101,12 @@ class ReworkAllMigrations < ActiveRecord::Migration
 
     create_table "page_totals", :force => true do |t|
       t.integer  "page_id"
-      t.float    "eligible_weeks",   :default => 0.0
+      t.float    "eligible_weeks"
       t.integer  "pageviews"
       t.integer  "unique_pageviews"
       t.integer  "entrances"
       t.integer  "time_on_page"
       t.integer  "exits"
-      t.integer  "visitors"
-      t.integer  "new_visits"
       t.datetime "created_at",                        :null => false
       t.datetime "updated_at",                        :null => false
     end
@@ -109,8 +118,8 @@ class ReworkAllMigrations < ActiveRecord::Migration
       t.string   "datatype"
       t.text     "title"
       t.string   "url_title",         :limit => 101
-      t.integer  "content_length",                   :default => 0
-      t.integer  "content_words",                    :default => 0
+      t.integer  "content_length"
+      t.integer  "content_words"
       t.datetime "source_created_at"
       t.datetime "source_updated_at"
       t.string   "source"
@@ -142,36 +151,15 @@ class ReworkAllMigrations < ActiveRecord::Migration
     add_index "revisions", ["node_id"], :name => "node_ndx"
     add_index "revisions", ["user_id"], :name => "user_ndx"
 
+
     create_table "tags", :force => true do |t|
       t.string   "name",                      :null => false
-      t.integer  "group_id",   :default => 0
+      t.integer  "group_id"
       t.datetime "created_at"
     end
 
     add_index "tags", ["group_id"], :name => "group_ndx"
     add_index "tags", ["name"], :name => "name_idx", :unique => true
-
-    create_table "total_diffs", :force => true do |t|
-      t.integer  "tag_id"
-      t.string   "datatype",                              :null => false
-      t.integer  "year",                   :default => 0
-      t.integer  "week",                   :default => 0
-      t.date     "yearweek_date"
-      t.integer  "previous_pages",         :default => 0
-      t.integer  "current_pages",          :default => 0
-      t.integer  "previous_upv"
-      t.integer  "current_upv"
-      t.float    "pct_upv_difference"
-      t.float    "pct_upv_change"
-      t.float    "previous_avg_upv"
-      t.float    "current_avg_upv"
-      t.float    "pct_avg_upv_difference"
-      t.float    "pct_avg_upv_change"
-      t.datetime "created_at",                            :null => false
-      t.datetime "updated_at",                            :null => false
-    end
-
-    add_index "total_diffs", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
 
     create_table "update_times", :force => true do |t|
       t.string   "item"
@@ -191,9 +179,9 @@ class ReworkAllMigrations < ActiveRecord::Migration
       t.string   "title"
       t.integer  "account_status"
       t.datetime "last_login_at"
-      t.integer  "position_id",                      :default => 0
-      t.integer  "location_id",                      :default => 0
-      t.integer  "county_id",                        :default => 0
+      t.integer  "position_id"
+      t.integer  "location_id"
+      t.integer  "county_id"
       t.boolean  "retired",                          :default => false
       t.boolean  "is_admin",                         :default => false
       t.integer  "primary_account_id"
@@ -201,25 +189,87 @@ class ReworkAllMigrations < ActiveRecord::Migration
       t.datetime "updated_at"
     end
 
-    create_table "week_diffs", :force => true do |t|
+
+    ## calculated tables that we really want to be consistent
+
+    create_table "page_diffs", :force => true do |t|
       t.integer  "page_id"
-      t.integer  "year",           :default => 0
-      t.integer  "week",           :default => 0
-      t.integer  "previous_upv"
-      t.integer  "current_upv"
-      t.float    "pct_difference"
-      t.float    "pct_change"
-      t.datetime "created_at",                    :null => false
-      t.datetime "updated_at",                    :null => false
+      t.integer  "yearweek"
+      t.integer  "year"
+      t.integer  "week"
+      t.date     "yearweek_date"
+      t.integer  "views"
+      t.integer  "views_previous_week"
+      t.integer  "views_previous_year"
+      t.float    "pct_difference_week"
+      t.float    "pct_difference_year"
+      t.float    "recent_pct_difference"
+      t.float    "pct_change_week"
+      t.float    "pct_change_year"
+      t.float    "recent_pct_change"
+      t.datetime "created_at",                           :null => false
     end
 
-    add_index "week_diffs", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
+    add_index "page_diffs", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
+    add_index "page_diffs", ["year", "week"], :name => "yearweek_ndx"
+
+    create_table "percentiles", :force => true do |t|
+      t.integer  "group_id"
+      t.string   "datatype",                  :null => false
+      t.integer  "yearweek"
+      t.integer  "year"
+      t.integer  "week"
+      t.date     "yearweek_date"
+      t.integer  "total"
+      t.integer  "seen"
+      t.float    "pct_99"
+      t.float    "pct_95"
+      t.float    "pct_90"
+      t.float    "pct_75"
+      t.float    "pct_50"
+      t.float    "pct_25"
+      t.float    "pct_10"
+      t.datetime "created_at",                :null => false
+    end
+
+    add_index "percentiles", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
+    add_index "percentiles", ["year", "week"], :name => "yearweek_ndx"
+
+
+    create_table "total_diffs", :force => true do |t|
+      t.integer  "group_id"
+      t.string   "datatype",                                 :null => false
+      t.integer  "yearweek"
+      t.integer  "year"
+      t.integer  "week"
+      t.date     "yearweek_date"
+      t.integer  "pages"
+      t.integer  "pages_previous_week"
+      t.integer  "pages_previous_year"
+      t.integer  "total_views"
+      t.integer  "total_views_previous_week"
+      t.integer  "total_views_previous_year"
+      t.float    "views"
+      t.float    "views_previous_week"
+      t.float    "views_previous_year"
+      t.float    "pct_difference_week"
+      t.float    "pct_difference_year"
+      t.float    "recent_pct_difference"
+      t.float    "pct_change_week"
+      t.float    "pct_change_year"
+      t.float    "recent_pct_change"
+      t.datetime "created_at",                               :null => false
+    end
+
+    add_index "total_diffs", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
+    add_index "total_diffs", ["year", "week"], :name => "yearweek_ndx"
 
     create_table "week_stats", :force => true do |t|
       t.integer  "page_id"
       t.integer  "yearweek"
-      t.integer  "year",             :default => 0
-      t.integer  "week",             :default => 0
+      t.integer  "year"
+      t.integer  "week"
+      t.date     "yearweek_date"
       t.integer  "pageviews"
       t.integer  "unique_pageviews"
       t.integer  "entrances"
@@ -231,39 +281,8 @@ class ReworkAllMigrations < ActiveRecord::Migration
       t.datetime "updated_at",                      :null => false
     end
 
-    add_index "week_stats", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
+    add_index "week_stats", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
+    add_index "week_stats", ["year", "week"], :name => "yearweek_ndx"
 
-    create_table "week_totals", :force => true do |t|
-      t.integer  "tag_id"
-      t.string   "datatype",                        :null => false
-      t.integer  "year",             :default => 0
-      t.integer  "week",             :default => 0
-      t.integer  "pages",            :default => 0
-      t.integer  "pageviews"
-      t.integer  "unique_pageviews"
-      t.integer  "entrances"
-      t.integer  "time_on_page"
-      t.integer  "exits"
-      t.integer  "visitors"
-      t.integer  "new_visits"
-      t.datetime "created_at",                      :null => false
-      t.datetime "updated_at",                      :null => false
-    end
-
-    add_index "week_totals", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
-
-    create_table "workflow_events", :force => true do |t|
-      t.integer  "node_id"
-      t.integer  "workflow_state_id"
-      t.integer  "user_id"
-      t.integer  "node_revision_id"
-      t.integer  "event"
-      t.string   "event_description"
-      t.datetime "created_at"
-    end
-
-    add_index "workflow_events", ["node_id"], :name => "node_ndx"
-    
   end
-
 end

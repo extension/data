@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120627224946) do
+ActiveRecord::Schema.define(:version => 20120629114955) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -47,8 +47,8 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
   add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
   create_table "delayed_jobs", :force => true do |t|
-    t.integer  "priority",   :default => 0
-    t.integer  "attempts",   :default => 0
+    t.integer  "priority"
+    t.integer  "attempts"
     t.text     "handler"
     t.text     "last_error"
     t.datetime "run_at"
@@ -56,8 +56,8 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
     t.datetime "failed_at"
     t.string   "locked_by"
     t.string   "queue"
-    t.datetime "created_at",                :null => false
-    t.datetime "updated_at",                :null => false
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
@@ -104,9 +104,10 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
 
   create_table "page_diffs", :force => true do |t|
     t.integer  "page_id"
-    t.integer  "yearweek",              :default => 0
-    t.integer  "year",                  :default => 0
-    t.integer  "week",                  :default => 0
+    t.integer  "yearweek"
+    t.integer  "year"
+    t.integer  "week"
+    t.date     "yearweek_date"
     t.integer  "views"
     t.integer  "views_previous_week"
     t.integer  "views_previous_year"
@@ -116,10 +117,11 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
     t.float    "pct_change_week"
     t.float    "pct_change_year"
     t.float    "recent_pct_change"
-    t.datetime "created_at",                           :null => false
+    t.datetime "created_at",            :null => false
   end
 
-  add_index "page_diffs", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "page_diffs", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
+  add_index "page_diffs", ["year", "week"], :name => "yearweek_ndx"
 
   create_table "page_taggings", :force => true do |t|
     t.integer  "page_id"
@@ -132,16 +134,14 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
 
   create_table "page_totals", :force => true do |t|
     t.integer  "page_id"
-    t.float    "eligible_weeks",   :default => 0.0
+    t.float    "eligible_weeks"
     t.integer  "pageviews"
     t.integer  "unique_pageviews"
     t.integer  "entrances"
     t.integer  "time_on_page"
     t.integer  "exits"
-    t.integer  "visitors"
-    t.integer  "new_visits"
-    t.datetime "created_at",                        :null => false
-    t.datetime "updated_at",                        :null => false
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
   add_index "page_totals", ["page_id"], :name => "page_ndx", :unique => true
@@ -151,8 +151,8 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
     t.string   "datatype"
     t.text     "title"
     t.string   "url_title",         :limit => 101
-    t.integer  "content_length",                   :default => 0
-    t.integer  "content_words",                    :default => 0
+    t.integer  "content_length"
+    t.integer  "content_words"
     t.datetime "source_created_at"
     t.datetime "source_updated_at"
     t.string   "source"
@@ -176,23 +176,25 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
 
   create_table "percentiles", :force => true do |t|
     t.integer  "group_id"
-    t.string   "datatype",                  :null => false
-    t.integer  "yearweek",   :default => 0
-    t.integer  "year",       :default => 0
-    t.integer  "week",       :default => 0
-    t.integer  "total",      :default => 0
-    t.integer  "seen",       :default => 0
-    t.integer  "pct_99",     :default => 0
-    t.integer  "pct_95",     :default => 0
-    t.integer  "pct_90",     :default => 0
-    t.integer  "pct_75",     :default => 0
-    t.integer  "pct_50",     :default => 0
-    t.integer  "pct_25",     :default => 0
-    t.integer  "pct_10",     :default => 0
-    t.datetime "created_at",                :null => false
+    t.string   "datatype",      :null => false
+    t.integer  "yearweek"
+    t.integer  "year"
+    t.integer  "week"
+    t.date     "yearweek_date"
+    t.integer  "total"
+    t.integer  "seen"
+    t.float    "pct_99"
+    t.float    "pct_95"
+    t.float    "pct_90"
+    t.float    "pct_75"
+    t.float    "pct_50"
+    t.float    "pct_25"
+    t.float    "pct_10"
+    t.datetime "created_at",    :null => false
   end
 
   add_index "percentiles", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
+  add_index "percentiles", ["year", "week"], :name => "yearweek_ndx"
 
   create_table "revisions", :force => true do |t|
     t.integer  "node_id"
@@ -205,8 +207,8 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
   add_index "revisions", ["user_id"], :name => "user_ndx"
 
   create_table "tags", :force => true do |t|
-    t.string   "name",                      :null => false
-    t.integer  "group_id",   :default => 0
+    t.string   "name",       :null => false
+    t.integer  "group_id"
     t.datetime "created_at"
   end
 
@@ -215,17 +217,17 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
 
   create_table "total_diffs", :force => true do |t|
     t.integer  "group_id"
-    t.string   "datatype",                                 :null => false
-    t.integer  "yearweek",                  :default => 0
-    t.integer  "year",                      :default => 0
-    t.integer  "week",                      :default => 0
+    t.string   "datatype",                  :null => false
+    t.integer  "yearweek"
+    t.integer  "year"
+    t.integer  "week"
     t.date     "yearweek_date"
-    t.integer  "pages",                     :default => 0
-    t.integer  "pages_previous_week",       :default => 0
-    t.integer  "pages_previous_year",       :default => 0
-    t.integer  "total_views",               :default => 0
-    t.integer  "total_views_previous_week", :default => 0
-    t.integer  "total_views_previous_year", :default => 0
+    t.integer  "pages"
+    t.integer  "pages_previous_week"
+    t.integer  "pages_previous_year"
+    t.integer  "total_views"
+    t.integer  "total_views_previous_week"
+    t.integer  "total_views_previous_year"
     t.float    "views"
     t.float    "views_previous_week"
     t.float    "views_previous_year"
@@ -235,10 +237,11 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
     t.float    "pct_change_week"
     t.float    "pct_change_year"
     t.float    "recent_pct_change"
-    t.datetime "created_at",                               :null => false
+    t.datetime "created_at",                :null => false
   end
 
-  add_index "total_diffs", ["group_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "total_diffs", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
+  add_index "total_diffs", ["year", "week"], :name => "yearweek_ndx"
 
   create_table "update_times", :force => true do |t|
     t.string   "item"
@@ -258,9 +261,9 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
     t.string   "title"
     t.integer  "account_status"
     t.datetime "last_login_at"
-    t.integer  "position_id",                      :default => 0
-    t.integer  "location_id",                      :default => 0
-    t.integer  "county_id",                        :default => 0
+    t.integer  "position_id"
+    t.integer  "location_id"
+    t.integer  "county_id"
     t.boolean  "retired",                          :default => false
     t.boolean  "is_admin",                         :default => false
     t.integer  "primary_account_id"
@@ -271,8 +274,9 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
   create_table "week_stats", :force => true do |t|
     t.integer  "page_id"
     t.integer  "yearweek"
-    t.integer  "year",             :default => 0
-    t.integer  "week",             :default => 0
+    t.integer  "year"
+    t.integer  "week"
+    t.date     "yearweek_date"
     t.integer  "pageviews"
     t.integer  "unique_pageviews"
     t.integer  "entrances"
@@ -280,29 +284,11 @@ ActiveRecord::Schema.define(:version => 20120627224946) do
     t.integer  "exits"
     t.integer  "visitors"
     t.integer  "new_visits"
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
-  add_index "week_stats", ["page_id", "year", "week"], :name => "recordsignature", :unique => true
-
-  create_table "week_totals", :force => true do |t|
-    t.integer  "tag_id"
-    t.string   "datatype",                        :null => false
-    t.integer  "year",             :default => 0
-    t.integer  "week",             :default => 0
-    t.integer  "pages",            :default => 0
-    t.integer  "pageviews"
-    t.integer  "unique_pageviews"
-    t.integer  "entrances"
-    t.integer  "time_on_page"
-    t.integer  "exits"
-    t.integer  "visitors"
-    t.integer  "new_visits"
-    t.datetime "created_at",                      :null => false
-    t.datetime "updated_at",                      :null => false
-  end
-
-  add_index "week_totals", ["tag_id", "datatype", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "week_stats", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
+  add_index "week_stats", ["year", "week"], :name => "yearweek_ndx"
 
 end

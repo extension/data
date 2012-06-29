@@ -136,8 +136,19 @@ class Page < ActiveRecord::Base
       end
       returnpercentiles[:total] = pagecount
       returnpercentiles[:seen] = weekstats.length
+      n = statsarray.length + 1
       percentiles.each do |percentile|
-        returnpercentiles[percentile] = statsarray[((percentile / 100) * statsarray.length).ceil - 1]
+        # nist calculation: http://www.itl.nist.gov/div898/handbook/prc/section2/prc252.htm
+        p_sub_n = (percentile/100) * n
+        k = p_sub_n.floor
+        if(k == 0)
+          returnpercentiles[percentile] = statsarray[0]
+        elsif(k == statsarray.length)
+          returnpercentiles[percentile] = statsarray[k-1]
+        else
+          d = (p_sub_n) - k
+          returnpercentiles[percentile] = statsarray[k-1] + d * (statsarray[k] - statsarray[k-1])        
+        end
       end
     end
     returnpercentiles
