@@ -81,6 +81,16 @@ class GAImporter < Thor
       run_and_log(TotalDiff,'rebuild','total weekly differences rebuild')      
       run_and_log(Percentile,'rebuild','percentiles rebuild')      
    end
+   
+   def item_rebuild(model)
+     if(model == 'WeekStat')
+       method = 'mass_rebuild_from_analytics'
+     else 
+       method = 'rebuild'
+     end
+     object = Object.const_get(model)
+     run_and_log(object,method,"#{model} #{method}")
+   end
       
       
   end
@@ -187,6 +197,15 @@ class GAImporter < Thor
   def internal
     load_rails(options[:environment])
     internal_rebuilds
+  end
+  
+  desc "model", "Rebuild a specific model"
+  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
+  method_option :name, :aliases => "-n", :desc => "Model name"
+  def model
+    load_rails(options[:environment])
+    item_rebuild(options[:name])
   end
   
   
