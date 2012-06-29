@@ -136,33 +136,48 @@ class Page < ActiveRecord::Base
       end
       returnpercentiles[:total] = pagecount
       returnpercentiles[:seen] = weekstats.length
-      n = statsarray.length + 1
       percentiles.each do |percentile|
-        # nist calculation: http://www.itl.nist.gov/div898/handbook/prc/section2/prc252.htm
-        p_sub_n = (percentile/100) * n
-        k = p_sub_n.floor
-        if(k == 0)
-          returnpercentiles[percentile] = statsarray[0]
-        elsif(k == statsarray.length)
-          returnpercentiles[percentile] = statsarray[k-1]
-        else
-          d = (p_sub_n) - k
-          returnpercentiles[percentile] = statsarray[k-1] + d * (statsarray[k] - statsarray[k-1])        
-        end
+        returnpercentiles[percentile] = statsarray.nist_percentile(percentile)
       end
     end
     returnpercentiles
   end
   
   def self.percentiles(options = {})
-    earliest_date = self.minimum(:created_at).to_date
-    year_weeks = Analytic.year_weeks_from_date(earliest_date)
-    percentiles = {}
-    year_weeks.each do |year,week|
-      yearweek = self.yearweek(year,week)
-      percentiles[yearweek] = self.percentiles_for_year_week(year,week,options)
+    percentiles = options[:percentiles] || Settings.default_percentiles
+    seenonly = options[:seenonly].nil? ? false : options[:seenonly]
+    
+    pagecounts_by_yearweek = self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
+    weekstats_by_yearweek = {}
+    self.joins(:week_stats).select("week_stats.yearweek as yearweek, week_stats.unique_pageviews as views").each do |ws|
+      weekstats_by_yearweek[ws.yearweek] ||= []
+      weekstats_by_yearweek[ws.yearweek] << ws.views
     end
-    percentiles
+    
+    returnpercentiles = {}
+    earliest_created_at = self.minimum(:created_at)
+    if(!earliest_created_at.nil?)
+      earliest_date = earliest_created_at.to_date
+      year_weeks = Analytic.year_weeks_from_date(earliest_date)
+      year_weeks.each do |year,week|
+        yearweek = self.yearweek(year,week)
+        returnpercentiles[yearweek] = {}
+        pagecount = pagecounts_by_yearweek.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum      
+        weekstats = weekstats_by_yearweek[yearweek] || []
+        if((pagecount > weekstats.length) and !seenonly)
+          emptyset = Array.new((pagecount - weekstats.length),0)
+          statsarray = (weekstats + emptyset).sort
+        else
+          statsarray = weekstats.sort
+        end
+        returnpercentiles[yearweek][:total] = pagecount
+        returnpercentiles[yearweek][:seen] = weekstats.length
+        percentiles.each do |percentile|
+          returnpercentiles[yearweek][percentile] = statsarray.nist_percentile(percentile)
+        end
+      end
+    end
+    returnpercentiles
   end
   
   def week_stats_data
@@ -195,6 +210,20 @@ class Page < ActiveRecord::Base
     end
     {:views => pd.views, :change_week => pd.pct_change_week, :change_year => pd.pct_change_year, :recent_change => recent, :average => average, :weeks => eligible_weeks.round }
   end
+  
+  
+  def self.stats_for_week_for_datatype(datatype)
+    (year,week) = self.last_year_week
+    td = TotalDiff.by_datatype(datatype).by_year_week(year,week).overall.first
+    recent = td.recent_pct_change.nil? ? nil : td.recent_pct_change / Settings.recent_weeks
+    average = TotalDiff.by_datatype(datatype).overall.average(:views)
+    weeks = TotalDiff.by_datatype(datatype).overall.count
+    {:views => td.views, :change_week => td.pct_change_week, :change_year => td.pct_change_year, :recent_change => recent, :average => average, :weeks => weeks }
+  end
+  
+  
+
+    
 
   
   

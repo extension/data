@@ -11,6 +11,8 @@ class TotalDiff < ActiveRecord::Base
   
   
   scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
+  scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
+  scope :overall, where(:group_id => 0)
   
   
   def self.rebuild
@@ -230,5 +232,9 @@ class TotalDiff < ActiveRecord::Base
     end
     views_change_by_group    
   end
+
+  
+
+  
   
 end
