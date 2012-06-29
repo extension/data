@@ -11,12 +11,13 @@ class Array
   # nist calculation: http://www.itl.nist.gov/div898/handbook/prc/section2/prc252.htm
   def nist_percentile(percentile)
     sorted = self.dup.sort!
-    n = (self.length+1)
+    length = sorted.length
+    n = (length+1)
     p_sub_n = (percentile/100) * n
     k = p_sub_n.floor
     if(k == 0)
       sorted[0]
-    elsif(k == n)
+    elsif(k == length)
       sorted[k-1]
     else
       d = (p_sub_n) - k
