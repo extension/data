@@ -23,6 +23,7 @@ class Percentile < ActiveRecord::Base
     datatypes = Page.datatypes
     group = options[:group]  
     if(group.nil? or group == 'overall')
+      group = nil
       group_id = 0
     else
       group_id = group.id
