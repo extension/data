@@ -102,7 +102,7 @@ module PagesHelper
       display = "<span class='mednumber'>n/a</span>"
     end
     output += "\n"
-    output +=  "<p>Change from previous week: #{display}</p>"
+    output +=  "<p>Views change from previous week: #{display}</p>"
     
     if(stats_for_week[:change_year])
       display = "<span class='mednumber #{sign_class(stats_for_week[:change_year])}'>#{number_to_percentage(stats_for_week[:change_year] * 100, :precision => 2)}</span>"      
@@ -110,7 +110,7 @@ module PagesHelper
       display = "<span class='mednumber'>n/a</span>"
     end
     output += "\n"
-    output +=  "<p>Change from same week last year: #{display}</p>"
+    output +=  "<p>Views change from same week last year: #{display}</p>"
     
     if(stats_for_week[:recent_change])
       display = "<span class='mednumber #{sign_class(stats_for_week[:recent_change])}'>#{up_or_down(stats_for_week[:recent_change])}</span>"
@@ -119,12 +119,12 @@ module PagesHelper
       display = "<span class='mednumber'>n/a</span>"
     end
     output += "\n"
-    output += "<p>Trend over last #{Settings.recent_weeks} weeks: #{display}</p>"
+    output += "<p>Views trend over last #{Settings.recent_weeks} weeks: #{display}</p>"
     
     if(stats_for_week[:average])
       display = "<span class='mednumber'>#{number_with_precision(stats_for_week[:average], :precision => 1)}</span>"
       output += "\n"
-      output += "<p>Average per page over #{stats_for_week[:weeks]} weeks: #{display}</p>"
+      output += "<p>Average views per page over #{stats_for_week[:weeks]} weeks: #{display}</p>"
     end    
     
     output.html_safe
