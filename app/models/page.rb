@@ -247,7 +247,9 @@ class Page < ActiveRecord::Base
     recent = td.recent_pct_change.nil? ? nil : td.recent_pct_change / Settings.recent_weeks
     average = TotalDiff.by_datatype(datatype).overall.average(:views)
     weeks = TotalDiff.by_datatype(datatype).overall.count
-    {:views => td.views, :change_week => td.pct_change_week, :change_year => td.pct_change_year, :recent_change => recent, :average => average, :weeks => weeks }
+    pages = td.pages
+    new_pages = td.pages - td.pages_previous_week
+    {:pages => td.pages, :new_pages => new_pages, :views => td.views, :change_week => td.pct_change_week, :change_year => td.pct_change_year, :recent_change => recent, :average => average, :weeks => weeks }
   end
   
   

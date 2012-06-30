@@ -26,4 +26,13 @@ module ApplicationHelper
     "<li#{list_item_class}>#{link_to(label,path)}</li>".html_safe
   end
   
+  def sign_class(value)
+    (value > 0 ) ? 'positive' : 'negative'
+  end
+  
+  def up_or_down(value)
+    (value > 0 ) ? '⬆'.html_safe : '⬇'.html_safe
+  end
+    
+  
 end

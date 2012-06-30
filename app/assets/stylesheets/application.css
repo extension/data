@@ -12,4 +12,5 @@
  *= require bootstrap
  *= require bootstrap_overrides
  *= require jqplot
+ *= require numbers
 */

@@ -9,6 +9,9 @@ class Percentile < ActiveRecord::Base
   belongs_to :group
   extend YearWeek
 
+  scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
+  scope :overall, where(:group_id => 0)
+
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
     self.rebuild_by_group(:group => 'overall')

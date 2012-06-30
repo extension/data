@@ -35,10 +35,16 @@ module PagesHelper
     Page.traffic_stats_data_by_datatype(datatype).to_json.html_safe
   end
   
+  def year_week_for_last_week
+    (year,week) = Page.last_year_week
+    "#{year} Week ##{week}".html_safe
+  end
+  
+  
   def date_range_for_last_week
     (year,week) = Page.last_year_week
     (sow,eow) = Page.date_pair_for_year_week(year,week)
-    "#{sow.to_s} — #{eow.to_s}".html_safe
+    "#{sow.strftime("%b %d")} — #{eow.strftime("%b %d")}".html_safe
   end
   
   def page_views_information(page)
@@ -80,40 +86,45 @@ module PagesHelper
   end
   
   
-  
+
   def overall_views_information(datatype)
     stats_for_week = Page.stats_for_week_for_datatype(datatype)
+    pages = (stats_for_week[:pages] || 0)
+    new_pages = stats_for_week[:new_pages]
+    output = "<p><span class='bignumber'>#{number_with_delimiter(pages)}</span> pages ( <span class='mednumber'>#{new_pages}</span> new pages )</p>"
+    output += "\n"
     views = (stats_for_week[:views] || 0)
-    output = "<p>#{number_with_precision(views, :precision => 1)} Views (Average/page)</p>"
+    output += "<p><span class='bignumber'>#{number_with_precision(views, :precision => 1)}</span> Views (average per page)</p>"
     output += "\n"
     if(stats_for_week[:change_week])
-      display = number_to_percentage(stats_for_week[:change_week] * 100, :precision => 2)
+      display = "<span class='mednumber #{sign_class(stats_for_week[:change_week])}'>#{number_to_percentage(stats_for_week[:change_week] * 100, :precision => 2)}</span>"
     else
-      display = "n/a"
+      display = "<span class='mednumber'>n/a</span>"
     end
     output += "\n"
     output +=  "<p>Change from previous week: #{display}</p>"
     
     if(stats_for_week[:change_year])
-      display = number_to_percentage(stats_for_week[:change_year] * 100, :precision => 2)
+      display = "<span class='mednumber #{sign_class(stats_for_week[:change_year])}'>#{number_to_percentage(stats_for_week[:change_year] * 100, :precision => 2)}</span>"      
     else
-      display = "n/a"
+      display = "<span class='mednumber'>n/a</span>"
     end
     output += "\n"
     output +=  "<p>Change from same week last year: #{display}</p>"
     
     if(stats_for_week[:recent_change])
-      display = number_to_percentage(stats_for_week[:recent_change] * 100, :precision => 2)
+      display = "<span class='mednumber #{sign_class(stats_for_week[:recent_change])}'>#{up_or_down(stats_for_week[:recent_change])}</span>"
+      display += " (<span class='#{sign_class(stats_for_week[:recent_change])}'>#{number_to_percentage(stats_for_week[:recent_change] * 100, :precision => 2)}</span>)"      
     else
-      display = "n/a"
+      display = "<span class='mednumber'>n/a</span>"
     end
     output += "\n"
     output += "<p>Trend over last #{Settings.recent_weeks} weeks: #{display}</p>"
     
     if(stats_for_week[:average])
-      display = number_with_precision(stats_for_week[:average], :precision => 1)
+      display = "<span class='mednumber'>#{number_with_precision(stats_for_week[:average], :precision => 1)}</span>"
       output += "\n"
-      output += "<p>Average per Page over #{stats_for_week[:weeks]} weeks: #{display}</p>"
+      output += "<p>Average per page over #{stats_for_week[:weeks]} weeks: #{display}</p>"
     end    
     
     output.html_safe

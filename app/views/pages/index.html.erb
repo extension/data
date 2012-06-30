@@ -2,7 +2,7 @@
 
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
-  <p class="lead">Views by datatype: Articles, Faqs, Events, and News</p>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
 </header>
 
 
@@ -12,13 +12,11 @@
   </div>  
   <div class="row-fluid">
     <div class="span4">
-      <h3>Last Week</h3>
-      <p><%= date_range_for_last_week %></p>
       <%= overall_views_information(datatype)%>
     </div>
   
     <div class="span8">
-      <h3>Views over time</h3>
+      <h3>Views per week over time</h3>
       <%= render(:partial => 'overall_traffic_plot', :locals => {:datatype => datatype})%>     
     </div>
   </div>
