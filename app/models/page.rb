@@ -10,6 +10,7 @@ class Page < ActiveRecord::Base
   has_many :analytics
   has_many :page_taggings
   has_many :tags, :through => :page_taggings
+  has_many :groups, :through => :tags
   belongs_to :node
   has_many :week_stats
   has_many :page_diffs
@@ -21,7 +22,7 @@ class Page < ActiveRecord::Base
   NOT_GOOGLE_INDEXED = 2
 
 
-  DATATYPES = ['Article','Event','Faq','News']
+  DATATYPES = ['Article','Faq','Event','News']
 
   scope :not_ignored, where("indexed != ?",NOT_INDEXED )
   scope :indexed, where(:indexed => INDEXED)
@@ -180,7 +181,7 @@ class Page < ActiveRecord::Base
     returnpercentiles
   end
   
-  def week_stats_data
+  def traffic_stats_data
     returndata = []
     week_stats = {}
     self.week_stats.order('yearweek').map do |ws|
@@ -189,26 +190,54 @@ class Page < ActiveRecord::Base
     end
     
     year_weeks = self.eligible_year_weeks
-    
-    row_count = 0
     year_weeks.each do |year,week|
-      yearweek_string = "#{year}-" + "%02d" % week 
+      yearweek_string = "#{year}-" + "%02d" % week
+      date = self.class.yearweek_date(year,week)
       upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
-      returndata << [yearweek_string,upv]
+      returndata << [date,upv]
     end
     returndata
   end
+  
+  def self.traffic_stats_data_by_datatype(datatype)
+    returndata = []
+    week_stats = {}
+    TotalDiff.by_datatype(datatype).overall.order('yearweek').map do |ws|
+      yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
+      week_stats[yearweek_string] = ws.views
+    end
+    
+    start_date = Page.by_datatype(datatype).minimum(:created_at).to_date
+    year_weeks = Analytic.year_weeks_from_date(start_date)
+    year_weeks.each do |year,week|
+      yearweek_string = "#{year}-" + "%02d" % week
+      date = self.yearweek_date(year,week)
+      upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
+      returndata << [date,upv]
+    end
+    returndata
+  end  
 
   def stats_for_week
     (year,week) = self.class.last_year_week
     pd = self.page_diffs.by_year_week(year,week).first
-    recent = pd.recent_pct_change.nil? ? nil : pd.recent_pct_change / Settings.recent_weeks
+    if(pd.nil?)
+      views = 0
+      change_week = nil
+      change_year = nil
+    else
+      views = pd.views
+      change_week = pd.pct_change_week
+      change_year = pd.pct_change_year
+      recent = pd.recent_pct_change.nil? ? nil : pd.recent_pct_change / Settings.recent_weeks
+    end
+    
     if(total_views = self.page_total.unique_pageviews and eligible_weeks = self.page_total.eligible_weeks)
       average = (total_views / eligible_weeks)
     else
       average = nil
     end
-    {:views => pd.views, :change_week => pd.pct_change_week, :change_year => pd.pct_change_year, :recent_change => recent, :average => average, :weeks => eligible_weeks.round }
+    {:views => views, :change_week => change_week, :change_year => change_year, :recent_change => recent, :average => average, :weeks => eligible_weeks.round }
   end
   
   

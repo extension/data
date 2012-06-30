@@ -46,7 +46,7 @@ class Percentile < ActiveRecord::Base
           insert_list << yearweek
           insert_list << year
           insert_list << week
-          insert_list << ActiveRecord::Base.quote_value(Date.commercial(year,week,7))
+          insert_list << ActiveRecord::Base.quote_value(self.yearweek_date(year,week))
           insert_list << (percentiles[:total] || 'NULL')
           insert_list << (percentiles[:seen] || 'NULL')
           insert_list << (percentiles[99] || 'NULL')

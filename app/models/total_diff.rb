@@ -15,6 +15,15 @@ class TotalDiff < ActiveRecord::Base
   scope :overall, where(:group_id => 0)
   
   
+  def self.max_views(nearest = nil)
+    with_scope do
+      max = maximum(:views)
+      if(nearest)
+        max = max + nearest - (max % nearest)
+      end
+    end
+  end
+  
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
     self.rebuild_by_datatype
@@ -130,7 +139,7 @@ class TotalDiff < ActiveRecord::Base
         insert_list << self.yearweek(year,week)
         insert_list << year
         insert_list << week
-        insert_list << ActiveRecord::Base.quote_value(Date.commercial(year,week,7))
+        insert_list << ActiveRecord::Base.quote_value(self.yearweek_date(year,week))
         insert_list << pages
         insert_list << pages_previous_week
         insert_list << pages_previous_year

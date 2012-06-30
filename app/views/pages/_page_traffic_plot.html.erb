@@ -1,0 +1,37 @@
+  <div id="traffic_plot_<%= page.id %>" style="height:160px; width:600px;"></div> 
+  <script class="code" type="text/javascript">
+    $(document).ready(function(){
+      setTimeout(function(){
+      var data = <%= jqplot_page_traffic_data(page) %>;
+      var plot1 = jQuery.jqplot ("traffic_plot_<%= page.id %>", [data], 
+        {
+          axesDefaults: {
+            pad: 0
+          },
+          axes: {
+            xaxis: {
+              renderer: $.jqplot.DateAxisRenderer,
+              tickOptions:{
+               formatString:'%b&nbsp;%#d&nbsp;%Y'
+              }
+            } 
+          },
+          seriesDefaults: {
+            showMarker: false,
+            shadow: false
+          },
+          highlighter: {
+            show: true,
+            formatString: '<strong>%s</strong> Views: %s',
+            tooltipLocation: 'ne'
+          },
+          grid: {
+              drawBorder: false,
+              shadow: false,
+              background: "white"
+          }
+        }
+      );
+    }, 100);
+    });
+  </script>

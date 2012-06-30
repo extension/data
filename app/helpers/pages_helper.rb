@@ -28,7 +28,11 @@ module PagesHelper
   end
   
   def jqplot_page_traffic_data(page)
-    page.week_stats_data.to_json.html_safe
+    page.traffic_stats_data.to_json.html_safe
+  end
+  
+  def jqplot_overall_traffic_data_by_datatype(datatype) 
+    Page.traffic_stats_data_by_datatype(datatype).to_json.html_safe
   end
   
   def date_range_for_last_week
@@ -39,7 +43,8 @@ module PagesHelper
   
   def page_views_information(page)
     stats_for_week = page.stats_for_week
-    output = "<p>#{stats_for_week[:views]} Views</p>"
+    views = (stats_for_week[:views] || 0)
+    output = "<p>#{views} Views</p>"
     output += "\n"
     if(stats_for_week[:change_week])
       display = number_to_percentage(stats_for_week[:change_week] * 100, :precision => 2)
@@ -55,7 +60,7 @@ module PagesHelper
       display = "n/a"
     end
     output += "\n"
-    output +=  "<p>Change from previous year: #{display}</p>"
+    output +=  "<p>Change from same week last year: #{display}</p>"
     
     if(stats_for_week[:recent_change])
       display = number_to_percentage(stats_for_week[:recent_change] * 100, :precision => 2)
@@ -73,6 +78,47 @@ module PagesHelper
     
     output.html_safe
   end
+  
+  
+  
+  def overall_views_information(datatype)
+    stats_for_week = Page.stats_for_week_for_datatype(datatype)
+    views = (stats_for_week[:views] || 0)
+    output = "<p>#{number_with_precision(views, :precision => 1)} Views (Average/page)</p>"
+    output += "\n"
+    if(stats_for_week[:change_week])
+      display = number_to_percentage(stats_for_week[:change_week] * 100, :precision => 2)
+    else
+      display = "n/a"
+    end
+    output += "\n"
+    output +=  "<p>Change from previous week: #{display}</p>"
+    
+    if(stats_for_week[:change_year])
+      display = number_to_percentage(stats_for_week[:change_year] * 100, :precision => 2)
+    else
+      display = "n/a"
+    end
+    output += "\n"
+    output +=  "<p>Change from same week last year: #{display}</p>"
+    
+    if(stats_for_week[:recent_change])
+      display = number_to_percentage(stats_for_week[:recent_change] * 100, :precision => 2)
+    else
+      display = "n/a"
+    end
+    output += "\n"
+    output += "<p>Trend over last #{Settings.recent_weeks} weeks: #{display}</p>"
+    
+    if(stats_for_week[:average])
+      display = number_with_precision(stats_for_week[:average], :precision => 1)
+      output += "\n"
+      output += "<p>Average per Page over #{stats_for_week[:weeks]} weeks: #{display}</p>"
+    end    
+    
+    output.html_safe
+  end
+  
     
   
 end

@@ -19,7 +19,7 @@ class PagesController < ApplicationController
     
     
     data_table = GoogleVisualr::DataTable.new    
-    data_table.new_column('string', 'Week')
+    data_table.new_column('date', 'Date')
     data_table.new_column('number', 'Views')
     
     week_stats = {}
@@ -28,11 +28,11 @@ class PagesController < ApplicationController
       week_stats[yearweek_string] = ws.unique_pageviews
     end
     
-    week_stats_data = @page.week_stats_data
+    week_stats_data = @page.traffic_stats_data
     data_table.add_rows(week_stats_data.size)
     row_count = 0
-    week_stats_data.each do |label,value|
-      data_table.set_cell(row_count,0,label)
+    week_stats_data.each do |date,value|
+      data_table.set_cell(row_count,0,date)
       data_table.set_cell(row_count,1,value)
       row_count += 1
     end

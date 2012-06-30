@@ -1,0 +1,41 @@
+  <div id="traffic_plot_<%= datatype %>" style="height:160px; width:600px;"></div> 
+  <script class="code" type="text/javascript">
+    $(document).ready(function(){
+      setTimeout(function(){
+      var data = <%= jqplot_overall_traffic_data_by_datatype(datatype) %>;
+      var plot1 = jQuery.jqplot ("traffic_plot_<%= datatype %>", [data], 
+        {
+          axesDefaults: {
+            pad: 0
+          },
+          axes: {
+            xaxis: {
+              renderer: $.jqplot.DateAxisRenderer,
+              tickOptions:{
+               formatString:'%b&nbsp;%#d&nbsp;%Y'
+              }
+            },
+            yaxis: {
+              min: 0,
+              max: <%= TotalDiff.overall.max_views(5) %>
+            } 
+          },
+          seriesDefaults: {
+            showMarker: false,
+            shadow: false
+          },
+          highlighter: {
+            show: true,
+            formatString: '<strong>%s</strong> Views: %s',
+            tooltipLocation: 'ne'
+          },
+          grid: {
+              drawBorder: false,
+              shadow: false,
+              background: "white"
+          }
+        }
+      );
+    }, 100);
+    });
+  </script>

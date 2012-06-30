@@ -58,6 +58,9 @@ module YearWeek
     self.year_week_for_date(last_week_date)
   end
   
+  def yearweek_date(year,week)
+    Date.commercial(year,week,7) 
+  end
   
   def year_weeks_between_dates(start_date,end_date)
     # construct a set of year-weeks given the start and end dates
