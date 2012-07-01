@@ -14,7 +14,7 @@ class PageDiff < ActiveRecord::Base
   
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
-    Page.where(:id => 40106).each do |page|
+    Page.find_each do |page|
       week_stats = page.week_stats
       week_stats_by_yearweek = {}
       page.week_stats.each do |ws|
