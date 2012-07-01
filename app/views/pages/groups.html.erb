@@ -43,7 +43,7 @@
                 (n/a)
               <%- end -%>
             </td>
-            <td><%= number_with_precision(group_stats[:views], :precision => 1) %></td>
+            <td><%= number_with_precision(group_stats[:views], :precision => 2) %></td>
             <td>
               <%- if(group_stats[:pages] > 0) 
                 group_pct_viewed = group_stats[:seen]/group_stats[:pages]
@@ -57,10 +57,14 @@
               <%- end -%>
             </td>
             <td>
-              <%- delta_views = (group_stats[:views] - overall[:views]) / overall[:views] %>
+              <%- if(group_stats[:pages] > 0) %>
+                <%- delta_views = (group_stats[:views] - overall[:views]) / overall[:views] %>
                 <span class='<%=sign_class_percentage(delta_views)%>'><%=up_or_down_percentage(delta_views)%></span> 
                 (<span class='<%=sign_class_percentage(delta_views)%>'><%=number_to_percentage(delta_views * 100, :precision => 1) %></span>)                
-            </td>
+              <%- else -%>
+                (n/a)
+              <%- end -%>
+            </td>    
             <%- end -%>
           </tr>
           <%- end -%>

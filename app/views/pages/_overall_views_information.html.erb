@@ -14,7 +14,7 @@
   <span class="count mednumber"><%= number_with_delimiter(seen)%></span> <span class="count">viewed (<%=number_to_percentage(seen_pct, :precision => 1)%>)</span>
 </p>
 </div>  
-<p><span class='mednumber'><%=number_with_precision(views, :precision => 1)%></span> views for week (average per page)</p>
+<p><span class='mednumber'><%=number_with_precision(views, :precision => 2)%></span> views for week (average per page)</p>
 
 <p> 
 <%- if stats_for_week[:change_week] -%> 
@@ -43,7 +43,7 @@ trend over last <%=Settings.recent_weeks%> weeks</p>
 
 <%- if stats_for_week[:recent_change] -%>
   <p>
-    <span class='mednumber'><%=number_with_precision(stats_for_week[:average], :precision => 1)%></span>  
+    <span class='mednumber'><%=number_with_precision(stats_for_week[:average], :precision => 2)%></span>  
     historical views per page (over <%=stats_for_week[:weeks]%> weeks)
   </p>
 <%- end -%>
