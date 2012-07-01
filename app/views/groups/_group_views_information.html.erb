@@ -4,7 +4,11 @@
   seen = (stats_for_week[:seen] || 0)
   new_pages = stats_for_week[:new_pages]
   views = (stats_for_week[:views] || 0)
-  seen_pct = ((seen/pages)*100).to_f
+  if(pages > 0)
+    seen_pct = ((seen/pages)*100).to_f
+  else
+    seen_pct = 0
+  end
 -%>
 
 <p><span class='mednumber'><%= number_with_delimiter(pages)%></span> pages ( <span class='mednumber'><%= new_pages%></span> new pages )</p>

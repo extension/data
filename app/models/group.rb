@@ -89,15 +89,20 @@ class Group < ActiveRecord::Base
       week_stats[yearweek_string] = ws.views
     end
     
-    start_date = self.pages.by_datatype(datatype).minimum(:created_at).to_date
-    year_weeks = Analytic.year_weeks_from_date(start_date)
-    year_weeks.each do |year,week|
-      yearweek_string = "#{year}-" + "%02d" % week
-      date = self.class.yearweek_date(year,week)
-      upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
-      returndata << [date,upv]
+    earliest_created_at = self.pages.by_datatype(datatype).minimum(:created_at)
+    if(!earliest_created_at.nil?)
+      start_date =  earliest_created_at.to_date   
+      year_weeks = Analytic.year_weeks_from_date(start_date)
+      year_weeks.each do |year,week|
+        yearweek_string = "#{year}-" + "%02d" % week
+        date = self.class.yearweek_date(year,week)
+        upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
+        returndata << [date,upv]
+      end
+      returndata
+    else
+      []
     end
-    returndata
   end
   
   
