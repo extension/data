@@ -257,6 +257,7 @@ class Page < ActiveRecord::Base
   
   
   def self.stats_for_week_for_datatype(datatype)
+    returndata = {}
     (year,week) = self.last_year_week
     td = TotalDiff.by_datatype(datatype).by_year_week(year,week).overall.first
     recent = td.recent_pct_change.nil? ? nil : td.recent_pct_change / Settings.recent_weeks
@@ -264,7 +265,24 @@ class Page < ActiveRecord::Base
     weeks = TotalDiff.by_datatype(datatype).overall.count
     pages = td.pages
     new_pages = td.pages - td.pages_previous_week
-    {:pages => td.pages, :new_pages => new_pages, :views => td.views, :change_week => td.pct_change_week, :change_year => td.pct_change_year, :recent_change => recent, :average => average, :weeks => weeks }
+    
+    pctile = Percentile.by_datatype(datatype).by_year_week(year,week).overall.first
+    
+    returndata[:pages] = pages
+    returndata[:new_pages] = new_pages
+    returndata[:views] =  td.views
+
+    returndata[:change_week] = td.pct_change_week
+    returndata[:change_year] = td.pct_change_year
+    returndata[:recent_change] = recent
+    returndata[:average] = average
+    returndata[:weeks] = weeks
+    returndata[:seen] = pctile.seen
+    Percentile::TRACKED.each do |pct|
+      column_name = "pct_#{pct}"
+      returndata[column_name.to_sym] = pctile.send(column_name)
+    end
+    returndata
   end
   
   

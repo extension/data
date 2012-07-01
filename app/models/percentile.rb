@@ -9,6 +9,7 @@ class Percentile < ActiveRecord::Base
   belongs_to :group
   extend YearWeek
 
+  scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
   scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
   scope :overall, where(:group_id => 0)
   
