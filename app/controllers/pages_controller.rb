@@ -13,6 +13,11 @@ class PagesController < ApplicationController
   def show
     @page = Page.includes(:node).find(params[:id])
   end
+  
+  def group
+    @group = Group.find(params[:id])
+  end
+  
 
   def traffic_chart
     @page = Page.find_by_id(params[:id])

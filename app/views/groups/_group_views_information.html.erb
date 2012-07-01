@@ -1,5 +1,5 @@
 <%-
-  stats_for_week = Page.stats_for_week_for_datatype(datatype)
+  stats_for_week = group.stats_for_week_for_datatype(datatype)
   pages = (stats_for_week[:pages] || 0)
   seen = (stats_for_week[:seen] || 0)
   new_pages = stats_for_week[:new_pages]

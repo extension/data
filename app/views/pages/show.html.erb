@@ -41,7 +41,7 @@
       </tr>
       <tr>
         <td>Groups</td>
-        <td><%= @page.groups.map(&:name).join(', ') %></td>
+        <td><%= @page.groups.map{|g| link_to(g.name, pages_group_path(g))}.join(', ').html_safe %></td>
       </tr>
       <tr>
       <tr>
