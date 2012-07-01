@@ -1,0 +1,35 @@
+  <div id="traffic_plot_<%= datatype %>" style="height:160px; width:600px;"></div> 
+  <script class="code" type="text/javascript">
+    $(document).ready(function(){
+      setTimeout(function(){
+        <% (labels,data) = jqplot_overall_traffic_data_by_datatype_with_percentiles(datatype) %>
+        var data = <%= data %>;
+        var labels = <%= labels %>;
+
+        var plot1 = jQuery.jqplot ("traffic_plot_<%= datatype %>", data, 
+        {
+          axesDefaults: {
+            pad: 0
+          },
+          axes: {
+            xaxis: {
+              renderer: $.jqplot.DateAxisRenderer,
+              tickOptions:{
+               formatString:'%b&nbsp;%Y'
+              }
+            },
+          },
+          seriesDefaults: {
+            showMarker: false,
+            shadow: false
+          },
+          grid: {
+              drawBorder: false,
+              shadow: false,
+              background: "white"
+          }
+        }
+      );
+    }, 100);
+    });
+  </script>

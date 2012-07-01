@@ -121,7 +121,7 @@ class Page < ActiveRecord::Base
   end
   
   def self.percentiles_for_year_week(year,week, options = {})
-    percentiles = options[:percentiles] || Settings.default_percentiles
+    percentiles = options[:percentiles] || Percentile::TRACKED
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]
     yearweek_string = self.yearweek_string(year,week)
     
@@ -145,7 +145,7 @@ class Page < ActiveRecord::Base
   end
   
   def self.percentiles(options = {})
-    percentiles = options[:percentiles] || Settings.default_percentiles
+    percentiles = options[:percentiles] || Percentile::TRACKED
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]
     
     pagecounts_by_yearweek = self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
@@ -216,7 +216,22 @@ class Page < ActiveRecord::Base
       returndata << [date,upv]
     end
     returndata
-  end  
+  end
+  
+  
+  
+  def self.traffic_stats_data_by_datatype_with_percentiles(datatype)
+    percentiles = Percentile.overall_percentile_data_by_datatype(datatype)
+    averages = self.traffic_stats_data_by_datatype(datatype)
+    
+    data = []
+    data << averages
+    Settings.display_percentiles.each do |pct|
+      data << percentiles[pct]
+    end
+    labels = ['Average Views'] + Settings.display_percentiles_labels
+    [labels,data]
+  end 
 
   def stats_for_week
     (year,week) = self.class.last_year_week

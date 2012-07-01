@@ -8,7 +8,7 @@
   <div class="span4">
     <h3>Last Week</h3>
     <p><%= date_range_for_last_week %></p>
-    <%= page_views_information(@page)%>
+    <%= render(:partial => 'page_views_information', :locals => {:page => @page}) %>
   </div>
   <div class="span8">
     <h3>Views over time</h3>
@@ -41,7 +41,7 @@
       </tr>
       <tr>
         <td>Groups</td>
-        <td>ToDo</td>
+        <td><%= @page.groups.map(&:name).join(', ') %></td>
       </tr>
       <tr>
       <tr>

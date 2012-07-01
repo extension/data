@@ -35,6 +35,12 @@ module PagesHelper
     Page.traffic_stats_data_by_datatype(datatype).to_json.html_safe
   end
   
+  def jqplot_overall_traffic_data_by_datatype_with_percentiles(datatype)
+    (labels,data) = Page.traffic_stats_data_by_datatype_with_percentiles(datatype)
+    [labels.to_json.html_safe,data.to_json.html_safe]
+  end
+  
+  
   def year_week_for_last_week
     (year,week) = Page.last_year_week
     "#{year} Week ##{week}".html_safe

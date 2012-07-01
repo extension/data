@@ -4,5 +4,7 @@ googleapps_analytics_limit: 10000
 googleapps_traffic_start: '2007-02-23'
 panda_start: '2011-02-28'
 session_token: '123456789012345678901234567890'
-default_percentiles: <%= [10,25,50,75,90,95,99] %>
+display_percentiles: [99,90,75,50]
+display_percentiles_labels: ['99th percentile','90th percentile', '75th percentile', '50th percentile']
 recent_weeks: 4
+flat_percentage: 0.025

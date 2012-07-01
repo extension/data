@@ -52,112 +52,116 @@ class TotalDiff < ActiveRecord::Base
     end
     
     insert_values = []
-    start_date = Page.minimum(:created_at).to_date
-    yearweeks = Analytic.year_weeks_from_date(start_date)
     datatypes.each do |datatype|
+      earliest_created_at = ((group.nil?) ? Page.by_datatype(datatype).minimum(:created_at) : group.pages.by_datatype(datatype).minimum(:created_at))
+      if(!earliest_created_at.nil?)
+        start_date = earliest_created_at.to_date
+        yearweeks = Analytic.year_weeks_from_date(start_date)
       
-      pagecounts = (group.nil?) ? Page.by_datatype(datatype).page_counts_by_yearweek : group.pages.by_datatype(datatype).page_counts_by_yearweek
       
-      running_change = []
-      running_difference = []
+        pagecounts = (group.nil?) ? Page.by_datatype(datatype).page_counts_by_yearweek : group.pages.by_datatype(datatype).page_counts_by_yearweek
       
-      yearweeks.each do |year,week|
+        running_change = []
+        running_difference = []
+      
+        yearweeks.each do |year,week|
         
-        current_key_string = "#{year}-#{week}-#{datatype}"
-        previous_year_key_string ="#{year-1}-#{week}-#{datatype}"
-        (previous_year,previous_week) = Analytic.previous_year_week(year,week)
-        previous_week_key_string = "#{previous_year}-#{previous_week}-#{datatype}"
+          current_key_string = "#{year}-#{week}-#{datatype}"
+          previous_year_key_string ="#{year-1}-#{week}-#{datatype}"
+          (previous_year,previous_week) = Analytic.previous_year_week(year,week)
+          previous_week_key_string = "#{previous_year}-#{previous_week}-#{datatype}"
     
     
-        pages = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum
-        pages_previous_week = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year,previous_week)}.values.sum  
-        pages_previous_year = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year-1,week)}.values.sum  
+          pages = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum
+          pages_previous_week = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year,previous_week)}.values.sum  
+          pages_previous_year = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(previous_year-1,week)}.values.sum  
         
-        total_views = (week_stats_by_yearweek[current_key_string] ? week_stats_by_yearweek[current_key_string] : 0)
-        total_views_previous_week = (week_stats_by_yearweek[previous_week_key_string] ? week_stats_by_yearweek[previous_week_key_string] : 0)        
-        total_views_previous_year = (week_stats_by_yearweek[previous_year_key_string] ? week_stats_by_yearweek[previous_year_key_string] : 0)        
+          total_views = (week_stats_by_yearweek[current_key_string] ? week_stats_by_yearweek[current_key_string] : 0)
+          total_views_previous_week = (week_stats_by_yearweek[previous_week_key_string] ? week_stats_by_yearweek[previous_week_key_string] : 0)        
+          total_views_previous_year = (week_stats_by_yearweek[previous_year_key_string] ? week_stats_by_yearweek[previous_year_key_string] : 0)        
 
-        views = ((pages == 0) ? 0 : (total_views / pages))
-        views_previous_week = ((pages_previous_week == 0) ? 0 : (total_views_previous_week / pages_previous_week))
-        views_previous_year = ((pages_previous_year == 0) ? 0 : (total_views_previous_year / pages_previous_year))
+          views = ((pages == 0) ? 0 : (total_views / pages))
+          views_previous_week = ((pages_previous_week == 0) ? 0 : (total_views_previous_week / pages_previous_week))
+          views_previous_year = ((pages_previous_year == 0) ? 0 : (total_views_previous_year / pages_previous_year))
 
-        # pct_difference
-        if((views + views_previous_week) == 0)
-           pct_difference_week = 0
-        else
-           pct_difference_week = (views - views_previous_week) / ((views + views_previous_week) / 2)
-        end   
-        if((views + views_previous_year) == 0)
-           pct_difference_year = 0
-        else
-           pct_difference_year = (views - views_previous_year) / ((views + views_previous_year) / 2)
-        end
-        # pct_change
-        if(views_previous_week == 0)
-          pct_change_week = 'NULL'
-        else
-          pct_change_week = (views - views_previous_week) / views_previous_week
-        end
-        if(views_previous_year == 0)
-          pct_change_year = 'NULL'
-        else
-          pct_change_year = (views - views_previous_year) / views_previous_year
-        end
+          # pct_difference
+          if((views + views_previous_week) == 0)
+             pct_difference_week = 0
+          else
+             pct_difference_week = (views - views_previous_week) / ((views + views_previous_week) / 2)
+          end   
+          if((views + views_previous_year) == 0)
+             pct_difference_year = 0
+          else
+             pct_difference_year = (views - views_previous_year) / ((views + views_previous_year) / 2)
+          end
+          # pct_change
+          if(views_previous_week == 0)
+            pct_change_week = 'NULL'
+          else
+            pct_change_week = (views - views_previous_week) / views_previous_week
+          end
+          if(views_previous_year == 0)
+            pct_change_year = 'NULL'
+          else
+            pct_change_year = (views - views_previous_year) / views_previous_year
+          end
         
-        if(pct_change_week != 'NULL')
-          running_change.push(pct_change_week)
-          if(running_change.size > Settings.recent_weeks)
-            running_change.shift
-            recent_pct_change = running_change.sum
-          elsif(running_change.size == Settings.recent_weeks)
-            recent_pct_change = running_change.sum
+          if(pct_change_week != 'NULL')
+            running_change.push(pct_change_week)
+            if(running_change.size > Settings.recent_weeks)
+              running_change.shift
+              recent_pct_change = running_change.sum
+            elsif(running_change.size == Settings.recent_weeks)
+              recent_pct_change = running_change.sum
+            else
+              recent_pct_change = 'NULL'
+            end
           else
             recent_pct_change = 'NULL'
           end
-        else
-          recent_pct_change = 'NULL'
-        end
         
-        if(pct_difference_week != 'NULL')  
-          running_difference.push(pct_difference_week)
-          if(running_difference.size > Settings.recent_weeks)
-            running_difference.shift
-            recent_pct_difference = running_difference.sum
-          elsif(running_difference.size == Settings.recent_weeks)
-            recent_pct_difference = running_difference.sum
+          if(pct_difference_week != 'NULL')  
+            running_difference.push(pct_difference_week)
+            if(running_difference.size > Settings.recent_weeks)
+              running_difference.shift
+              recent_pct_difference = running_difference.sum
+            elsif(running_difference.size == Settings.recent_weeks)
+              recent_pct_difference = running_difference.sum
+            else
+              recent_pct_difference = 'NULL'
+            end
           else
             recent_pct_difference = 'NULL'
           end
-        else
-          recent_pct_difference = 'NULL'
-        end
         
               
-        insert_list = []
-        insert_list << group_id
-        insert_list << ActiveRecord::Base.quote_value(datatype)
-        insert_list << self.yearweek(year,week)
-        insert_list << year
-        insert_list << week
-        insert_list << ActiveRecord::Base.quote_value(self.yearweek_date(year,week))
-        insert_list << pages
-        insert_list << pages_previous_week
-        insert_list << pages_previous_year
-        insert_list << total_views
-        insert_list << total_views_previous_week
-        insert_list << total_views_previous_year
-        insert_list << views
-        insert_list << views_previous_week
-        insert_list << views_previous_year
-        insert_list << pct_difference_week
-        insert_list << pct_difference_year
-        insert_list << recent_pct_difference
-        insert_list << pct_change_week
-        insert_list << pct_change_year
-        insert_list << recent_pct_change
-        insert_list << 'NOW()'        
-        insert_values << "(#{insert_list.join(',')})"
-      end # year-week
+          insert_list = []
+          insert_list << group_id
+          insert_list << ActiveRecord::Base.quote_value(datatype)
+          insert_list << self.yearweek(year,week)
+          insert_list << year
+          insert_list << week
+          insert_list << ActiveRecord::Base.quote_value(self.yearweek_date(year,week))
+          insert_list << pages
+          insert_list << pages_previous_week
+          insert_list << pages_previous_year
+          insert_list << total_views
+          insert_list << total_views_previous_week
+          insert_list << total_views_previous_year
+          insert_list << views
+          insert_list << views_previous_week
+          insert_list << views_previous_year
+          insert_list << pct_difference_week
+          insert_list << pct_difference_year
+          insert_list << recent_pct_difference
+          insert_list << pct_change_week
+          insert_list << pct_change_year
+          insert_list << recent_pct_change
+          insert_list << 'NOW()'        
+          insert_values << "(#{insert_list.join(',')})"
+        end # year-week
+      end # created_at nil? check
     end # datatypes    
     if(!insert_values.blank?)
       columns = self.column_names.reject{|n| n == "id"}
