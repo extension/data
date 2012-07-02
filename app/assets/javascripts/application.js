@@ -16,4 +16,5 @@
 //= require jqplot
 //= require jqplot/plugins/dateAxisRenderer
 //= require jqplot/plugins/highlighter
+//= require jqplot/plugins/enhancedLegendRenderer
 //= require_tree .

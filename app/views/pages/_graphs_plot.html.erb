@@ -1,0 +1,37 @@
+  <div id="plot_for_<%= datakey %>" style="height:240px; width:800px;"></div> 
+  <script class="code" type="text/javascript">
+    $(document).ready(function(){
+      setTimeout(function(){
+      var data = <%= data[datakey].to_json.html_safe %>;
+      var plot1 = jQuery.jqplot("plot_for_<%= datakey %>", [data], 
+        {
+          axesDefaults: {
+            pad: 0
+          },
+          axes: {
+            xaxis: {
+              renderer: $.jqplot.DateAxisRenderer,
+              tickOptions:{
+               formatString:'%b&nbsp;%Y'
+              }
+            },
+            yaxis: {
+              <%- if datakey != 'change' -%>
+              min: 0,
+              <%- end -%>
+            } 
+          },
+          seriesDefaults: {
+            showMarker: false,
+            shadow: false
+          },
+          grid: {
+              drawBorder: false,
+              shadow: false,
+              background: "white"
+          }
+        }
+      );
+    }, 100);
+    });
+  </script>

@@ -10,6 +10,8 @@ Positronic::Application.routes.draw do
     end
   end
   
+  match '/pages/graphs/:datatype' => 'pages#graphs', :as => 'graphs_pages', :via => :get
+  
   resources :groups, :only => [:index, :show] do
     member do
       get :pages

@@ -16,8 +16,8 @@
     </div>
   
     <div class="span8">
-      <h3>Views per week over time</h3>
-      <%= render(:partial => 'overall_traffic_plot', :locals => {:datatype => datatype})%>     
+      <h3>Views per week over time <small><%= link_to('more...',graphs_pages_path(:datatype => datatype))%></small></h3>
+      <%= render(:partial => 'overall_traffic_plot', :locals => {:datatype => datatype})%>
     </div>
   </div>
 <%- end -%>

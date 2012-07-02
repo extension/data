@@ -286,6 +286,68 @@ class Page < ActiveRecord::Base
   end
   
   
+  def self.graph_data_by_datatype(datatype)
+    returndata = {}
+    returndata['pagegrowth'] = []
+    returndata['views'] = []
+    returndata['change'] = []
+    returndata['rolling'] = []
+    returndata['seen_pct'] = []
+    
+    week_stats = {}
+    TotalDiff.by_datatype(datatype).overall.order('yearweek').map do |ws|
+      yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
+      week_stats[yearweek_string] = {:pages => ws.pages, :views => ws.views, :change => ws.pct_change_week}
+    end
+    
+    Percentile.by_datatype(datatype).overall.order('yearweek').map do |pctile|
+      yearweek_string = "#{pctile.year}-" + "%02d" % pctile.week 
+      week_stats[yearweek_string] ||= {}
+      if(pctile.total > 0)
+        week_stats[yearweek_string][:seen_pct] = (pctile.seen / pctile.total)
+      else
+        week_stats[yearweek_string][:seen_pct] = 0
+      end
+      Percentile::TRACKED.each do |pct|
+        column_name = "pct_#{pct}"
+        week_stats[yearweek_string][column_name] = pctile.send(column_name)
+      end
+    end
+      
+    
+    start_date = Page.by_datatype(datatype).minimum(:created_at).to_date
+    year_weeks = Analytic.year_weeks_from_date(start_date)
+    views_total = 0
+    loopcount = 0
+    year_weeks.each do |year,week|
+      loopcount += 1
+      yearweek_string = "#{year}-" + "%02d" % week
+      date = self.yearweek_date(year,week)
+      if(week_stats[yearweek_string].nil?)
+        views = 0
+        change = 0
+        pages = 0
+        seen_pct = 0
+      else
+        views = week_stats[yearweek_string][:views].nil? ? 0 : week_stats[yearweek_string][:views]
+        change = week_stats[yearweek_string][:change].nil? ? 0 : week_stats[yearweek_string][:change]
+        pages = week_stats[yearweek_string][:pages].nil? ? 0 : week_stats[yearweek_string][:pages]
+        seen_pct = week_stats[yearweek_string][:seen_pct].nil? ? 0 : week_stats[yearweek_string][:seen_pct]
+      end
+      
+      views_total += views
+      rolling = (views_total / loopcount)        
+      returndata['pagegrowth'] << [date,pages]
+      returndata['views'] << [date,views]
+      returndata['change'] << [date,change*100]
+      returndata['rolling'] << [date,rolling]
+      returndata['seen_pct'] << [date,seen_pct*100]
+    end
+    returndata
+  end
+  
+    
+  
 
     
 
