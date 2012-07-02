@@ -7,6 +7,7 @@ Positronic::Application.routes.draw do
     collection do
       get :panda_impact_summary
       get :groups
+      get :list
     end
   end
   
@@ -16,6 +17,7 @@ Positronic::Application.routes.draw do
     member do
       get :pages
       get :pagesgraphs
+      get :pageslist
     end
   end
   

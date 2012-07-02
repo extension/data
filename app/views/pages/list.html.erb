@@ -1,0 +1,11 @@
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<div class="row-fluid">
+  <div class="span12">
+	  <%= paginate @pagelist %>
+	  <%= render(:partial => 'pagelist', :locals => {:pagelist => @pagelist} )%>
+  </div>
+</div>

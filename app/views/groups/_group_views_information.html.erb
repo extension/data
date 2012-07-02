@@ -11,7 +11,7 @@
   end
 -%>
 
-<p><span class='mednumber'><%= number_with_delimiter(pages)%></span> pages ( <span class='mednumber'><%= new_pages%></span> new pages )</p>
+<p><span class='mednumber'><%= number_with_delimiter(pages)%></span> <%= link_to('pages', pageslist_group_path(group,:datatype => datatype))%> ( <span class='mednumber'><%= new_pages%></span> new pages )</p>
 <div class='barchart'>
 <p>
   <span class="index" style="width: <%= seen_pct.to_i %>%">&nbsp;</span>

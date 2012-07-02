@@ -35,6 +35,11 @@ class Page < ActiveRecord::Base
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
   scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
+  scope :last_week_view_ordered, lambda{
+    (year,week) = Analytic.latest_year_week
+    joins(:page_diffs).where("page_diffs.year = ? AND page_diffs.week = ?",year,week).order("page_diffs.views DESC")
+  }
+  
   
   def self.earliest_year_week
     if(@yearweek.blank?)
@@ -57,6 +62,34 @@ class Page < ActiveRecord::Base
     Analytic.year_weeks_from_date(start_date)
   end
   
+  def last_diff
+    if(!@last_diff)
+      (year,week) = Analytic.latest_year_week
+      @last_diff = self.page_diffs.by_year_week(year,week).first
+    end
+    @last_diff
+  end
+  
+  def last_percentile
+    # overall
+    (year,week) = Analytic.latest_year_week
+    overall_percentiles = Percentile.overall_percentile_for_year_week_datatype(year,week,self.datatype)
+    ld = self.last_diff
+    if(ld.nil?)
+      nil
+    else
+      views = ld.views
+      Percentile::TRACKED.each do |pct|
+        column_name = "pct_#{pct}"
+        if(views >= overall_percentiles.send(column_name))
+          return pct
+        end
+      end
+      return 0
+    end
+  end
+    
+      
         
   def self.find_by_title_url(url)
    return nil unless url

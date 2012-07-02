@@ -70,6 +70,15 @@ class Percentile < ActiveRecord::Base
     end # datatypes
   end
   
+  def self.overall_percentile_for_year_week_datatype(year,week,datatype)
+    key = "#{year}-#{week}-#{datatype}"
+    if(!@cachedpercentiles or !@cachedpercentiles[key])
+      @cachedpercentiles ||= {}
+      @cachedpercentiles[key] = self.by_year_week(year,week).by_datatype(datatype).overall.first
+    end
+    @cachedpercentiles[key]
+  end
+  
   def self.overall_percentile_data_by_datatype(datatype)
     returndata = {}
     week_stats = {}

@@ -23,5 +23,20 @@ class GroupsController < ApplicationController
     (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)
   end
   
+  def pageslist
+    @group = Group.find(params[:id])
+    
+    @datatype = params[:datatype]
+    if(!Page::DATATYPES.include?(@datatype))
+      @page_title = "All Pages for Group ##{@group.id}"
+      @page_title_display = "All Pages for #{@group.name}"
+      @pagelist = @group.pages.last_week_view_ordered.page(params[:page])
+    else
+      @page_title = "#{@datatype.pluralize} for Group ##{@group.id}"
+      @page_title_display = "#{@datatype.pluralize} for #{@group.name}"
+      @pagelist = @group.pages.by_datatype(@datatype).last_week_view_ordered.page(params[:page])
+    end
+  end
+  
 
 end
