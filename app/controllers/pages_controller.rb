@@ -65,5 +65,7 @@ class PagesController < ApplicationController
     @diffs = TotalDiff.panda_impacts(@panda_comparison_weeks)
   end
   
+  def groups
+  end
 
 end
