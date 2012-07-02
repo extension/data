@@ -105,7 +105,7 @@ class Percentile < ActiveRecord::Base
   def self.group_percentile_data_by_datatype(group,datatype)
     returndata = {}
     week_stats = {}
-    self.by_group(group).by_datatype(datatype).overall.order('yearweek').map do |percentiles|
+    self.by_group(group).by_datatype(datatype).order('yearweek').map do |percentiles|
       yearweek_string = "#{percentiles.year}-" + "%02d" % percentiles.week 
       week_stats[yearweek_string] = {}
       TRACKED.each do |pct|
