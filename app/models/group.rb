@@ -38,7 +38,7 @@ class Group < ActiveRecord::Base
   
   def stats_for_week_for_datatype(datatype)
     returndata = {}
-    (year,week) = self.class.last_year_week
+    (year,week) = Analytic.latest_year_week
     td = self.total_diffs.by_datatype(datatype).by_year_week(year,week).first
     if(td.nil?)
       pages = self.pages.by_datatype(datatype).count

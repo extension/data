@@ -42,13 +42,13 @@ module PagesHelper
 
   
   def year_week_for_last_week
-    (year,week) = Page.last_year_week
+    (year,week) = Analytic.latest_year_week
     "#{year} Week ##{week}".html_safe
   end
   
   
   def date_range_for_last_week
-    (year,week) = Page.last_year_week
+    (year,week) = Analytic.latest_year_week
     (sow,eow) = Page.date_pair_for_year_week(year,week)
     "#{sow.strftime("%b %d")} — #{eow.strftime("%b %d")}".html_safe
   end

@@ -234,7 +234,7 @@ class Page < ActiveRecord::Base
   end 
 
   def stats_for_week
-    (year,week) = self.class.last_year_week
+    (year,week) = Analytic.latest_year_week
     pd = self.page_diffs.by_year_week(year,week).first
     if(pd.nil?)
       views = 0
@@ -258,7 +258,7 @@ class Page < ActiveRecord::Base
   
   def self.stats_for_week_for_datatype(datatype)
     returndata = {}
-    (year,week) = self.last_year_week
+    (year,week) = Analytic.latest_year_week
     td = TotalDiff.by_datatype(datatype).by_year_week(year,week).overall.first
     recent = td.recent_pct_change.nil? ? nil : td.recent_pct_change / Settings.recent_weeks
     average = TotalDiff.by_datatype(datatype).overall.average(:views)

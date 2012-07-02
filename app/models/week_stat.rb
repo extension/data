@@ -140,7 +140,7 @@ class WeekStat < ActiveRecord::Base
   end
   
   def self.last_week_stats
-    (lastyear,lastweek) = self.last_year_week
+    (lastyear,lastweek) = Analytic.latest_year_week
     with_scope do
       where(:year => lastyear).where(:week => lastweek)
     end
