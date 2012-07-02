@@ -31,7 +31,7 @@ module ApplicationHelper
   end
   
   def up_or_down(value)
-    (value > 0 ) ? '⬆'.html_safe : '⬇'.html_safe
+    (value > 0 ) ? '↑'.html_safe : '↓'.html_safe
   end
   
   def sign_class_percentage(value)
@@ -44,9 +44,9 @@ module ApplicationHelper
   
   def up_or_down_percentage(value)
     if(value.abs < Settings.flat_percentage)
-      '⬌'.html_safe
+      '↔'.html_safe
     else
-      (value > 0 ) ? '⬆'.html_safe : '⬇'.html_safe
+      (value > 0 ) ? '↑'.html_safe : '↓'.html_safe
     end
   end
   
