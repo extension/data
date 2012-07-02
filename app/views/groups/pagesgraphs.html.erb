@@ -1,0 +1,66 @@
+<% @page_title = "Graphs for Group ##{@group.id} - #{@dataytype}" %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @datatype %> graphs for <%= @group.name %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<div class="page-header">
+  <h1>Page growth</h1>
+</div>  
+<div class="row-fluid">
+  <div class="span12">
+    <h3></h3>
+    <%= render(:partial => 'pagesgraphs_plot', :locals => {:data => @graph_data, :datakey => 'pagegrowth'})%>     
+  </div>
+</div>
+
+<div class="page-header">
+  <h1>% Viewed</h1>
+</div>
+<div class="row-fluid">
+  <div class="span12">
+    <%= render(:partial => 'pagesgraphs_plot', :locals => {:data => @graph_data, :datakey => 'seen_pct'})%>     
+  </div>
+</div>
+
+
+<div class="page-header">
+  <h1>Views</h1>
+</div>  
+<div class="row-fluid">
+  <div class="span12">
+    <%= render(:partial => 'pagesgraphs_plot', :locals => {:data => @graph_data, :datakey => 'views'})%>     
+  </div>
+</div>
+
+<div class="page-header">
+  <h1>Views change</h1>
+</div>  
+<div class="row-fluid">
+  <div class="span12">
+    <%= render(:partial => 'pagesgraphs_plot', :locals => {:data => @graph_data, :datakey => 'change'})%>     
+  </div>
+</div>
+
+<div class="page-header">
+  <h1>Rolling views average</h1>
+</div>
+<div class="row-fluid">
+  <div class="span12">
+    <%= render(:partial => 'pagesgraphs_plot', :locals => {:data => @graph_data, :datakey => 'rolling'})%>     
+  </div>
+</div>
+
+
+<div class="page-header">
+  <h1>Percentiles</h1>
+</div>  
+<div class="row-fluid">
+  <div class="span12">
+    <p><em>click the legend labels to toggle display of the given item</em></p>
+    <%= render(:partial => 'pagesgraphs_percentiles', :locals => {:data => @percentiles_data, :labels => @percentiles_labels})%>     
+  </div>
+</div>
+
+
+

@@ -15,7 +15,7 @@
     </div>
   
     <div class="span8">
-      <h3>Views per week over time</h3>
+      <h3>Views per week over time <small><%= link_to('more...',pagesgraphs_group_path(@group, :datatype => datatype))%></small></h3>
       <% if @group.pages.by_datatype(datatype).count > 0 %>
       <%= render(:partial => 'group_traffic_plot', :locals => {:datatype => datatype, :group => @group})%>
       <%- else -%>

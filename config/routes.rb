@@ -15,6 +15,9 @@ Positronic::Application.routes.draw do
   resources :groups, :only => [:index, :show] do
     member do
       get :pages
+      get :pagesgraphs
     end
   end
+  
+  
 end

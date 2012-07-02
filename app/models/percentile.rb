@@ -10,6 +10,7 @@ class Percentile < ActiveRecord::Base
   extend YearWeek
 
   scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
+  scope :by_group, lambda{|group| where(:group_id => group.id)}
   scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
   scope :overall, where(:group_id => 0)
   
@@ -82,6 +83,38 @@ class Percentile < ActiveRecord::Base
     end
     
     start_date = Page.by_datatype(datatype).minimum(:created_at).to_date
+    year_weeks = Analytic.year_weeks_from_date(start_date)
+    year_weeks.each do |year,week|
+      yearweek_string = "#{year}-" + "%02d" % week
+      date = self.yearweek_date(year,week)
+      TRACKED.each do |pct|
+        returndata[pct] ||= []
+        if(week_stats[yearweek_string].nil?)
+          views = 0
+        elsif(week_stats[yearweek_string][pct].nil?)
+          views = 0
+        else
+          views = week_stats[yearweek_string][pct]
+        end        
+        returndata[pct] << [date,views]
+      end
+    end
+    returndata
+  end  
+  
+  def self.group_percentile_data_by_datatype(group,datatype)
+    returndata = {}
+    week_stats = {}
+    self.by_group(group).by_datatype(datatype).overall.order('yearweek').map do |percentiles|
+      yearweek_string = "#{percentiles.year}-" + "%02d" % percentiles.week 
+      week_stats[yearweek_string] = {}
+      TRACKED.each do |pct|
+        column_name = "pct_#{pct}"
+        week_stats[yearweek_string][pct] = percentiles.send(column_name)
+      end
+    end
+    
+    start_date = group.pages.by_datatype(datatype).minimum(:created_at).to_date
     year_weeks = Analytic.year_weeks_from_date(start_date)
     year_weeks.each do |year,week|
       yearweek_string = "#{year}-" + "%02d" % week
