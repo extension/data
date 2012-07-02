@@ -1,5 +1,12 @@
+<%- if !@datatype 
+      @page_title = "All Pages"
+      @page_title_display = "All #{link_to('Pages',pages_path)}"
+    else
+      @page_title = "Pages - #{@datatype.pluralize}"
+      @page_title_display = "#{link_to('Pages',pages_path)} - #{@datatype.pluralize}"
+    end -%>
 <header class="jumbotron subhead" id="overview">
-  <h1><%= @page_title %></h1>
+  <h1><%= @page_title_display.html_safe %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
 </header>
 

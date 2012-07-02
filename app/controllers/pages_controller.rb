@@ -21,10 +21,9 @@ class PagesController < ApplicationController
   def list
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
-      @page_title = "Pages - All"
+      @datatype = nil
       @pagelist = Page.last_week_view_ordered.page(params[:page])
     else
-      @page_title = "Pages - #{@datatype.pluralize}"
       @pagelist = Page.by_datatype(@datatype).last_week_view_ordered.page(params[:page])
     end
   end
