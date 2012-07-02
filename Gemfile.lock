@@ -81,6 +81,8 @@ GEM
     distribution (0.7.0)
     erubis (2.7.0)
     eventmachine (0.12.10)
+    exception_notification (2.6.1)
+      actionmailer (>= 3.0.4)
     execjs (1.4.0)
       multi_json (~> 1.0)
     extendmatrix (0.3.1)
@@ -271,6 +273,7 @@ DEPENDENCIES
   coffee-rails (~> 3.2.1)
   daemons
   delayed_job_active_record
+  exception_notification
   garb
   google_visualr (>= 2.1)
   gsl!
