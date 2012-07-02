@@ -26,7 +26,7 @@
           </tr>
         </thead>
         <tbody>
-          <%- Group.launched.each do |group| %>
+          <%- Group.launched.order(:name).each do |group| %>
           <tr>
             <td><%= link_to(group.name, pages_group_path(group)) %></td>
             <%- Page::DATATYPES.each do |datatype| -%>
