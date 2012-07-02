@@ -3,9 +3,8 @@
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+  
 </header>
-
-
 <div class="row-fluid">
   <div class="span12">
 	    <table class="table table-bordered">
@@ -17,15 +16,30 @@
             <%- end -%>
           </tr>
           <tr>
-            <th>&nbsp;</th>
+            <td>(<em><span class='positive'>↑</span>, <span class='negative'>↓</span>, ↔ show relation to overall value</em>)</td>
             <%- Page::DATATYPES.each do |datatype| -%>
               <th>Pages</th>
-              <th>% Viewed (∆)</th>
-              <th>Views (∆)</th>
+              <th>% Viewed</th>
+              <th>Views</th>
             <%- end -%>
           </tr>
         </thead>
         <tbody>
+          <tr>
+            <td><%= link_to('Overall', pages_path) %></td>
+            <%- Page::DATATYPES.each do |datatype| -%>
+            <%- overall = Page.stats_for_week_for_datatype(datatype) -%>            
+            <td>
+              <%= number_with_delimiter(overall[:pages]) %>
+            <td>
+              <%= number_to_percentage(overall[:seen]/overall[:pages]*100, :precision => 1) %>
+            </td>
+            <td>
+              <%= number_with_precision(overall[:views], :precision => 2) %>              
+            </td>  
+            <%- end -%>
+          </tr>
+                    
           <%- Group.launched.order(:name).each do |group| %>
           <tr>
             <td><%= link_to(group.name, pages_group_path(group)) %></td>
@@ -41,9 +55,8 @@
                 pct_viewed = overall[:seen]/overall[:pages]
                 delta_viewed = (group_pct_viewed - pct_viewed) / pct_viewed
                 %>
-                <span class='<%=sign_class_percentage(delta_viewed)%>'><%=up_or_down_percentage(delta_viewed)%></span>
                 <%= number_to_percentage(group_stats[:seen]/group_stats[:pages]*100, :precision => 1) %>
-                (<span class='<%=sign_class_percentage(delta_viewed)%>'><%=number_to_percentage(delta_viewed * 100, :precision => 1) %></span>)                
+                <span class='<%=sign_class_percentage(delta_viewed)%>'><%=up_or_down_percentage(delta_viewed)%></span>
               <%- else -%>
                 n/a
               <%- end -%>
@@ -51,9 +64,9 @@
             <td>
               <%- if(group_stats[:pages] > 0) %>
                 <%- delta_views = (group_stats[:views] - overall[:views]) / overall[:views] %>
-                <span class='<%=sign_class_percentage(delta_views)%>'><%=up_or_down_percentage(delta_views)%></span> 
                 <%= number_with_precision(group_stats[:views], :precision => 2) %>
-                (<span class='<%=sign_class_percentage(delta_views)%>'><%=number_to_percentage(delta_views * 100, :precision => 1) %></span>)                
+                <span class='<%=sign_class_percentage(delta_views)%>'><%=up_or_down_percentage(delta_views)%></span>
+                              
               <%- else -%>
                 n/a
               <%- end -%>
