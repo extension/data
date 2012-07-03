@@ -1,0 +1,11 @@
+<ul class="breadcrumb">
+  <li>
+    <%= link_to('Pages',pages_path) %><span class="divider">/</span>
+  </li>
+  <%- if @group -%>
+  <%= breadcrumb_li('group') %><%= link_to(@group.name, group_pages_path(@group)) %><span class="divider">/</span></li>
+  <%- end -%>
+  <%- if local_assigns.has_key?(:endpoint) -%>
+  <li class='active'><%= endpoint %></li>
+  <%- end -%>
+</ul>

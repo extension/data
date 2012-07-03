@@ -1,7 +1,14 @@
-<% @page_title = "Graphs for #{@datatype.pluralize}" %>
-
+<%- if @group.nil? 
+      @page_title = "#{@datatype.pluralize} Graphs "
+      @page_title_display = "#{@datatype.pluralize} Graphs "
+    else
+      @page_title = "#{@datatype.pluralize} Graphs for Group ##{@group.id}"
+      @page_title_display = "#{@datatype.pluralize} Graphs for #{@group.name}"
+    end
+-%>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => 'graphs'}) %>
 <header class="jumbotron subhead" id="overview">
-  <h1><%= link_to('Overall',pages_path) %> Graphs for <%= @datatype.pluralize %></h1>
+  <h1><%= @page_title_display %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
 </header>
 

@@ -42,7 +42,7 @@
                     
           <%- Group.launched.order(:name).each do |group| %>
           <tr>
-            <td><%= link_to(group.name, pages_group_path(group)) %></td>
+            <td><%= link_to(group.name, group_pages_path(group)) %></td>
             <%- Page::DATATYPES.each do |datatype| -%>
             <%- overall = Page.stats_for_week_for_datatype(datatype) 
                 group_stats = group.stats_for_week_for_datatype(datatype)                  

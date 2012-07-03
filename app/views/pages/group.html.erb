@@ -1,0 +1,26 @@
+<% @page_title = "Page Information - Group ##{@group.id}" %>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:group => @group}) %>
+<header class="jumbotron subhead" id="overview">
+  <h1>Page Information for <%= @group.name %></h1>
+  <p class="lead">
+    Data for <%= year_week_for_last_week%>
+    (<%= date_range_for_last_week%>) 
+  </p>
+</header>
+
+<div class="row">
+<%- Page::DATATYPES.each do |datatype| -%>
+    <div class="span3">
+      <h3><%= datatype.pluralize %>
+      </h3>
+      <hr/>
+         
+      <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => @group.stats_for_week_for_datatype(datatype)}) %>
+      <p>
+        <%= link_to("<i class='icon-list'></i> pages list".html_safe,list_pages_path(:datatype => datatype, :group => @group.id),:class => 'btn btn-small  btn-info') %>      
+        <%= link_to("<i class='icon-picture'></i> graphs".html_safe,graphs_pages_path(:datatype => datatype, :group => @group.id),:class => 'btn btn-small  btn-info') %>
+      </p>
+    <hr/>
+    </div>
+<%- end -%>
+</div>

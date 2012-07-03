@@ -28,14 +28,25 @@ class PagesController < ApplicationController
     end
   end
   
+  
   def graphs
+    if(params[:group])
+      @group = Group.find(params[:group])
+    end
+    
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
       # for now, error later
       @datatype = 'Article'
     end
-    @graph_data = Page.graph_data_by_datatype(@datatype)
-    (@percentiles_labels,@percentiles_data) = Page.traffic_stats_data_by_datatype_with_percentiles(@datatype)
+    
+    if(@group)
+      @graph_data = @group.graph_data_by_datatype(@datatype)
+      (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)
+    else
+      @graph_data = Page.graph_data_by_datatype(@datatype)
+      (@percentiles_labels,@percentiles_data) = Page.traffic_stats_data_by_datatype_with_percentiles(@datatype)
+    end
   end
 
   def traffic_chart

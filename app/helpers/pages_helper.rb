@@ -50,7 +50,7 @@ module PagesHelper
   def date_range_for_last_week
     (year,week) = Analytic.latest_year_week
     (sow,eow) = Page.date_pair_for_year_week(year,week)
-    "#{sow.strftime("%b %d")} — #{eow.strftime("%b %d")}".html_safe
+    "#{sow.strftime("%b&nbsp;%d")} - #{eow.strftime("%b&nbsp;%d")}".html_safe
   end
       
   def pct_change(change,extraclass=nil)
@@ -81,6 +81,14 @@ module PagesHelper
     end
   end
   
+  
+  def breadcrumb_li(matchaction)
+    if(params[:action] == matchaction)
+      "<li class='active'>".html_safe
+    else
+      "<li>".html_safe
+    end
+  end  
     
   
 end

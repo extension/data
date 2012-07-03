@@ -11,14 +11,12 @@ Positronic::Application.routes.draw do
     end
   end
   
+  match '/pages/graphs/:datatype/:group' => 'pages#graphs', :as => 'graphs_pages', :via => :get
   match '/pages/graphs/:datatype' => 'pages#graphs', :as => 'graphs_pages', :via => :get
+  match '/pages/group/:id' => 'pages#group', :as => 'group_pages', :via => :get
   
   resources :groups, :only => [:index, :show] do
-    member do
-      get :pages
-      get :pagesgraphs
-      get :pageslist
-    end
+
   end
   
   
