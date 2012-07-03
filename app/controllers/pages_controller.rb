@@ -19,13 +19,23 @@ class PagesController < ApplicationController
   end
   
   def list
+    if(params[:group])
+      @group = Group.find(params[:group])
+    end
+    if(@group)
+      @scope = @group.pages
+    else
+      @scope = Page
+    end
+    
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
       @datatype = nil
-      @pagelist = Page.last_week_view_ordered.page(params[:page])
     else
-      @pagelist = Page.by_datatype(@datatype).last_week_view_ordered.page(params[:page])
+      @scope = @scope.by_datatype(@datatype)
     end
+    @pagelist = @scope.last_week_view_ordered.page(params[:page])
+    
   end
   
   

@@ -1,10 +1,19 @@
-<%- if !@datatype 
+<%- if !@datatype
       @page_title = "All Pages"
-      @page_title_display = "All #{link_to('Pages',pages_path)}"
+      @page_title_display = "All Pages"
+      @endpoint = 'all pages'
     else
-      @page_title = "Pages - #{@datatype.pluralize}"
-      @page_title_display = "#{link_to('Pages',pages_path)} - #{@datatype.pluralize}"
-    end -%>
+      @page_title = "#{@datatype.pluralize}"
+      @page_title_display = "#{@datatype.pluralize}"
+      @endpoint = "#{@datatype.pluralize}"
+    end 
+    
+    if @group
+      @page_title += " for Group ##{@group.id}"
+      @page_title_display += " for #{@group.name}"
+    end
+-%>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title_display.html_safe %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
