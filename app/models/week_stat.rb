@@ -9,6 +9,9 @@ class WeekStat < ActiveRecord::Base
   extend YearWeek
   belongs_to :page
   attr_accessible :page_id, :pageviews, :unique_pageviews, :year, :week, :entrances, :time_on_page, :exits, :visitors, :new_visits
+  
+  
+  scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
       
   def self.mass_create_or_update_for_pages(year,week)
     select_statement = <<-END
@@ -71,6 +74,11 @@ class WeekStat < ActiveRecord::Base
     group_by = "page_id,yearweek"
     sql_statement = "INSERT INTO #{self.table_name} (#{insert_columns.join(', ')}) SELECT #{select_statement} FROM #{Analytic.table_name} WHERE #{where_clause} GROUP BY #{group_by}"
     self.connection.execute(sql_statement)
+    
+    # go back and clear out stats earlier than first page created_at
+    delete_statement = "DELETE #{self.table_name}.* FROM #{self.table_name},#{Page.table_name} WHERE #{self.table_name}.page_id = #{Page.table_name}.id and #{self.table_name}.yearweek < YEARWEEK(#{Page.table_name}.created_at,3)"
+    self.connection.execute(delete_statement)
+    
   end
 
   def self.sums_by_yearweek
