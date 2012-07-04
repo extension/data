@@ -4,9 +4,8 @@
     <title><%= @page_title %></title>
     <%= stylesheet_link_tag    "application" %>
     <%= javascript_include_tag "application" %>
-    <script src='http://www.google.com/jsapi'></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <%= csrf_meta_tags %>
-    
     <%= render(:partial => 'shared/google_tracking') %>
   </head>
   <body>
