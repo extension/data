@@ -195,7 +195,10 @@ class Analytic < ActiveRecord::Base
   end
   
   
-  
+  def self.latest_yearweek
+    (year,week) = latest_year_week
+    yearweek(year,week)
+  end
   
   def self.latest_year_week
     if(!@latest_year_week)

@@ -36,8 +36,8 @@ class Page < ActiveRecord::Base
   scope :from_create, where(:source => 'create')
   scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
   scope :last_week_view_ordered, lambda{
-    (year,week) = Analytic.latest_year_week
-    joins(:page_diffs).where("page_diffs.year = ? AND page_diffs.week = ?",year,week).order("page_diffs.views DESC")
+    yearweek = Analytic.latest_yearweek
+    joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
   }
   
   
