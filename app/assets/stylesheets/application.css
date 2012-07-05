@@ -12,6 +12,7 @@
  *= require bootstrap
  *= require bootstrap_overrides
  *= require responsive
+ *= require media_pagination
  *= require jqplot
  *= require numbers
 */

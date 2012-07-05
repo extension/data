@@ -1,0 +1,52 @@
+/* concept via http://www.ripariandata.com/blog/responsive-pagination-with-kaminari/ */
+
+@media (max-width: 900px) {
+  .pagination .page.away-4 {
+    display:none;
+  }
+}
+@media (max-width: 825px) {
+  .pagination .page.away-3 {
+    display:none;
+  }
+}
+@media (max-width: 750px) {
+  .pagination .page.away-2 {
+    display:none;
+  }
+}
+
+@media (max-width: 320px) {
+
+  .pagination .gap {
+    display:none;
+  }
+
+}
+
+@media (max-width: 320px) {
+  .pagination .first {
+    display:none;
+  }
+  
+  .pagination .last {
+    display:none;
+  }
+  
+
+  
+  .pagination .next_page a {
+    -webkit-border-radius: 3px 0 0 3px;
+    -moz-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  
+  
+  .pagination .prev a{
+    border-left-width: 1px;
+    -webkit-border-radius: 3px 0 0 3px;
+    -moz-border-radius: 3px 0 0 3px;
+    border-radius: 3px 0 0 3px;
+  }
+  
+}
