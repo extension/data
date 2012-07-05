@@ -210,8 +210,7 @@ class ConsistentifyTables < ActiveRecord::Migration
       t.datetime "created_at",                           :null => false
     end
 
-    add_index "page_diffs", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
-    add_index "page_diffs", ["year", "week"], :name => "yearweek_ndx"
+    add_index "page_diffs", ["page_id", "yearweek","year","week"], :name => "recordsignature", :unique => true
 
     create_table "percentiles", :force => true do |t|
       t.integer  "group_id"
@@ -232,8 +231,7 @@ class ConsistentifyTables < ActiveRecord::Migration
       t.datetime "created_at",                :null => false
     end
 
-    add_index "percentiles", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
-    add_index "percentiles", ["year", "week"], :name => "yearweek_ndx"
+    add_index "percentiles", ["group_id", "datatype", "yearweek","year", "week"], :name => "recordsignature", :unique => true
 
 
     create_table "total_diffs", :force => true do |t|
@@ -261,8 +259,7 @@ class ConsistentifyTables < ActiveRecord::Migration
       t.datetime "created_at",                               :null => false
     end
 
-    add_index "total_diffs", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
-    add_index "total_diffs", ["year", "week"], :name => "yearweek_ndx"
+    add_index "total_diffs", ["group_id", "datatype", "yearweek","year", "week"], :name => "recordsignature", :unique => true
 
     create_table "week_stats", :force => true do |t|
       t.integer  "page_id"
@@ -281,8 +278,7 @@ class ConsistentifyTables < ActiveRecord::Migration
       t.datetime "updated_at",                      :null => false
     end
 
-    add_index "week_stats", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
-    add_index "week_stats", ["year", "week"], :name => "yearweek_ndx"
+    add_index "week_stats", ["page_id", "yearweek","year", "week"], :name => "recordsignature", :unique => true
 
   end
 end
