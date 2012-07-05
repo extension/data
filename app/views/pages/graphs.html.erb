@@ -15,7 +15,7 @@
 <div class="page-header">
   <h1><%= @datatype %> growth</h1>
 </div>  
-<div class="row-fluid">
+<div class="row">
   <div class="span12">
     <h3></h3>
     <%= render(:partial => 'graphs_plot', :locals => {:data => @graph_data, :datakey => 'pagegrowth'})%>     
@@ -25,7 +25,7 @@
 <div class="page-header">
   <h1>% Viewed</h1>
 </div>
-<div class="row-fluid">
+<div class="row">
   <div class="span12">
     <%= render(:partial => 'graphs_plot', :locals => {:data => @graph_data, :datakey => 'seen_pct'})%>     
   </div>
@@ -34,7 +34,7 @@
 <div class="page-header">
   <h1>Views</h1>
 </div>  
-<div class="row-fluid">
+<div class="row">
   <div class="span12">
     <%= render(:partial => 'graphs_plot', :locals => {:data => @graph_data, :datakey => 'views'})%>     
   </div>
@@ -43,7 +43,7 @@
 <div class="page-header">
   <h1>Rolling views average</h1>
 </div>
-<div class="row-fluid">
+<div class="row">
   <div class="span12">
     <%= render(:partial => 'graphs_plot', :locals => {:data => @graph_data, :datakey => 'rolling'})%>     
   </div>
@@ -53,7 +53,7 @@
 <div class="page-header">
   <h1>Percentiles</h1>
 </div>  
-<div class="row-fluid">
+<div class="row">
   <div class="span12">
     <p><em>click the legend labels to toggle display of the given item</em></p>
     <%= render(:partial => 'graphs_percentiles', :locals => {:data => @percentiles_data, :labels => @percentiles_labels})%>     
