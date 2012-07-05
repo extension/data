@@ -10,8 +10,8 @@
  *
  *= require_self
  *= require bootstrap
- *= require responsive
  *= require bootstrap_overrides
+ *= require responsive
  *= require jqplot
  *= require numbers
 */
