@@ -8,6 +8,7 @@ Positronic::Application.routes.draw do
       get :panda_impact_summary
       get :groups
       get :list
+      post :setdate
     end
   end
   

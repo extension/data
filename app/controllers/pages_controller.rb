@@ -70,5 +70,24 @@ class PagesController < ApplicationController
   
   def groups
   end
+  
+  
+  def setdate
+    if(params[:date])
+      begin
+        @date = Date.parse(params[:date])
+        session[:date] = @date.to_s
+      rescue
+        # nothing
+      end
+    end
+
+    if(!params[:currenturi].nil?)
+      return redirect_to(Base64.decode64(params[:currenturi]))
+    else
+      return redirect_to(root_url)
+    end
+  end
+  
 
 end

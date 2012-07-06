@@ -113,6 +113,9 @@ GEM
     jquery-rails (2.0.2)
       railties (>= 3.2.0, < 5.0)
       thor (~> 0.14)
+    jquery-ui-rails (1.0.0)
+      jquery-rails
+      railties (>= 3.1.0)
     json (1.7.3)
     kaminari (0.13.0)
       actionpack (>= 3.0.0)
@@ -279,6 +282,7 @@ DEPENDENCIES
   gsl!
   jqplot-rails!
   jquery-rails
+  jquery-ui-rails
   kaminari
   mysql2
   net-http-spy

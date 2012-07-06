@@ -41,6 +41,19 @@ module PagesHelper
   end
 
   
+  def week_picker_date
+    (year,week) = Analytic.latest_year_week
+    (sow,eow) = Analytic.date_pair_for_year_week(year,week)
+     
+    if(@date and @date < eow)
+      (at_date_year,at_date_week) = Analytic.year_week_for_date(date)
+      (sow,eow) = Analytic.date_pair_for_year_week(at_date_year,at_date_week)
+    end
+    sow.strftime('%Y-%m-%d')
+  end
+      
+      
+      
   def year_week_for_last_week
     (year,week) = Analytic.latest_year_week
     "#{year} Week ##{week}".html_safe
