@@ -78,21 +78,7 @@ module PagesHelper
       "<span class='#{classes.join(' ')}'>#{number_to_percentage(change * 100, :precision => 2)}</span>".html_safe
     end
   end
-  
-  def pct(number,extraclass=nil)
-    if(!number)
-      'n/a'
-    else
-      classes = []
-      if(extraclass)
-        classes << extraclass
-      end 
-      "<span class='#{classes.join(' ')}'>#{number_to_percentage(number * 100, :precision => 2)}</span>".html_safe
-    end
-  end
-  
-  
-  
+    
   
   def trend(change,extraclass=nil)
     if(!change)
