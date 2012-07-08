@@ -18,28 +18,61 @@ class PagesController < ApplicationController
     @group = Group.find(params[:id])
   end
   
-  def datatype
+  def groupdatatype
+    @group = Group.find(params[:id])
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
       # ToDo: error out
       @datatype = 'Article'
     end
     
+    @graph_data = @group.graph_data_by_datatype(@datatype)
+    (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)  
+  end
+  
+  
+  def datatype
+    @datatype = params[:datatype]
+    if(!Page::DATATYPES.include?(@datatype))
+      # ToDo: error out
+      @datatype = 'Article'
+    end
     @graph_data = Page.graph_data_by_datatype(@datatype)
     (@percentiles_labels,@percentiles_data) = Page.traffic_stats_data_by_datatype_with_percentiles(@datatype)
-    
   end
     
   
   def list
-    if(params[:group])
-      @group = Group.find(params[:group])
-    end
-    if(@group)
-      @scope = @group.pages
+    @scope = Page
+    @datatype = params[:datatype]
+    if(!Page::DATATYPES.include?(@datatype))
+      @datatype = nil
     else
-      @scope = Page
+      @scope = @scope.by_datatype(@datatype)
     end
+    @pagelist = @scope.filtered_pagelist(params).page(params[:page])
+    
+    list_type = @datatype.nil? ? 'Pages' : @datatype.pluralize
+    case(params[:filter])
+    when 'viewed'
+      @page_title = "Viewed #{list_type}"
+      @page_title_display = "Viewed #{list_type}"
+      @endpoint = 'viewed'
+    when 'unviewed'
+      @page_title = "Unviewed #{list_type}"
+      @page_title_display = "Unviewed #{list_type}"
+      @endpoint = 'unviewed'
+    else
+      @page_title = "All #{list_type}"
+      @page_title_display = "All #{list_type}"
+      @endpoint = 'all'
+    end      
+
+  end
+  
+  def grouplist
+    @group = Group.find(params[:id])
+    @scope = @group.pages
     
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
@@ -47,24 +80,25 @@ class PagesController < ApplicationController
     else
       @scope = @scope.by_datatype(@datatype)
     end
-    @pagelist = @scope.last_week_view_ordered.page(params[:page])
+    @pagelist = @scope.filtered_pagelist(params).page(params[:page])
     
         
-    if !@datatype
-      @page_title = "All Pages"
-      @page_title_display = "All Pages"
-      @endpoint = 'all pages'
+    list_type = @datatype.nil? ? 'Pages' : @datatype.pluralize
+    case(params[:filter])
+    when 'viewed'
+      @page_title = "Viewed #{list_type} for Group ##{@group.id}"
+      @page_title_display = "Viewed #{list_type} for #{@group.name}"
+      @endpoint = 'viewed'
+    when 'unviewed'
+      @page_title = "Unviewed #{list_type} for Group ##{@group.id}"
+      @page_title_display = "Unviewed #{list_type} for #{@group.name}"
+      @endpoint = 'unviewed'
     else
-      @page_title = "#{@datatype.pluralize}"
-      @page_title_display = "#{@datatype.pluralize}"
-      @endpoint = "#{@datatype.pluralize}"
-    end 
-    
-    if @group
-      @page_title += " for Group ##{@group.id}"
-      @page_title_display += " for #{@group.name}"
-    end
-    
+      @page_title = "All #{list_type}"
+      @page_title_display = "All #{list_type}"
+      @endpoint = 'all'
+    end    
+      
   end
   
   

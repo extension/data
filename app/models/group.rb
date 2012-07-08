@@ -135,7 +135,7 @@ class Group < ActiveRecord::Base
     end
       
     
-    start_date = Page.by_datatype(datatype).minimum(:created_at).to_date
+    start_date = self.pages.by_datatype(datatype).minimum(:created_at).to_date
     year_weeks = Analytic.year_weeks_from_date(start_date)
     views_total = 0
     loopcount = 0

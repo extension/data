@@ -1,5 +1,5 @@
 <%-
-  stats_for_week =  Page.stats_for_week_for_datatype(@datatype)
+  stats_for_week =  @group.stats_for_week_for_datatype(@datatype)
   pages = (stats_for_week[:pages] || 0)
   seen = (stats_for_week[:seen] || 0)
   unseen = pages-seen
@@ -34,10 +34,8 @@
     
     <div class="span4">
       <p><%= number_list_link(number_with_delimiter(pages),{:datatype => @datatype})%> total <%= @datatype.downcase.pluralize %></p>
-      <p><%= number_list_link(number_with_delimiter(seen),{:datatype => @datatype,:filter => 'viewed'})%> viewed <%= @datatype.downcase.pluralize %> 
-        (<span class='regnumber'><%=number_to_percentage(seen_pct, :precision => 2)%></span>)</p>
-      <p><%= number_list_link(number_with_delimiter(unseen),{:datatype => @datatype, :filter => 'unviewed'})%> unviewed <%= @datatype.downcase.pluralize %> 
-        (<span class='regnumber'><%=number_to_percentage(unseen_pct, :precision => 2)%></span>)</p>       
+      <p><%= number_list_link(number_with_delimiter(seen),{:datatype => @datatype,:filter => 'viewed'})%> viewed <%= @datatype.downcase.pluralize %> (<%=number_to_percentage(seen_pct, :precision => 2)%>)</p>
+      <p><%= number_list_link(number_with_delimiter(unseen),{:datatype => @datatype, :filter => 'unviewed'})%> unviewed <%= @datatype.downcase.pluralize %> (<%=number_to_percentage(unseen_pct, :precision => 2)%>)</p>       
     </div>
     
     

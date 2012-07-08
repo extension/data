@@ -216,8 +216,8 @@ class Page < ActiveRecord::Base
   
   def traffic_stats_data(showrolling = true)
     returndata = []
-    upv = []
-    rolling = []
+    upv_data = []
+    rolling_data = []
     week_stats = {}
     self.week_stats.order('yearweek').map do |ws|
       yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
@@ -225,11 +225,21 @@ class Page < ActiveRecord::Base
     end
     
     year_weeks = self.eligible_year_weeks
+    weekcount = 0
+    running_upv = 0
     year_weeks.each do |year,week|
+      weekcount +=1
       yearweek_string = "#{year}-" + "%02d" % week
       date = self.class.yearweek_date(year,week)
       upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
-      returndata << [date,upv]
+      running_upv = running_upv+upv
+      rolling_data << [date,(running_upv / weekcount)] 
+      upv_data << [date,upv]
+    end
+    if(showrolling)
+      returndata = [upv_data,rolling_data]
+    else
+      returndata = [upv_data]
     end
     returndata
   end
@@ -385,15 +395,13 @@ class Page < ActiveRecord::Base
   def self.filtered_pagelist(params)
     yearweek = Analytic.latest_yearweek
     with_scope do
-      if(params[:filter])
-        case(params[:filter])
-        when 'viewed'
-          joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views > 0').order("page_diffs.views DESC")
-        when 'unviewed'
-          joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views = 0').order("page.created_at ASC")
-        else
-          joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
-        end
+      case(params[:filter])
+      when 'viewed'
+        joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views > 0').order("page_diffs.views DESC")
+      when 'unviewed'
+        joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views = 0').order("pages.created_at ASC")
+      else
+        joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
       end
     end
   end

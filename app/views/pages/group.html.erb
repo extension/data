@@ -18,8 +18,7 @@
       <%- if stats_for_week_for_datatype[:pages] and stats_for_week_for_datatype[:pages] > 0 -%>   
         <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => stats_for_week_for_datatype}) %>
         <p>
-          <%= link_to("<i class='icon-list'></i> pages list".html_safe,list_pages_path(:datatype => datatype, :group => @group.id),:class => 'btn btn-small  btn-info') %>      
-          <%= link_to("<i class='icon-picture'></i> graphs".html_safe,graphs_pages_path(:datatype => datatype, :group => @group.id),:class => 'btn btn-small  btn-info') %>
+          <%= link_to("<i class='icon-th'></i> #{datatype.pluralize} details".html_safe,datatype_group_pages_path(:datatype => datatype, :id => @group.id),:class => 'btn btn-info') %>      
         </p>
       <%- else -%>
         No data.

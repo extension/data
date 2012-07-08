@@ -79,6 +79,21 @@ module PagesHelper
     end
   end
   
+  def pct(number,extraclass=nil)
+    if(!number)
+      'n/a'
+    else
+      classes = []
+      if(extraclass)
+        classes << extraclass
+      end 
+      "<span class='#{classes.join(' ')}'>#{number_to_percentage(number * 100, :precision => 2)}</span>".html_safe
+    end
+  end
+  
+  
+  
+  
   def trend(change,extraclass=nil)
     if(!change)
       'n/a'
@@ -105,7 +120,11 @@ module PagesHelper
   
   def number_list_link(number_text,params,number_class='mednumber')
     number_span = "<span class='#{number_class}'>#{number_text}</span>".html_safe
-    link_to(number_span,list_pages_path(params)).html_safe
+    if(@group)
+      link_to(number_span,list_group_pages_path(params.merge(:id => @group.id))).html_safe
+    else
+      link_to(number_span,list_pages_path(params)).html_safe
+    end
   end
     
   

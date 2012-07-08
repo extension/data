@@ -3,7 +3,7 @@
     $(document).ready(function(){
       setTimeout(function(){
       var data = <%= jqplot_page_traffic_data(page) %>;
-      var plot1 = jQuery.jqplot ("traffic_plot_<%= page.id %>", [data], 
+      var plot1 = jQuery.jqplot ("traffic_plot_<%= page.id %>", data, 
         {
           axesDefaults: {
             pad: 0

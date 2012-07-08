@@ -1,0 +1,12 @@
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display.html_safe %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<div class="row">
+  <div class="span12">
+	  <%= paginate(@pagelist) %>
+	  <%= render(:partial => 'pagelist', :locals => {:pagelist => @pagelist} )%>
+  </div>
+</div>
