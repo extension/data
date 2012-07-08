@@ -15,8 +15,7 @@
          
       <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => Page.stats_for_week_for_datatype(datatype)}) %>
       <p>
-        <%= link_to("<i class='icon-list'></i> pages list".html_safe,list_pages_path(:datatype => datatype),:class => 'btn btn-small  btn-info') %>      
-        <%= link_to("<i class='icon-picture'></i> graphs".html_safe,graphs_pages_path(:datatype => datatype),:class => 'btn btn-small  btn-info') %>
+        <%= link_to("<i class='icon-th'></i> #{datatype.pluralize} details".html_safe,datatype_pages_path(:datatype => datatype),:class => 'btn btn-info') %>      
       </p>
     <hr/>
     </div>

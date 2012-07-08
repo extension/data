@@ -161,7 +161,7 @@ class Page < ActiveRecord::Base
     returnpercentiles = {}
     with_scope do
       pagecount = self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek_string).count
-      weekstats = self.joins(:week_stats).where("week_stats.year = ?",year).where("week_stats.week = ?",week).pluck("week_stats.unique_pageviews")
+      weekstats = self.joins(:week_stats).where("week_stats.year = ?",year).where("week_stats.week = ?",week).where("week_stats.unique_pageviews > 0").pluck("week_stats.unique_pageviews")
       if((pagecount > weekstats.length) and !seenonly)
         emptyset = Array.new((pagecount - weekstats.length),0)
         statsarray = (weekstats + emptyset).sort
@@ -214,8 +214,10 @@ class Page < ActiveRecord::Base
     returnpercentiles
   end
   
-  def traffic_stats_data
+  def traffic_stats_data(showrolling = true)
     returndata = []
+    upv = []
+    rolling = []
     week_stats = {}
     self.week_stats.order('yearweek').map do |ws|
       yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
@@ -379,7 +381,22 @@ class Page < ActiveRecord::Base
     returndata
   end
   
-    
+  
+  def self.filtered_pagelist(params)
+    yearweek = Analytic.latest_yearweek
+    with_scope do
+      if(params[:filter])
+        case(params[:filter])
+        when 'viewed'
+          joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views > 0').order("page_diffs.views DESC")
+        when 'unviewed'
+          joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views = 0').order("page.created_at ASC")
+        else
+          joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
+        end
+      end
+    end
+  end
   
 
     

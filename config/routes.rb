@@ -11,9 +11,11 @@ Positronic::Application.routes.draw do
       post :setdate
     end
   end
-  
+
+  # pretty url matchers
   match '/pages/graphs/:datatype/:group' => 'pages#graphs', :as => 'graphs_pages', :via => :get
   match '/pages/graphs/:datatype' => 'pages#graphs', :as => 'graphs_pages', :via => :get
+  match '/pages/datatype/:datatype' => 'pages#datatype', :as => 'datatype_pages', :via => :get
   match '/pages/group/:id' => 'pages#group', :as => 'group_pages', :via => :get
   
   resources :groups, :only => [:index, :show] do

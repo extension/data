@@ -19,4 +19,3 @@
 //= require jqplot/plugins/enhancedLegendRenderer
 //= require responsive-tables
 //= require jquery.ui.datepicker
-//= require_tree .

@@ -18,6 +18,19 @@ class PagesController < ApplicationController
     @group = Group.find(params[:id])
   end
   
+  def datatype
+    @datatype = params[:datatype]
+    if(!Page::DATATYPES.include?(@datatype))
+      # ToDo: error out
+      @datatype = 'Article'
+    end
+    
+    @graph_data = Page.graph_data_by_datatype(@datatype)
+    (@percentiles_labels,@percentiles_data) = Page.traffic_stats_data_by_datatype_with_percentiles(@datatype)
+    
+  end
+    
+  
   def list
     if(params[:group])
       @group = Group.find(params[:group])
@@ -35,6 +48,22 @@ class PagesController < ApplicationController
       @scope = @scope.by_datatype(@datatype)
     end
     @pagelist = @scope.last_week_view_ordered.page(params[:page])
+    
+        
+    if !@datatype
+      @page_title = "All Pages"
+      @page_title_display = "All Pages"
+      @endpoint = 'all pages'
+    else
+      @page_title = "#{@datatype.pluralize}"
+      @page_title_display = "#{@datatype.pluralize}"
+      @endpoint = "#{@datatype.pluralize}"
+    end 
+    
+    if @group
+      @page_title += " for Group ##{@group.id}"
+      @page_title_display += " for #{@group.name}"
+    end
     
   end
   

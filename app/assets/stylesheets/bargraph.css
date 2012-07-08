@@ -1,0 +1,71 @@
+/* experiments */
+
+ul.bargraph li {
+  height: 35px;
+  color: white;
+  text-align: left;
+  font-size: 14px;
+  line-height: 35px;
+  padding: 0px 20px;
+  border: 1px solid #000000; 
+  margin-bottom: 5px;
+}
+
+ul.bargraph li.p99 {
+background: #084594;
+width:99%;
+}
+ 
+ul.bargraph li.p90 {
+background: #2171b5;
+width:90%;
+}
+ 
+ul.bargraph li.p75 {
+background: #4292c6;
+width:75%;
+}
+ 
+ul.bargraph li.p50 {
+background: #6baed6;
+width:50%;
+}
+ 
+ul.bargraph li.p25 {
+background: #9ecae1;
+width:25%;
+}
+ 
+ul.bargraph li.p10 {
+background: #c6dbef;
+width:10%;
+}   
+
+
+.barchart { 
+  border: 1px solid #4bb2c5; 
+  width: 15em;
+  margin: 0 0 9px; 
+}
+
+.barchart p { 
+  display: block;
+  position: relative;
+  margin: 0px; 
+}
+
+.barchart .index { 
+  display: block;
+  position: absolute;
+  top: 0; 
+  left: 0;
+  bottom: 0; 
+  background: #4bb2c5; 
+  text-indent: -9999px; 
+  overflow: hidden; 
+}
+
+.barchart .count { 
+  z-index: 2;
+  position: relative;  
+}

@@ -4,30 +4,3 @@
 .negative {color:red;}
 .positive {color:green;}
 
-.barchart { 
-  border: 1px solid #4bb2c5; 
-  width: 15em;
-  margin: 0 0 9px; 
-}
-
-.barchart p { 
-  display: block;
-  position: relative;
-  margin: 0px; 
-}
-
-.barchart .index { 
-  display: block;
-  position: absolute;
-  top: 0; 
-  left: 0;
-  bottom: 0; 
-  background: #4bb2c5; 
-  text-indent: -9999px; 
-  overflow: hidden; 
-}
-
-.barchart .count { 
-  z-index: 2;
-  position: relative;  
-}

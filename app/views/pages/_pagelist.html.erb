@@ -8,7 +8,6 @@
         <th>% Change Week</th>
         <th>% Change Year</th>
         <th>Trend</th>
-        <th>Percentile</th>
     </tr>
   </thead>
   
@@ -31,13 +30,11 @@
         <td>n/a</td>
         <td>n/a</td>
         <td>n/a</td>
-        <td>n/a</td>
       <%- else -%>
         <td><%= page.last_diff.views %></td>
         <td><%= pct_change(page.last_diff.pct_change_week)%></td>
         <td><%= pct_change(page.last_diff.pct_change_year)%></td>
         <td><%= trend(page.last_diff.recent_pct_change)%></td>
-        <td><%= page.last_percentile.to_s %><sup>th</sup></td>             
       <%- end -%>
     </tr>
   <%- end -%>

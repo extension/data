@@ -3,9 +3,12 @@
 </ul>
 
 <!-- Core Navigation -->
+<%- if !@hide_navbar%>
 <ul class="nav">
-
+	<%= nav_item(pages_path,'Pages') %>
+	<%= nav_item(groups_pages_path,'Groups') %>
 </ul>
+<%- end -%>
 
 
 
@@ -20,7 +23,7 @@
 		</ul>
 	</li>
 	<%- else -%>
-	<%- end -%>
-	
+    <%- # Nothing for now -%>
+	<%- end -%>	
 </ul>
 

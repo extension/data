@@ -57,7 +57,6 @@ $(function() {
         }
     });
     
-    setDates('.week-picker');
 
     var $calendarTR = $('.ui-weekpicker .ui-datepicker-calendar tr');
     $calendarTR.live('mousemove', function () {
