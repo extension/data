@@ -15,7 +15,7 @@
 <p><span class='mednumber'><%=number_to_percentage(seen_pct, :precision => 2)%></span> viewed for week</p>
 <p><%= pct_change(stats_for_week[:change_week],'mednumber') %> from previous week</p>
 <p><%= pct_change(stats_for_week[:change_year],'mednumber') %> from previous year</p>
-<p><%= trend(stats_for_week[:recent_change],'mednumber') %> <%=Settings.recent_weeks%> week trend</p>
+<p><%= trend(stats_for_week[:recent_change],'mednumber') %> trend/week (last <%=Settings.recent_weeks%> weeks)</p>
 
 
 
