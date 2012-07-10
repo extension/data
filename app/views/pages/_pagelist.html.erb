@@ -14,7 +14,12 @@
   <tbody>
     <%- for page in pagelist -%>
   	<tr>
-      <td><%= link_to(page.title.truncate(80, :separator => ' '),page_path(page)) %></td>
+      <%- if page.title.blank? 
+          title = '(blank)' 
+        else
+          title = page.title.truncate(80, :separator => ' ')
+        end -%>
+      <td><%= link_to(title,page_path(page)) %></td>
       <td><%= page.id %></td>
       <td>
         <%- if(page.node) -%>
