@@ -153,5 +153,20 @@ class PagesController < ApplicationController
     end
   end
   
+  
+  def search
+    if(params[:q])      
+      if(params[:q].to_i > 0)
+        id_number = params[:q].to_i
+        @page = Page.find_by_id(id_number)
+        if(@page)
+          return redirect_to(page_path(@page))
+        end
+      else
+        like= "%".concat(params[:q].concat("%"))
+        @pagelist = Page.where("title like ?", like)
+      end
+    end
+  end
 
 end

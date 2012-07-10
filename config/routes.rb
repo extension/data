@@ -9,6 +9,7 @@ Positronic::Application.routes.draw do
       get :groups
       get :list
       post :setdate
+      post :search
     end
   end
 
