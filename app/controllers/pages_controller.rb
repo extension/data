@@ -157,10 +157,13 @@ class PagesController < ApplicationController
   def search
     if(params[:q])      
       if(params[:q].to_i > 0)
-        id_number = params[:q].to_i
-        @page = Page.find_by_id(id_number)
-        if(@page)
+        @id_number = params[:q].to_i
+        @page = Page.find_by_id(@id_number)
+        @node = Node.find_by_id(@id_number)
+        if(@page and !@node)
           return redirect_to(page_path(@page))
+        elsif(@node and !@page and !@node.page.nil?)
+          return redirect_to(page_path(@node.page))
         end
       else
         like= "%".concat(params[:q].concat("%"))

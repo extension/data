@@ -8,7 +8,7 @@
   <li class="divider-vertical"></li>
   
 	<%= form_tag(search_pages_path, { :class => 'navbar-search pull-left' }) do -%>
-    <%= text_field_tag :q, params[:q], {:class => 'search-query', :placeholder => 'Find page (name, id, or node id)', :autocomplete => 'off'} -%>
+    <%= text_field_tag :q, params[:q], {:class => 'search-query', :placeholder => 'Find page (title, page id, or node id)', :autocomplete => 'off'} -%>
 	<%- end -%>
   <li class="divider-vertical"></li>
   
