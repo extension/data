@@ -8,7 +8,7 @@
 
 
 <div class="well">
-  <%= text_field_tag("groupfinder",'',{:class => 'input search-query', :placeholder => 'Type and select a group name...'}) %>
+  <%= text_field_tag("groupfinder",'',{:class => 'input search-query', :placeholder => 'Type and select to jump to group'}) %>
   <script class="code" type="text/javascript">
     $('#groupfinder').autocomplete({
       source: "/data/groups",
@@ -20,76 +20,30 @@
   </script>
 </div>
 
+
+<div class="page-header">
+  <h1>Top Groups for Week
+    <small>by average views/page</small>
+  </h1>
+</div> 
+
 <div class="row">
-  <div class="span12">
-	    <table class="table table-bordered responsive">
-        <thead>
-          <tr>
-            <th>Group</th>
-            <%- Page::DATATYPES.each do |datatype| -%>
-              <th colspan='3'><%= datatype.pluralize %></th>
-            <%- end -%>
-          </tr>
-          <tr>
-            <td>(<em><span class='positive'>↑</span>, <span class='negative'>↓</span>, ↔ show relation to overall value</em>)</td>
-            <%- Page::DATATYPES.each do |datatype| -%>
-              <th>Pages</th>
-              <th>% Viewed</th>
-              <th>Views</th>
-            <%- end -%>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><%= link_to('Overall', pages_path) %></td>
-            <%- Page::DATATYPES.each do |datatype| -%>
-            <%- overall = Page.stats_for_week_for_datatype(datatype) -%>            
-            <td>
-              <%= number_with_delimiter(overall[:pages]) %>
-            <td>
-              <%= number_to_percentage(overall[:seen]/overall[:pages]*100, :precision => 1) %>
-            </td>
-            <td>
-              <%= number_with_precision(overall[:views], :precision => 2) %>              
-            </td>  
-            <%- end -%>
-          </tr>
-                    
-          <%- @grouplist.each do |group| %>
-          <tr>
-            <td><%= link_to(group.name, group_pages_path(group)) %></td>
-            <%- Page::DATATYPES.each do |datatype| -%>
-            <%- overall = Page.stats_for_week_for_datatype(datatype) 
-                group_stats = group.stats_for_week_for_datatype(datatype)                  
-            -%>            
-            <td>
-              <%= number_with_delimiter(group_stats[:pages]) %>
-            <td>
-              <%- if(group_stats[:pages] > 0) 
-                group_pct_viewed = group_stats[:seen]/group_stats[:pages]
-                pct_viewed = overall[:seen]/overall[:pages]
-                delta_viewed = (group_pct_viewed - pct_viewed) / pct_viewed
-                %>
-                <%= number_to_percentage(group_stats[:seen]/group_stats[:pages]*100, :precision => 1) %>
-                <span class='<%=sign_class_percentage(delta_viewed)%>'><%=up_or_down_percentage(delta_viewed)%></span>
-              <%- else -%>
-                n/a
-              <%- end -%>
-            </td>
-            <td>
-              <%- if(group_stats[:pages] > 0) %>
-                <%- delta_views = (group_stats[:views] - overall[:views]) / overall[:views] %>
-                <%= number_with_precision(group_stats[:views], :precision => 2) %>
-                <span class='<%=sign_class_percentage(delta_views)%>'><%=up_or_down_percentage(delta_views)%></span>
-                              
-              <%- else -%>
-                n/a
-              <%- end -%>
-            </td>  
-            <%- end -%>
-          </tr>
-          <%- end -%>
-        </tbody>
-      </table>
-  </div>
+  <%- Page::DATATYPES.each do |datatype| -%>
+    <div class="span3">
+      <div class="page-header">
+        <h3><%= datatype.pluralize%></h3>
+      </div> 
+      <%- groupslist = Group.launched.top_views(:datatype => datatype) -%>
+      <dl>
+      <%- groupslist.each do |group| %>
+        <%- group_stats = group.stats_for_week_for_datatype(datatype) -%>
+        <dt><%= link_to(group.name, group_pages_path(group))%></dt>
+        <dd>
+          <span class='regnumber'><%= number_with_precision(group_stats[:views], :precision => 2) %></span>
+          views of <span class='regnumber'><%= number_with_delimiter(group_stats[:pages])%></span> items
+        </dd>
+      <%- end -%>
+      </dl>      
+    </div>
+  <%- end -%>
 </div>

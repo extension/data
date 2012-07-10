@@ -16,7 +16,9 @@ class Group < ActiveRecord::Base
   has_many :total_diffs
   has_many :percentiles
   
-  scope :launched, where(:is_launched => true)  
+  scope :launched, where(:is_launched => true)
+
+    
   
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};") 
@@ -179,6 +181,31 @@ class Group < ActiveRecord::Base
     [labels,data]
   end 
   
+  def self.top_or_bottom_by_views(top_or_bottom,options = {})
+    case top_or_bottom
+    when 'top'
+      sortorder = 'total_diffs.views DESC'
+    when 'bottom'
+      sortorder = 'total_diffs.views ASC,total_diffs.pages DESC'
+    else
+      sortorder = 'total_diffs.views ASC,total_diffs.pages DESC'
+    end
+    yearweek = options[:yearweek] || Analytic.latest_yearweek
+    pagecount = options[:pagecount] || 10
+    limit = options[:limit] || 5
+    datatype = options[:datatype] || 'Article'
+    with_scope do
+      joins(:total_diffs).where("total_diffs.datatype = ?",datatype).where("total_diffs.yearweek = ?",yearweek).where("total_diffs.pages >= ?",pagecount).order(sortorder).limit(limit)
+    end
+  end
+  
+  def self.top_views(options = {})
+    self.top_or_bottom_by_views('top',options)
+  end
+  
+  def self.bottom_views(options = {})
+    self.top_or_bottom_by_views('bottom',options)
+  end
   
   
   
