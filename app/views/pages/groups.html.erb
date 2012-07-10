@@ -38,10 +38,9 @@
       <%- groupslist.each do |group| %>
         <%- group_stats = group.stats_for_week_for_datatype(datatype) -%>
         <dt><%= link_to(group.name, group_pages_path(group))%></dt>
-        <dd>
-          <span class='regnumber'><%= number_with_precision(group_stats[:views], :precision => 2) %></span>
-          views of <span class='regnumber'><%= number_with_delimiter(group_stats[:pages])%></span> items
-        </dd>
+        <dd><span class='regnumber'><%= number_with_precision(group_stats[:views], :precision => 2) %></span> views</dd>
+        <dd><span class='regnumber'><%= number_to_percentage(group_stats[:seen]/group_stats[:pages]*100, :precision => 1) %></span>
+        of <span class='regnumber'><%= number_with_delimiter(group_stats[:pages])%></span> items viewed</dd>
       <%- end -%>
       </dl>      
     </div>
