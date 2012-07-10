@@ -1,0 +1,48 @@
+<% @page_title = "Groups page information" %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+  <p>(<em><span class='positive'>↑</span>, <span class='negative'>↓</span>, ↔ show relation to overall  % viewed and views</em>)</p>
+</header>
+
+<%- overall_stats = {} 
+    Page::DATATYPES.each do |datatype|
+      overall_stats[datatype] = Page.stats_for_week_for_datatype(datatype) 
+    end -%>
+
+<%- Group.launched.order(:name).each do |group| %>
+<div class="page-header">
+  <h3><%= link_to(group.name,group_pages_path(group))%></h3>
+</div> 
+<div class="row">
+  <%- Page::DATATYPES.each do |datatype| -%>
+    <div class="span3">
+      <%- group_stats = group.stats_for_week_for_datatype(datatype) -%>            
+      <p><span class='mednumber'><%= number_with_delimiter(group_stats[:pages])%></span> <%= datatype.pluralize %></p>
+      <p>
+      <%- if(group_stats[:pages] > 0) 
+        group_pct_viewed = group_stats[:seen]/group_stats[:pages]
+        pct_viewed = overall_stats[datatype][:seen]/overall_stats[datatype][:pages]
+        delta_viewed = (group_pct_viewed - pct_viewed) / pct_viewed
+        %>
+        <span class='mednumber <%=sign_class_percentage(delta_viewed)%>'><%=up_or_down_percentage(delta_viewed)%></span>
+        <span class='mednumber'><%= number_to_percentage(group_stats[:seen]/group_stats[:pages]*100, :precision => 1) %></span> % viewed for week
+      <%- else -%>
+        n/a
+      <%- end -%>
+      </p>
+      <p>
+        <%- if(group_stats[:pages] > 0) %>
+          <%- delta_views = (group_stats[:views] - overall_stats[datatype][:views]) / overall_stats[datatype][:views] %>
+          <span class='mednumber <%=sign_class_percentage(delta_views)%>'><%=up_or_down_percentage(delta_views)%></span>
+          <span class='mednumber'><%= number_with_precision(group_stats[:views], :precision => 2) %></span> views for week
+        <%- else -%>
+          n/a
+        <%- end -%>
+      </p>  
+    </div>
+  <%- end -%>
+</div>
+<%- end -%>
+ 

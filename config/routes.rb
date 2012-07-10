@@ -20,9 +20,14 @@ Positronic::Application.routes.draw do
   match '/pages/group/:id/list' => 'pages#grouplist', :as => 'list_group_pages', :via => :get
   match '/pages/group/:id/:datatype' => 'pages#groupdatatype', :as => 'datatype_group_pages', :via => :get
   
-  resources :groups, :only => [:index, :show] do
-
+  resources :groups, :only => [:index, :show] 
+  
+  # data routes
+  scope "data" do
+    match "/groups" => "data#groups", :as => 'data_groups'
   end
+  
+  
   
   
 end

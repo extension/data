@@ -17,4 +17,5 @@
  *= require numbers
  *= require responsive-tables
  *= require jquery.ui.datepicker
+ *= require autocomplete
 */

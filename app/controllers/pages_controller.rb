@@ -10,6 +10,10 @@ class PagesController < ApplicationController
   def index
   end
   
+  def groups
+    @grouplist = Group.launched.order(:name)
+  end
+  
   def show
     @page = Page.includes(:node).find(params[:id])
   end
@@ -129,9 +133,6 @@ class PagesController < ApplicationController
       @panda_comparison_weeks = 3
     end
     @diffs = TotalDiff.panda_impacts(@panda_comparison_weeks)
-  end
-  
-  def groups
   end
   
   
