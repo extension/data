@@ -29,7 +29,7 @@
       <p><span class='mednumber'><%=number_with_precision(views, :precision => 2)%></span> views/page for week</p>
       <p><%= pct_change(stats_for_week[:change_week],'mednumber') %> from previous week</p>
       <p><%= pct_change(stats_for_week[:change_year],'mednumber') %> from previous year</p>
-      <p><%= trend(stats_for_week[:recent_change],'mednumber') %> <%=Settings.recent_weeks%> trend/week (last <%=Settings.recent_weeks%> weeks)</p>
+      <p><%= trend(stats_for_week[:recent_change],'mednumber') %> trend/week (last <%=Settings.recent_weeks%> weeks)</p>
     </div>
     
     <div class="span4">
