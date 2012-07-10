@@ -15,7 +15,7 @@
 -%>
 
 <% @page_title = "#{@datatype.pluralize} Information" %>
-<%= render(:partial => 'page_breadcrumbs') %>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:showgroups=> true} ) %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
   <%= render(:partial => 'date_changing_lead')%>

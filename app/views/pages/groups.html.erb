@@ -1,5 +1,5 @@
 <% @page_title = "Groups page information" %>
-
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => 'Groups'}) %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>

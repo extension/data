@@ -1,5 +1,5 @@
 <% @page_title = "Page Information - Group ##{@group.id}" %>
-<%= render(:partial => 'page_breadcrumbs', :locals => {:group => @group}) %>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:showgroups=> true, :group => @group}) %>
 <header class="jumbotron subhead" id="overview">
   <h1>Page Information for <%= @group.name %></h1>
   <p class="lead">
