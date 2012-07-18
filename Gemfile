@@ -52,7 +52,7 @@ gem "garb" # garb for now until it breaks June 2012
 gem 'thor'
 
 # campfire integration
-gem "tinder", "~> 1.8.0"
+#gem "tinder", "~> 1.8.0"
 
 # legacy data support
 gem 'safe_attributes'
@@ -73,7 +73,7 @@ group :development do
   gem 'pry'
   
   # moar advanced stats in dev only
-  gem 'gsl', :git => 'git://github.com/30robots/rb-gsl.git'
-  gem 'statsample-optimization', :require => 'statsample'
+  #gem 'gsl', :git => 'git://github.com/30robots/rb-gsl.git'
+  #gem 'statsample-optimization', :require => 'statsample'
   
 end
