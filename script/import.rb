@@ -72,6 +72,7 @@ class GAImporter < Thor
       run_and_log(Revision,'rebuild','create revision import')
       run_and_log(AaeNode,'rebuild','create aae node import')
       run_and_log(NodeEvent,'rebuild','create node events import')
+      run_and_log(NodeContributor,'rebuild','create node contributors import')
     end
     
     def internal_rebuilds

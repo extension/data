@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120629114955) do
+ActiveRecord::Schema.define(:version => 20120720160131) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -19,32 +19,6 @@ ActiveRecord::Schema.define(:version => 20120629114955) do
   end
 
   add_index "aae_nodes", ["node_id", "aae_id"], :name => "node_group_ndx"
-
-  create_table "analytics", :force => true do |t|
-    t.integer  "page_id"
-    t.integer  "yearweek"
-    t.integer  "year"
-    t.integer  "week"
-    t.text     "analytics_url"
-    t.string   "url_type"
-    t.integer  "url_page_id"
-    t.integer  "url_migrated_id"
-    t.string   "url_wiki_title"
-    t.string   "url_widget_id"
-    t.string   "analytics_url_hash"
-    t.integer  "pageviews"
-    t.integer  "unique_pageviews"
-    t.integer  "entrances"
-    t.integer  "time_on_page"
-    t.integer  "exits"
-    t.integer  "visitors"
-    t.integer  "new_visits"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
-  add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority"
@@ -71,6 +45,19 @@ ActiveRecord::Schema.define(:version => 20120629114955) do
   end
 
   add_index "groups", ["create_gid"], :name => "create_group_ndx"
+
+  create_table "node_contributors", :force => true do |t|
+    t.integer  "node_id"
+    t.integer  "user_id"
+    t.integer  "node_revision_id"
+    t.string   "role"
+    t.string   "author"
+    t.datetime "contributed_at"
+    t.datetime "created_at"
+  end
+
+  add_index "node_contributors", ["node_id"], :name => "node_ndx"
+  add_index "node_contributors", ["user_id"], :name => "user_ndx"
 
   create_table "node_events", :force => true do |t|
     t.integer  "node_id"
@@ -120,8 +107,7 @@ ActiveRecord::Schema.define(:version => 20120629114955) do
     t.datetime "created_at",            :null => false
   end
 
-  add_index "page_diffs", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
-  add_index "page_diffs", ["year", "week"], :name => "yearweek_ndx"
+  add_index "page_diffs", ["page_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "page_taggings", :force => true do |t|
     t.integer  "page_id"
@@ -193,8 +179,7 @@ ActiveRecord::Schema.define(:version => 20120629114955) do
     t.datetime "created_at",    :null => false
   end
 
-  add_index "percentiles", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
-  add_index "percentiles", ["year", "week"], :name => "yearweek_ndx"
+  add_index "percentiles", ["group_id", "datatype", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "revisions", :force => true do |t|
     t.integer  "node_id"
@@ -240,8 +225,7 @@ ActiveRecord::Schema.define(:version => 20120629114955) do
     t.datetime "created_at",                :null => false
   end
 
-  add_index "total_diffs", ["group_id", "datatype", "yearweek"], :name => "recordsignature", :unique => true
-  add_index "total_diffs", ["year", "week"], :name => "yearweek_ndx"
+  add_index "total_diffs", ["group_id", "datatype", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "update_times", :force => true do |t|
     t.string   "item"
@@ -288,7 +272,6 @@ ActiveRecord::Schema.define(:version => 20120629114955) do
     t.datetime "updated_at",       :null => false
   end
 
-  add_index "week_stats", ["page_id", "yearweek"], :name => "recordsignature", :unique => true
-  add_index "week_stats", ["year", "week"], :name => "yearweek_ndx"
+  add_index "week_stats", ["page_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
 end
