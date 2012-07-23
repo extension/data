@@ -7,6 +7,7 @@
 
 class NodeContributor < ActiveRecord::Base
   belongs_to :node
+  belongs_to :user
   
   def associate_with_user
     checkstring = self.author.downcase

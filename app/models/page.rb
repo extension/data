@@ -15,7 +15,8 @@ class Page < ActiveRecord::Base
   has_many :week_stats
   has_many :page_diffs
   has_one :page_total
-
+  has_many :contributors, :through => :node, :source => :contributors, :uniq => true
+  
   # index settings
   NOT_INDEXED = 0
   INDEXED = 1
