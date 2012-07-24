@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class NodeContributor < ActiveRecord::Base
+class NodeMetacontribution < ActiveRecord::Base
   belongs_to :node
   belongs_to :user
   

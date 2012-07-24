@@ -11,8 +11,8 @@ class Node < ActiveRecord::Base
   has_many :nodes, :through => :node_groups
   has_many :aae_nodes
   has_many :node_events
-  has_many :node_contributors
-  has_many :contributors, :through => :node_contributors, :source => :user, :uniq => true
+  has_many :node_metacontributions
+  has_many :meta_contributors, :through => :node_metacontributions, :source => :user, :uniq => true
   
   scope :articles, where(:node_type => 'article')
   scope :faqs,     where(:node_type => 'faq')

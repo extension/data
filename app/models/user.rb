@@ -7,9 +7,9 @@
 
 class User < ActiveRecord::Base
   has_many :node_events
-  has_many :node_contributors
-  has_many :contributed_nodes, :through => :node_contributors, :source => :node, :uniq => true
-  has_many :contributed_pages, :through => :contributed_nodes, :source => :page, :uniq => true
+  has_many :node_metacontributions
+  has_many :meta_contributed_nodes, :through => :node_metacontributions, :source => :node, :uniq => true
+  has_many :meta_contributed_pages, :through => :meta_contributed_nodes, :source => :page, :uniq => true
   
   def fullname 
     "#{self.first_name} #{self.last_name}"
