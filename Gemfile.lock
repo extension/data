@@ -42,7 +42,7 @@ GEM
       sass
     arel (3.0.2)
     builder (3.0.0)
-    capatross (1.1.1)
+    capatross (1.2.0)
       capistrano (>= 2.11)
       grit (>= 2.4)
       rest-client (>= 1.6.7)
