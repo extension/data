@@ -19,9 +19,15 @@
               <%- if datakey != 'change' -%>
               min: 0,
               <%- end -%>
+              <%- if datakey == 'seen_pct' -%>
+              max: 100,
+              <%- end -%>
             } 
           },
           seriesDefaults: {
+            <%- if local_assigns.has_key?(:fill) and fill == true -%>
+            fill: true,
+            <%- end -%>
             showMarker: false,
             shadow: false
           },
