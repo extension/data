@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class Node < ActiveRecord::Base
+  extend YearWeek
   has_one :page
   has_many :node_groups
   has_many :nodes, :through => :node_groups
@@ -21,7 +22,9 @@ class Node < ActiveRecord::Base
   scope :has_page, where(:has_page => true)
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date).order("#{self.table_name}.created_at")}
     
-  
+  # datatypes that we care about
+  PUBLISHED_DATATYPES = ['article','faq','news']
+
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    
     CreateNode.find_in_batches do |group|
@@ -90,6 +93,13 @@ class Node < ActiveRecord::Base
     end
   end
   
+  def self.earliest_year_week
+    if(@yearweek.blank?)
+      earliest_date = self.minimum(:created_at).to_date
+      @yearweek = [earliest_date.cwyear,earliest_date.cweek]
+    end
+    @yearweek
+  end 
 
 
 end

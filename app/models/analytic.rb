@@ -212,7 +212,12 @@ class Analytic < ActiveRecord::Base
     end
     @latest_year_week
   end
-    
+
+  def self.latest_date
+    (year,week) = self.latest_year_week
+    (blah,last_date) = self.date_pair_for_year_week(year,week)
+    last_date
+  end
     
   def self._latest_year_week
     year = self.maximum(:year)
