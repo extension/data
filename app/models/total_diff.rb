@@ -33,9 +33,9 @@ class TotalDiff < ActiveRecord::Base
   end
   
   
-  def self.rebuild_by_datatype(options = {})
+  def self.rebuild_by_event_type(options = {})
     
-    datatypes = Page.datatypes
+    datatypes = Page::DATATYPES
     group = options[:group]
     if(group.nil?)
       group_id = 0

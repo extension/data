@@ -28,7 +28,9 @@ Positronic::Application.routes.draw do
     match "/groups" => "data#groups", :as => 'data_groups'
   end
   
-  
+
+  match '/nodes/graphs' => 'nodes#graphs', :as => 'graphs_nodes', :via => :get
+
   
   
 end

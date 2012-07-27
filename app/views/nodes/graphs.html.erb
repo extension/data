@@ -1,0 +1,42 @@
+<%- 
+	if @group.nil? 
+      @page_title = "#{@datatype.pluralize.capitalize} Activity Graphs "
+      @page_title_display = "#{@datatype.pluralize.capitalize} Activity Graphs "
+      data_scope = NodeWeekTotal.by_datatype(@datatype).by_event_type(@event_type).overall
+    else
+      @page_title = "#{@datatype.pluralize.capitalize} Activity Graphs for Group ##{@group.id}"
+      @page_title_display = "#{@datatype.pluralize.capitalize} Activity Graphs for #{@group.name}"
+      data_scope = NodeWeekTotal.by_datatype(@datatype).by_event_type(@event_type).where(:group_id => @group.id)
+    end
+-%>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<div class="page-header">
+  <h1><%= @event_type.capitalize %> - Total</h1>
+</div>
+<div class="row">
+  <div class="span12">
+    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('total'), :datakey => 'totals', :ymax => (@showmax ? nil : data_scope.graph_max('total',@maxpercentile)) })%>     
+  </div>
+</div>
+
+<div class="page-header">
+  <h1><%= @event_type.capitalize %> - Items</h1>
+</div>  
+<div class="row">
+  <div class="span12">
+    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('items'), :datakey => 'items', :ymax => (@showmax ? nil : data_scope.graph_max('items',@maxpercentile))})%>     
+  </div>
+</div>
+
+<div class="page-header">
+  <h1><%= @event_type.capitalize %> - Users</h1>
+</div>
+<div class="row">
+  <div class="span12">
+    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('users'), :datakey => 'users', :ymax => (@showmax ? nil : data_scope.graph_max('users',@maxpercentile))})%>     
+  </div>
+</div>

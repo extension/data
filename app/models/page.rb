@@ -150,10 +150,6 @@ class Page < ActiveRecord::Base
   end
   
   
-  def self.datatypes
-    self.group(:datatype).pluck(:datatype)
-  end
-  
   def self.percentiles_for_year_week(year,week, options = {})
     percentiles = options[:percentiles] || Percentile::TRACKED
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]

@@ -27,7 +27,7 @@ class Percentile < ActiveRecord::Base
   
   def self.rebuild_by_group(options = {})
     
-    datatypes = Page.datatypes
+    datatypes = Page::DATATYPES
     group = options[:group]  
     if(group.nil? or group == 'overall')
       group = nil

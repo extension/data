@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120720160131) do
+ActiveRecord::Schema.define(:version => 20120726220141) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -103,6 +103,23 @@ ActiveRecord::Schema.define(:version => 20120720160131) do
 
   add_index "node_metacontributions", ["node_id"], :name => "node_ndx"
   add_index "node_metacontributions", ["user_id"], :name => "user_ndx"
+
+  create_table "node_week_totals", :force => true do |t|
+    t.integer  "group_id"
+    t.string   "datatype",      :limit => 25
+    t.string   "event_type",    :limit => 25
+    t.integer  "yearweek"
+    t.integer  "year"
+    t.integer  "week"
+    t.date     "yearweek_date"
+    t.integer  "eligible"
+    t.integer  "total"
+    t.integer  "items"
+    t.integer  "users"
+    t.datetime "created_at",                  :null => false
+  end
+
+  add_index "node_week_totals", ["group_id", "datatype", "event_type", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "nodes", :force => true do |t|
     t.integer  "revision_id"

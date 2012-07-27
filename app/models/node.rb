@@ -15,6 +15,18 @@ class Node < ActiveRecord::Base
   has_many :node_metacontributions
   has_many :meta_contributors, :through => :node_metacontributions, :source => :user, :uniq => true
   
+  # datatypes that we care about
+  PUBLISHED_DATATYPES = ['article','faq','news']
+
+  scope :by_datatype, lambda{|datatype|
+    case datatype
+    when 'all'
+      where(1)
+    else 
+      where("node_type = ?",datatype)
+    end
+  }
+
   scope :articles, where(:node_type => 'article')
   scope :faqs,     where(:node_type => 'faq')
   scope :news,     where(:node_type => 'news')
@@ -22,8 +34,7 @@ class Node < ActiveRecord::Base
   scope :has_page, where(:has_page => true)
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date).order("#{self.table_name}.created_at")}
     
-  # datatypes that we care about
-  PUBLISHED_DATATYPES = ['article','faq','news']
+
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    
@@ -47,6 +58,12 @@ class Node < ActiveRecord::Base
     update_sql = "UPDATE #{self.table_name},#{Page.table_name} SET #{self.table_name}.has_page = 1 WHERE #{self.table_name}.id = #{Page.table_name}.node_id and #{Page.table_name}.source = 'create'"
     self.connection.execute(update_sql)
     
+  end
+
+  def self.counts_by_yearweek
+    with_scope do
+      self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
+    end
   end
   
   def self.published_since(date)
