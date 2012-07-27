@@ -17,6 +17,7 @@
 //= require jqplot/plugins/dateAxisRenderer
 //= require jqplot/plugins/highlighter
 //= require jqplot/plugins/enhancedLegendRenderer
+//= require jqplot/plugins/cursor
 //= require responsive-tables
 //= require jquery.ui.datepicker
 //= require jquery.ui.autocomplete
