@@ -81,7 +81,9 @@ class GAImporter < Thor
       run_and_log(PageDiff,'rebuild','page weekly differences rebuild')
       run_and_log(TotalDiff,'rebuild','total weekly differences rebuild')      
       run_and_log(Percentile,'rebuild','percentiles rebuild')      
+      run_and_log(NodeWeekTotal,'rebuild','node activity rebuild')      
    end
+
    
    def item_rebuild(model)
      if(model == 'WeekStat')
