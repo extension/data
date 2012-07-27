@@ -31,19 +31,6 @@ class NodesController < ApplicationController
       @event_type = 'all'
     end
 
-    # the following parameters are meant to "chop" the spikes in activity at the xth percentile
-    if(!params[:showmax].nil? and FALSE_PARAMETER_VALUES.include?(params[:showmax]))
-      @showmax = false
-    else
-      @showmax = true
-    end
-
-    if(params[:maxpercentile])
-      @maxpercentile = params[:maxpercentile].to_i
-    else
-      @maxpercentile = 95
-    end
-
   end
 
 end

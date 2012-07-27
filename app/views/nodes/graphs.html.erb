@@ -19,7 +19,7 @@
 </div>
 <div class="row">
   <div class="span12">
-    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('total'), :datakey => 'totals', :ymax => (@showmax ? nil : data_scope.graph_max('total',@maxpercentile)) })%>     
+    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('total'), :datakey => 'totals' })%>     
   </div>
 </div>
 
@@ -28,7 +28,7 @@
 </div>  
 <div class="row">
   <div class="span12">
-    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('items'), :datakey => 'items', :ymax => (@showmax ? nil : data_scope.graph_max('items',@maxpercentile))})%>     
+    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('items'), :datakey => 'items'})%>     
   </div>
 </div>
 
@@ -37,6 +37,6 @@
 </div>
 <div class="row">
   <div class="span12">
-    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('users'), :datakey => 'users', :ymax => (@showmax ? nil : data_scope.graph_max('users',@maxpercentile))})%>     
+    <%= render(:partial => 'graphs_plot', :locals => {:data => data_scope.graph_data('users'), :datakey => 'users'})%>     
   </div>
 </div>
