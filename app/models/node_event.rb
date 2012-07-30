@@ -42,41 +42,31 @@ class NodeEvent < ActiveRecord::Base
   }
   
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
-  
-  scope :by_datatype, lambda{|datatype|
-    case datatype
-    when 'all'
-      where(1)
-    else 
-      joins(:node).where("nodes.node_type = ?",datatype)
-    end
-  }
 
+
+  
+
+  PUBLISHABLE_NODES = ['article','faq','news']
+
+  scope :all_nodes, where(1) # just a convenience scope for scoping node types and activity types
   scope :articles, joins(:node).where("nodes.node_type = 'article'")
   scope :faqs, joins(:node).where("nodes.node_type = 'faq'")
   scope :news, joins(:node).where("nodes.node_type = 'news'")
+  scope :forums, joins(:node).where("nodes.node_type = 'forum'")
+  scope :publishables, joins(:node).where("nodes.node_type IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
+  scope :nonpublishables, joins(:node).where("nodes.node_type NOT IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
   
-  EVENT_TYPES = ['all','edits','comments','reviews','publishes']
+  # used as a sanitycheck list
+  NODE_SCOPES = ['all_nodes','articles','faqs','news','publishables','nonpublishables','forums']
 
-  scope :by_event_type, lambda{|event_type|
-    case event_type
-    when 'all'
-      where(1)
-    when 'edits' 
-      where(:event => EDIT) 
-    when 'comments'
-      where(:event => COMMENT)
-    when 'reviews'
-      where("event IN (#{REVIEWED_EVENTS.join(',')})")
-    when 'publishes'
-      where(:event => PUBLISHED)
-    end
-  }
-
+  scope :all_activity, where(1) # just a convenience scope for scoping node types and activity types
   scope :edits, where(:event => EDIT) 
   scope :comments, where(:event => COMMENT)
   scope :reviews, where("event IN (#{REVIEWED_EVENTS.join(',')})")
   scope :publishes, where(:event => PUBLISHED)
+
+  # used as a sanitycheck list
+  ACTIVITY_SCOPES = ['all_activity','edits','comments','reviews','publishes']
 
 
 
@@ -154,27 +144,27 @@ class NodeEvent < ActiveRecord::Base
     REVIEWED_EVENTS.include?(self.event)
   end
 
-  def self.stats(event_type)
+  def self.stats(activity)
     returnstats = {}
-    if(!(EVENT_TYPES.include?(event_type)))
+    if(!(ACTIVITY_SCOPES.include?(activity)))
       return returnstats
     end
     with_scope do
-      returnstats[:total] = self.by_event_type(event_type).count
-      returnstats[:users] = self.by_event_type(event_type).count(:user_id,:distinct => true)
-      returnstats[:items] = self.by_event_type(event_type).count(:node_id,:distinct => true)
+      returnstats[:total] = self.send(activity).count
+      returnstats[:users] = self.send(activity).count(:user_id,:distinct => true)
+      returnstats[:items] = self.send(activity).count(:node_id,:distinct => true)
     end
     returnstats
   end
 
-  def self.stats_by_yearweek(event_type)
+  def self.stats_by_yearweek(activity)
     returnstats = {}
-    if(!(EVENT_TYPES.include?(event_type)))
+    if(!(ACTIVITY_SCOPES.include?(activity)))
       return returnstats
     end
     with_scope do
       # get the byweek groupings
-      by_yearweek_stats = self.group("YEARWEEK(node_events.created_at,3)").stats(event_type)
+      by_yearweek_stats = self.group("YEARWEEK(node_events.created_at,3)").stats(activity)
       self.eligible_year_weeks.each do |year,week|
         yearweek = self.yearweek(year,week)
         returnstats[yearweek] = {}
@@ -196,13 +186,42 @@ class NodeEvent < ActiveRecord::Base
       # scoped start date
       earliest_created_at = self.minimum(:created_at)
       if(!earliest_created_at.nil?)
-        start_date = self.minimum(:created_at).to_date
+        start_date = earliest_created_at.to_date
         self.year_weeks_between_dates(start_date,latest_date)
       else
         []
       end
     end
   end
+
+
+
+  def self.stats_to_graph_data(yearweek_stats,column_value,showrolling = true)
+    returndata = []
+    value_data = []
+    rolling_data = []
+    with_scope do
+      running_total = 0 
+      weekcount = 0
+      yearweek_stats.keys.sort.each do |yearweek|
+        date = self.yearweek_date(yearweek)
+        weekcount += 1
+        value = yearweek_stats[yearweek][column_value]
+        running_total += value
+        rolling_data << [date,(running_total / weekcount)]
+        value_data << [date,value]
+      end
+    end
+    if(showrolling)
+      returndata = [value_data,rolling_data]
+    else
+      returndata = [value_data]
+    end
+    returndata
+  end
+
+
+
 
   
 end	

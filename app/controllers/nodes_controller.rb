@@ -7,28 +7,29 @@
 
 class NodesController < ApplicationController
 
-  TRUE_PARAMETER_VALUES = [true, 1, '1', 't', 'T', 'true', 'TRUE', 'yes','YES'].to_set
-  FALSE_PARAMETER_VALUES = [false, 0, '0', 'f', 'F', 'false', 'FALSE','no','NO'].to_set
-  
+
 
   def graphs
     if(params[:group])
       @group = Group.find(params[:group])
     end
     
-    allowed_datatypes = ['all'] + Node::PUBLISHED_DATATYPES
-    allowed_event_types = ['all','edits']
-
-    @datatype = params[:datatype]
-    if(!allowed_datatypes.include?(@datatype))
+    @node_scope = params[:node_scope]
+    if(!NodeEvent::NODE_SCOPES.include?(@node_scope))
       # for now, error later
-      @datatype = 'all'
+      @node_scope = 'all_nodes'
     end
 
-    @event_type = params[:event_type]
-    if(!allowed_event_types.include?(@event_type))
+    @activity_scope = params[:activity_scope]
+    if(!NodeEvent::ACTIVITY_SCOPES.include?(@activity_scope))
       # for now, error later
-      @event_type = 'all'
+      @activity_scope = 'all_activity'
+    end
+
+    if(@group.nil?)
+      @yearweek_stats = NodeEvent.send(@node_scope).stats_by_yearweek(@activity_scope)
+    else
+      @yearweek_stats = @group.node_events.send(@node_scope).stats_by_yearweek(@activity_scope)
     end
 
   end
