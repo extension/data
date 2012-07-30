@@ -142,7 +142,7 @@ class TotalDiff < ActiveRecord::Base
           insert_list << self.yearweek(year,week)
           insert_list << year
           insert_list << week
-          insert_list << ActiveRecord::Base.quote_value(self.yearweek_date(year,week))
+          insert_list << ActiveRecord::Base.quote_value(self.year_week_date(year,week))
           insert_list << pages
           insert_list << pages_previous_week
           insert_list << pages_previous_year

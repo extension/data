@@ -98,7 +98,7 @@ class Group < ActiveRecord::Base
       year_weeks = Analytic.year_weeks_from_date(start_date)
       year_weeks.each do |year,week|
         yearweek_string = "#{year}-" + "%02d" % week
-        date = self.class.yearweek_date(year,week)
+        date = self.class.year_week_date(year,week)
         upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
         returndata << [date,upv]
       end
@@ -145,7 +145,7 @@ class Group < ActiveRecord::Base
     year_weeks.each do |year,week|
       loopcount += 1
       yearweek_string = "#{year}-" + "%02d" % week
-      date = self.class.yearweek_date(year,week)
+      date = self.class.year_week_date(year,week)
       if(week_stats[yearweek_string].nil?)
         views = 0
         change = 0

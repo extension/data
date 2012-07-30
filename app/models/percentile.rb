@@ -52,7 +52,7 @@ class Percentile < ActiveRecord::Base
           insert_list << yearweek
           insert_list << year
           insert_list << week
-          insert_list << ActiveRecord::Base.quote_value(self.yearweek_date(year,week))
+          insert_list << ActiveRecord::Base.quote_value(self.year_week_date(year,week))
           insert_list << (percentiles[:total] || 'NULL')
           insert_list << (percentiles[:seen] || 'NULL')
           TRACKED.each do |pct|
@@ -95,7 +95,7 @@ class Percentile < ActiveRecord::Base
     year_weeks = Analytic.year_weeks_from_date(start_date)
     year_weeks.each do |year,week|
       yearweek_string = "#{year}-" + "%02d" % week
-      date = self.yearweek_date(year,week)
+      date = self.year_week_date(year,week)
       TRACKED.each do |pct|
         returndata[pct] ||= []
         if(week_stats[yearweek_string].nil?)
@@ -127,7 +127,7 @@ class Percentile < ActiveRecord::Base
     year_weeks = Analytic.year_weeks_from_date(start_date)
     year_weeks.each do |year,week|
       yearweek_string = "#{year}-" + "%02d" % week
-      date = self.yearweek_date(year,week)
+      date = self.year_week_date(year,week)
       TRACKED.each do |pct|
         returndata[pct] ||= []
         if(week_stats[yearweek_string].nil?)

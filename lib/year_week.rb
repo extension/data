@@ -58,11 +58,11 @@ module YearWeek
     self.year_week_for_date(last_week_date)
   end
   
-  def yearweek_date(year,week)
+  def year_week_date(year,week)
     Date.commercial(year,week,7) 
   end
 
-  def date_from_yearweek(yearweek)
+  def yearweek_date(yearweek)
     if(yearweek.to_s =~ %r{(\d{4})(\d{2})})
       year = $1.to_i
       week = $2.to_i
