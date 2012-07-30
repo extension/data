@@ -204,7 +204,7 @@ class NodeEvent < ActiveRecord::Base
       running_total = 0 
       weekcount = 0
       yearweek_stats.keys.sort.each do |yearweek|
-        date = self.yearweek_date(yearweek)
+        date = self.date_from_yearweek(yearweek)
         weekcount += 1
         value = yearweek_stats[yearweek][column_value]
         running_total += value
