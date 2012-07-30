@@ -8,12 +8,33 @@
 class User < ActiveRecord::Base
   has_many :node_events
   has_many :node_metacontributions
-  has_many :meta_contributed_nodes, :through => :node_metacontributions, :source => :node, :uniq => true
-  has_many :meta_contributed_pages, :through => :meta_contributed_nodes, :source => :page, :uniq => true
-  
+
+  # note! not unique!
+  has_many :meta_contributed_nodes, :through => :node_metacontributions, :source => :node
+  has_many :meta_contributed_pages, :through => :meta_contributed_nodes, :source => :page
+  has_many :contributed_nodes, :through => :node_events, :source => :node
+  has_many :contributed_pages, :through => :contributed_nodes, :source => :page
+
+
   def fullname 
     "#{self.first_name} #{self.last_name}"
   end
+
+  def contributions_by_page
+    self.contributed_pages.group("pages.id").select("pages.*, group_concat(node_events.event) as contributions")
+  end
+
+  def contributions_by_node
+    self.contributed_nodes.group("nodes.id").select("nodes.*, group_concat(node_events.event) as contributions")
+  end
+
+   def meta_contributions_by_page
+    self.meta_contributed_pages.group("pages.id").select("pages.*, group_concat(node_metacontributions.role) as metacontributions")
+  end
+
+  def meta_contributions_by_node
+    self.meta_contributed_nodes.group("nodes.id").select("nodes.*, group_concat(node_metacontributions.role) as metacontributions")
+  end 
 
 
   def self.rebuild

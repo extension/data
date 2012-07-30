@@ -13,7 +13,8 @@ class Node < ActiveRecord::Base
   has_many :aae_nodes
   has_many :node_events
   has_many :node_metacontributions
-  has_many :meta_contributors, :through => :node_metacontributions, :source => :user, :uniq => true
+  has_many :meta_contributors, :through => :node_metacontributions, :source => :user
+  has_many :contributors, :through => :node_events, :source => :user
   
   # datatypes that we care about
   PUBLISHED_DATATYPES = ['article','faq','news']
@@ -33,8 +34,16 @@ class Node < ActiveRecord::Base
   
   scope :has_page, where(:has_page => true)
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date).order("#{self.table_name}.created_at")}
-    
 
+
+
+  def contributions_by_contributor
+    self.contributors.group("users.id").select("users.*, group_concat(node_events.event) as contributions")
+  end
+
+  def meta_contributions_by_contributor
+    self.meta_contributors.group("users.id").select("users.*, group_concat(node_metacontributions.role) as metacontributions")
+  end
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    

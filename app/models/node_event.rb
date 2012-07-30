@@ -10,8 +10,6 @@ class NodeEvent < ActiveRecord::Base
   belongs_to :node
   belongs_to :user
 
-
-
   DRAFT = 1
   READY_FOR_REVIEW = 2
   REVIEWED = 3
