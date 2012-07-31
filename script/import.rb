@@ -63,7 +63,7 @@ class GAImporter < Thor
       run_and_log(Group,'rebuild','darmok group import')
       run_and_log(Tag,'rebuild','darmok tag import')
       run_and_log(PageTagging,'rebuild','darmok page tagging import')
-      run_and_log(User,'rebuild','darmok user import')
+      run_and_log(Contributor,'rebuild','darmok contributor import')
     end
     
     def create_rebuilds
@@ -71,7 +71,7 @@ class GAImporter < Thor
       run_and_log(NodeGroup,'rebuild','create group node import')
       run_and_log(Revision,'rebuild','create revision import')
       run_and_log(AaeNode,'rebuild','create aae node import')
-      run_and_log(NodeEvent,'rebuild','create node events import')
+      run_and_log(NodeActivity,'rebuild','create node events import')
       run_and_log(NodeMetacontribution,'rebuild','create node contributors import')
     end
     

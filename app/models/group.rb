@@ -9,7 +9,7 @@ class Group < ActiveRecord::Base
   extend YearWeek
   has_many :node_groups
   has_many :nodes, :through => :node_groups
-  has_many :node_events, :through => :nodes
+  has_many :node_activities, :through => :nodes
   has_many :tags
   has_many :pages, :through => :tags
   has_many :analytics, :through => :tags

@@ -10,7 +10,7 @@ set :application, "positronic"
 set :repository,  "git@github.com:extension/positronic.git"
 set :branch, "master"
 set :scm, "git"
-set :user, "pacecar"
+set :contributor, "pacecar"
 set :use_sudo, false
 set :keep_releases, 3
 ssh_options[:forward_agent] = true

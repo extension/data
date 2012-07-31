@@ -5,14 +5,14 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class User < ActiveRecord::Base
-  has_many :node_events
+class Contributor < ActiveRecord::Base
+  has_many :node_activities
   has_many :node_metacontributions
 
   # note! not unique!
   has_many :meta_contributed_nodes, :through => :node_metacontributions, :source => :node
   has_many :meta_contributed_pages, :through => :meta_contributed_nodes, :source => :page
-  has_many :contributed_nodes, :through => :node_events, :source => :node
+  has_many :contributed_nodes, :through => :node_activities, :source => :node
   has_many :contributed_pages, :through => :contributed_nodes, :source => :page
 
 
@@ -21,11 +21,11 @@ class User < ActiveRecord::Base
   end
 
   def contributions_by_page
-    self.contributed_pages.group("pages.id").select("pages.*, group_concat(node_events.event) as contributions")
+    self.contributed_pages.group("pages.id").select("pages.*, group_concat(node_activities.event) as contributions")
   end
 
   def contributions_by_node
-    self.contributed_nodes.group("nodes.id").select("nodes.*, group_concat(node_events.event) as contributions")
+    self.contributed_nodes.group("nodes.id").select("nodes.*, group_concat(node_activities.event) as contributions")
   end
 
    def meta_contributions_by_page

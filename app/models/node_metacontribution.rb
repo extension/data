@@ -7,18 +7,18 @@
 
 class NodeMetacontribution < ActiveRecord::Base
   belongs_to :node
-  belongs_to :user
+  belongs_to :contributor
   
-  def associate_with_user
+  def associate_with_contributor
     checkstring = self.author.downcase
-    if(contributor = User.where('idstring = ?',checkstring).first)
-      self.update_attribute(:user_id, contributor.id)
-    elsif(contributor = User.where('email = ?',checkstring).first)
-      self.update_attribute(:user_id, contributor.id)
-    elsif(contributors = User.where("CONCAT(first_name,' ',last_name) = ?",checkstring))
+    if(contributor = Contributor.where('idstring = ?',checkstring).first)
+      self.update_attribute(:contributor_id, contributor.id)
+    elsif(contributor = Contributor.where('email = ?',checkstring).first)
+      self.update_attribute(:contributor_id, contributor.id)
+    elsif(contributors = Contributor.where("CONCAT(first_name,' ',last_name) = ?",checkstring))
       if(contributors.size == 1)
         contributor = contributors.first
-        self.update_attribute(:user_id, contributor.id)
+        self.update_attribute(:contributor_id, contributor.id)
       end
     end    
   end
@@ -41,12 +41,12 @@ class NodeMetacontribution < ActiveRecord::Base
     self.connection.execute(insert_sql)
     
     # associate
-    self.associate_all_with_users
+    self.associate_all_with_contributors
   end
   
-  def self.associate_all_with_users
+  def self.associate_all_with_contributors
     self.find_each do |nc|
-      nc.associate_with_user
+      nc.associate_with_contributor
     end
   end
   

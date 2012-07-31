@@ -5,10 +5,10 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class NodeEvent < ActiveRecord::Base
+class NodeActivity < ActiveRecord::Base
   extend YearWeek
   belongs_to :node
-  belongs_to :user
+  belongs_to :contributor
 
   DRAFT = 1
   READY_FOR_REVIEW = 2
@@ -100,7 +100,7 @@ class NodeEvent < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(revision.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,user_id,node_revision_id,event,log,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,log,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
         
@@ -117,7 +117,7 @@ class NodeEvent < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(cwe.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,user_id,node_revision_id,event,log,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,log,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
     
@@ -132,7 +132,7 @@ class NodeEvent < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(comment.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,user_id,event,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,event,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
       
@@ -149,7 +149,7 @@ class NodeEvent < ActiveRecord::Base
     end
     with_scope do
       returnstats[:total] = self.send(activity).count
-      returnstats[:users] = self.send(activity).count(:user_id,:distinct => true)
+      returnstats[:contributors] = self.send(activity).count(:contributor_id,:distinct => true)
       returnstats[:items] = self.send(activity).count(:node_id,:distinct => true)
     end
     returnstats
@@ -162,11 +162,11 @@ class NodeEvent < ActiveRecord::Base
     end
     with_scope do
       # get the byweek groupings
-      by_yearweek_stats = self.group("YEARWEEK(node_events.created_at,3)").stats(activity)
+      by_yearweek_stats = self.group("YEARWEEK(node_activities.created_at,3)").stats(activity)
       self.eligible_year_weeks.each do |year,week|
         yearweek = self.yearweek(year,week)
         returnstats[yearweek] = {}
-        [:total,:items,:users].each do |column_value|
+        [:total,:items,:contributors].each do |column_value|
           if(by_yearweek_stats[column_value][yearweek])
             returnstats[yearweek][column_value] = by_yearweek_stats[column_value][yearweek]
           else

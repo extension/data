@@ -11,10 +11,10 @@ class Node < ActiveRecord::Base
   has_many :node_groups
   has_many :nodes, :through => :node_groups
   has_many :aae_nodes
-  has_many :node_events
+  has_many :node_activities
   has_many :node_metacontributions
-  has_many :meta_contributors, :through => :node_metacontributions, :source => :user
-  has_many :contributors, :through => :node_events, :source => :user
+  has_many :meta_contributors, :through => :node_metacontributions, :source => :contributor
+  has_many :activity_contributors, :through => :node_activities, :source => :contributor
   
   # datatypes that we care about
   PUBLISHED_DATATYPES = ['article','faq','news']
@@ -38,11 +38,11 @@ class Node < ActiveRecord::Base
 
 
   def contributions_by_contributor
-    self.contributors.group("users.id").select("users.*, group_concat(node_events.event) as contributions")
+    self.contributors.group("contributors.id").select("contributors.*, group_concat(node_activities.event) as contributions")
   end
 
   def meta_contributions_by_contributor
-    self.meta_contributors.group("users.id").select("users.*, group_concat(node_metacontributions.role) as metacontributions")
+    self.meta_contributors.group("contributors.id").select("contributors.*, group_concat(node_metacontributions.role) as metacontributions")
   end
 
   def self.rebuild
@@ -76,7 +76,7 @@ class Node < ActiveRecord::Base
   end
   
   def self.published_since(date)
-    joins(:node_events).where("node_events.event = #{NodeEvent::PUBLISHED}").where("node_events.created_at > ?",date).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
+    joins(:node_activities).where("node_activities.event = #{NodeActivity::PUBLISHED}").where("node_activities.created_at > ?",date).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
   end
   
   
@@ -94,8 +94,8 @@ class Node < ActiveRecord::Base
       published_count = 0
       reviewed_counts = []
       reviews = 0
-      node.node_events.created_since(date).each do |wfe|
-        if(wfe.event == NodeEvent::PUBLISHED)
+      node.node_activities.created_since(date).each do |wfe|
+        if(wfe.event == NodeActivity::PUBLISHED)
           published_count += 1
           reviewed_counts << reviews
           reviews = 0

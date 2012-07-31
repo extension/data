@@ -60,16 +60,19 @@ class ConsistentifyTables < ActiveRecord::Migration
 
     add_index "groups", ["create_gid"], :name => "create_group_ndx"
 
-    create_table "node_events", :force => true do |t|
+    create_table "node_activities", :force => true do |t|
       t.integer  "node_id"
-      t.integer  "user_id"
+      t.integer  "contributor_id"
       t.integer  "node_revision_id"
       t.integer  "event"
       t.text     "log"
       t.datetime "created_at"
     end
 
-    add_index "node_events", ["node_id"], :name => "node_ndx"
+    add_index "node_activities", ["node_id"], :name => "node_ndx"
+    add_index "node_activities", ["event","created_at"], :name => "event_activity_ndx"
+    add_index "node_activities", ["contributor_id","event","created_at"], :name => "contributor_activity_ndx"
+    add_index "node_activities", ["node_id","event","created_at"], :name => "node_activity_ndx"
 
     create_table "node_groups", :force => true do |t|
       t.integer  "node_id"
@@ -89,6 +92,22 @@ class ConsistentifyTables < ActiveRecord::Migration
     end
 
     add_index "nodes", ["has_page"], :name => "page_flag_ndx"
+    add_index "nodes", ["node_type"], :name => "node_type_ndx"
+
+
+    create_table "node_metacontributions", :force => true do |t|
+      t.integer  "node_id"
+      t.integer  "contributor_id"
+      t.integer  "node_revision_id"
+      t.string   "role"
+      t.string   "author"
+      t.datetime "contributed_at"
+      t.datetime "created_at"
+    end
+    
+    add_index "node_metacontributions", ["node_id"], :name => "node_ndx"
+    add_index "node_metacontributions", ["contributor_id"], :name => "contributor_ndx"
+    
 
     create_table "page_taggings", :force => true do |t|
       t.integer  "page_id"
@@ -143,13 +162,13 @@ class ConsistentifyTables < ActiveRecord::Migration
 
     create_table "revisions", :force => true do |t|
       t.integer  "node_id"
-      t.integer  "user_id"
+      t.integer  "contributor_id"
       t.text     "log"
       t.datetime "created_at"
     end
 
     add_index "revisions", ["node_id"], :name => "node_ndx"
-    add_index "revisions", ["user_id"], :name => "user_ndx"
+    add_index "revisions", ["contributor_id"], :name => "contributor_ndx"
 
 
     create_table "tags", :force => true do |t|
@@ -171,7 +190,7 @@ class ConsistentifyTables < ActiveRecord::Migration
 
     add_index "update_times", ["item"], :name => "item_ndx"
 
-    create_table "users", :force => true do |t|
+    create_table "contributors", :force => true do |t|
       t.string   "idstring",           :limit => 80,                    :null => false
       t.string   "first_name"
       t.string   "last_name"

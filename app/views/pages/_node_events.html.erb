@@ -10,11 +10,11 @@
           </tr>
         </thead>
         <tbody>
-          <%- node.node_events.order("created_at DESC").each do |ne| -%>
+          <%- node.node_activities.order("created_at DESC").each do |ne| -%>
           <tr>
             <td><%= ne.created_at.to_s %></td>
             <td><%= ne.event_to_s %></td>
-            <td><%= ne.user.fullname %></td>
+            <td><%= ne.contributor.fullname %></td>
           </tr>
           <%- end -%>
         </tbody>

@@ -12,13 +12,13 @@
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
 </header>
 
-<%- ['total','items','users'].each do |column_value| -%>
+<%- ['total','items','contributors'].each do |column_value| -%>
 <div class="page-header">
   <h1><%= activity_scope_label(@activity_scope) %> - <%= column_value.capitalize %></h1>
 </div>
 <div class="row">
   <div class="span12">
-    <%= render(:partial => 'graphs_plot', :locals => {:data => NodeEvent.stats_to_graph_data(@yearweek_stats,column_value.to_sym), :datakey => column_value })%>     
+    <%= render(:partial => 'graphs_plot', :locals => {:data => NodeActivity.stats_to_graph_data(@yearweek_stats,column_value.to_sym), :datakey => column_value })%>     
   </div>
 </div>
 <%- end -%>
