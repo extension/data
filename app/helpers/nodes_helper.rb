@@ -21,4 +21,14 @@ module NodesHelper
 			activity_scope.capitalize
 		end
 	end
+
+	def node_contributions_display(contributions)
+		list = contributions.split(',')
+		list.uniq.map{|contribution| NodeActivity.event_to_s(contribution.to_i)}.join(', ').html_safe
+	end
+
+	def node_meta_contributions_display(contributions)
+		list = contributions.split(',')
+		list.uniq.join(', ').html_safe
+	end
 end

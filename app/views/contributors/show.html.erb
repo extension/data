@@ -1,0 +1,120 @@
+<% @page_title = "Contributions for #{@contributor.fullname}" %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+
+<div class="row">
+  <div class="span12">
+       <h3>Contributor Information</h3>
+  <table class="table table-bordered">
+ 
+    <tbody>
+      <tr>
+        <td>Title</td>
+        <td><%= @contributor.title %></td>
+      </tr>
+      <tr>
+        <td>Last login at</td>
+        <td><%= @contributor.last_login_at %></td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+       <h3>Direct Contributions</h3>
+  <table class="table table-bordered">
+
+    <thead>
+      <tr>
+        <th>Node</th>
+        <th>Page</th>
+        <th>Contributions</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+      <%- @contributor.contributions_by_node.each do |node| -%>
+      <%- 
+        if node.title.blank? 
+          node_title_display = '(blank)' 
+        else
+          node_title_display = node.title.truncate(80, :separator => ' ')
+        end
+
+        if node.has_page?
+          if node.page.title.blank? 
+            page_title_display = link_to('(blank)',page_path(node.page)).html_safe
+          else
+            page_title_display = link_to(node.page.title.truncate(80, :separator => ' '),page_path(node.page)).html_safe
+          end
+        else
+          page_title_display = 'not published'
+        end
+        -%>
+      <tr>
+        <td><%= node_title_display %></td>
+        <td><%= page_title_display %></td>
+        <td><%= node_contributions_display(node.contributions) %></td>
+      </tr>
+      <%- end -%>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+       <h3>Listed Contributions</h3>
+  <table class="table table-bordered">
+
+    <thead>
+      <tr>
+        <th>Node</th>
+        <th>Page</th>
+        <th>Contributions</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+      <%- @contributor.meta_contributions_by_node.each do |node| -%>
+      <%- 
+        if node.title.blank? 
+          node_title_display = '(blank)' 
+        else
+          node_title_display = node.title.truncate(80, :separator => ' ')
+        end
+
+        if node.has_page?
+          if node.page.title.blank? 
+            page_title_display = link_to('(blank)',page_path(node.page)).html_safe
+          else
+            page_title_display = link_to(node.page.title.truncate(80, :separator => ' '),page_path(node.page)).html_safe
+          end
+        else
+          page_title_display = 'not published'
+        end
+        -%>
+      <tr>
+        <td><%= node_title_display %></td>
+        <td><%= page_title_display %></td>
+        <td><%= node_meta_contributions_display(node.metacontributions) %></td>
+      </tr>
+      <%- end -%>
+    </tbody>
+  </table>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+

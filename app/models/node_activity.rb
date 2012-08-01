@@ -67,13 +67,16 @@ class NodeActivity < ActiveRecord::Base
   ACTIVITY_SCOPES = ['all_activity','edits','comments','reviews','publishes']
 
 
-
-  def event_to_s
-    if(EVENT_STRINGS[self.event])
-      EVENT_STRINGS[self.event]
+  def self.event_to_s(event)
+    if(EVENT_STRINGS[event])
+      EVENT_STRINGS[event]
     else
       'unknown'
     end
+  end
+
+  def event_to_s
+    self.class.event_to_s(self.event)
   end
   
   def self.earliest_year_week
