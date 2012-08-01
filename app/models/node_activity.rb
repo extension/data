@@ -181,6 +181,7 @@ class NodeActivity < ActiveRecord::Base
     returnstats
   end
 
+
   def self.eligible_year_weeks
     latest_date = Analytic.latest_date
     with_scope do 

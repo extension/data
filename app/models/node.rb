@@ -9,7 +9,7 @@ class Node < ActiveRecord::Base
   extend YearWeek
   has_one :page
   has_many :node_groups
-  has_many :nodes, :through => :node_groups
+  has_many :groups, :through => :node_groups
   has_many :aae_nodes
   has_many :node_activities
   has_many :node_metacontributions
@@ -17,7 +17,7 @@ class Node < ActiveRecord::Base
   has_many :activity_contributors, :through => :node_activities, :source => :contributor
   
   # datatypes that we care about
-  PUBLISHED_DATATYPES = ['article','faq','news']
+  PUBLISHED_TYPES = ['article','faq','news']
 
   scope :by_datatype, lambda{|datatype|
     case datatype
@@ -38,12 +38,28 @@ class Node < ActiveRecord::Base
 
 
   def contributions_by_contributor
-    self.contributors.group("contributors.id").select("contributors.*, group_concat(node_activities.event) as contributions")
+    self.activity_contributors.group("contributors.id").select("contributors.*, group_concat(node_activities.event) as contributions")
   end
 
   def meta_contributions_by_contributor
     self.meta_contributors.group("contributors.id").select("contributors.*, group_concat(node_metacontributions.role) as metacontributions")
   end
+
+  def contributions_count
+    counts = {}
+    counts[:contributors] = self.node_activities.count('contributor_id',:distinct => true)
+    counts[:actions] = self.node_activities.count    
+    counts[:byaction] = self.node_activities.group('event').count
+    counts
+  end
+
+  def metacontributions_count
+    counts = {}
+    counts[:contributors] = self.node_metacontributions.count('contributor_id',:distinct => true)
+    counts[:actions] = self.node_metacontributions.count    
+    counts[:byaction] = self.node_metacontributions.group('role').count
+    counts
+  end 
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")    

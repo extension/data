@@ -8,6 +8,20 @@
 class NodeMetacontribution < ActiveRecord::Base
   belongs_to :node
   belongs_to :contributor
+
+  PUBLISHABLE_NODES = ['article','faq','news']
+
+  scope :all_nodes, where(1) # just a convenience scope for scoping node types and activity types
+  scope :articles, joins(:node).where("nodes.node_type = 'article'")
+  scope :faqs, joins(:node).where("nodes.node_type = 'faq'")
+  scope :news, joins(:node).where("nodes.node_type = 'news'")
+  scope :forums, joins(:node).where("nodes.node_type = 'forum'")
+  scope :publishables, joins(:node).where("nodes.node_type IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
+  scope :nonpublishables, joins(:node).where("nodes.node_type NOT IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
+  
+  # used as a sanitycheck list
+  NODE_SCOPES = ['all_nodes','articles','faqs','news','publishables','nonpublishables','forums']
+
   
   def associate_with_contributor
     checkstring = self.author.downcase

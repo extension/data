@@ -33,5 +33,6 @@ Positronic::Application.routes.draw do
 
   resources :contributors, :only => [:index, :show] 
 
+  resources :nodes, :only => [:index, :show] 
   
 end

@@ -1,0 +1,115 @@
+<% @page_title = "Details for Node ##{@node.id}" %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+
+<div class="page-header">
+  <h1>Activity</h1>
+</div>
+<div class="row">
+  <div class="span4">
+    <h3>Contributions</h3>
+    <%- activity_counts = @node.contributions_count -%>
+    <%- if(activity_counts[:contributors] > 0 ) -%>
+     <dl>
+      <dt><span class='regnumber'><%= activity_counts[:actions] %></span> contributions by <span class='regnumber'><%= activity_counts[:contributors] %></span> contributors</dt>
+      <%- activity_counts[:byaction].keys.each do |action| -%>
+      <dd><span class='regnumber'><%= activity_counts[:byaction][action] %></span> <%= NodeActivity.event_to_s(action) %></dd>
+      <%- end -%>
+    <%- else -%>
+      <p>none</p>
+    <%- end -%>
+
+    <%- if(Node::PUBLISHED_TYPES.include?(@node.node_type)) -%>
+    <hr/>
+    <h3>Listed Contributions</h3>
+    <%- meta_activity_counts = @node.metacontributions_count -%>
+    <%- if(meta_activity_counts[:contributors] > 0 ) -%>
+     <dl>
+      <dt><span class='regnumber'><%= meta_activity_counts[:actions] %></span> contributions by <span class='regnumber'><%= meta_activity_counts[:contributors] %></span> contributors</dt>
+      <%- meta_activity_counts[:byaction].keys.each do |action| -%>
+      <dd><span class='regnumber'><%= meta_activity_counts[:byaction][action] %></span> <%= action %></dd>
+      <%- end -%>
+    <%- else -%>
+      <p>none</p>
+    <%- end -%>
+    <%- end -%>
+
+  </div>
+
+  <div class="span8">
+    <%= render(:partial => 'graphs_plot', :locals => {:data => NodeActivity.stats_to_graph_data(@node.node_activities.stats_by_yearweek('all_activity'),:total), :datakey => @node.id })%>     
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+	 <h3>Node Information</h3>
+	<table class="table table-bordered">
+ 
+	  <tbody>
+      <tr>
+        <td>Title</td>
+        <td><%= @node.title %></td>
+      </tr>
+      <tr>
+        <td>Node Type</td>
+        <td><%= @node.node_type %></td>
+      </tr>
+      <tr>
+        <td>Published?</td>
+        <td>
+          <%- if @node.has_page? -%>
+            Yes. (<%= link_to("Page ID ##{@node.page.id}",page_path(@node.page)) %>)
+          <%- else -%>
+            No.
+          <%- end -%>
+        </td>
+      </tr>
+      <tr>
+        <td>Groups</td>
+        <td><%= @node.groups.map{|g| g.name}.join(', ').html_safe %></td>
+      </tr>
+      <tr>
+      <tr> 
+        <td>@ Create</td>
+        <td><%= link_to("http://create.extension.org/node/#{@node.id}","http://create.extension.org/node/#{@node.id}")%></td>
+      </tr>
+      <tr> 
+        <td>Contributors</td>
+        <td>
+          <%- @node.contributions_by_contributor.each do |contributor| -%>
+            <p>
+              <%= link_to(contributor.fullname, contributor_path(contributor)) %>
+              : <%= node_contributions_display(contributor.contributions) %>
+            </p>
+          <%- end -%>
+        </td>
+      </tr>
+      <tr> 
+        <td>Listed contributors</td>
+        <td>
+          <%- @node.meta_contributions_by_contributor.each do |contributor| -%>
+            <p>
+              <%= link_to(contributor.fullname, contributor_path(contributor)) %>
+              : <%= node_meta_contributions_display(contributor.metacontributions) %>
+            </p>
+          <%- end -%>
+        </td>
+      </tr>
+	  </tbody>
+	</table>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
