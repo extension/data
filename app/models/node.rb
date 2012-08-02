@@ -36,6 +36,18 @@ class Node < ActiveRecord::Base
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date).order("#{self.table_name}.created_at")}
 
 
+  def display_title(options = {})
+    truncate_it = options[:truncate].nil? ? true : options[:truncate]
+
+    if(self.title.blank?)
+      display_title = '(blank)'
+    elsif(truncate_it)
+      display_title = self.title.truncate(80, :separator => ' ')
+    else
+      display_title = self.title
+    end
+    display_title
+  end
 
   def contributions_by_contributor
     self.activity_contributors.group("contributors.id").select("contributors.*, group_concat(node_activities.event) as contributions")

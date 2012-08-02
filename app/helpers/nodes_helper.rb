@@ -22,13 +22,16 @@ module NodesHelper
 		end
 	end
 
-	def node_contributions_display(contributions)
-		list = contributions.split(',')
-		list.uniq.map{|contribution| NodeActivity.event_to_s(contribution.to_i)}.join(', ').html_safe
+	def node_title_display(node,options = {})
+		link_to(node.display_title(options),node_path(node)).html_safe
 	end
 
-	def node_meta_contributions_display(contributions)
-		list = contributions.split(',')
-		list.uniq.join(', ').html_safe
+	def node_page_title_display(node,options = {})
+		if(node.has_page?)
+			link_to(node.page.display_title(options),page_path(node)).html_safe
+		else
+			'not published'
+		end
 	end
+
 end

@@ -21,11 +21,11 @@ class Contributor < ActiveRecord::Base
   end
 
   def contributions_by_page
-    self.contributed_pages.group("pages.id").select("pages.*, group_concat(node_activities.event) as contributions")
+    self.contributed_pages.group("pages.id").select("pages.*, max(node_activities.created_at) as last_contribution_at, group_concat(node_activities.event) as contributions")
   end
 
   def contributions_by_node
-    self.contributed_nodes.group("nodes.id").select("nodes.*, group_concat(node_activities.event) as contributions")
+    self.contributed_nodes.group("nodes.id").select("nodes.*, max(node_activities.created_at) as last_contribution_at, group_concat(node_activities.event) as contributions")
   end
 
    def meta_contributions_by_page

@@ -222,6 +222,10 @@ class NodeActivity < ActiveRecord::Base
     returndata
   end
 
+  def self.contributions_display(contributions)
+    list = contributions.split(',')
+    list.uniq.map{|contribution| self.event_to_s(contribution.to_i)}.join(', ')
+  end
 
 
 

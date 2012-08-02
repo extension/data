@@ -63,5 +63,10 @@ class NodeMetacontribution < ActiveRecord::Base
       nc.associate_with_contributor
     end
   end
+
+  def self.contributions_display(contributions)
+    list = contributions.split(',')
+    list.uniq.join(', ')
+  end
   
 end

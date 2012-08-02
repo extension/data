@@ -1,0 +1,32 @@
+<% @page_title = "Listed Create Contributions for #{@contributor.fullname}" %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+<div class="row">
+  <div class="span12">
+      <%= paginate(@metacontributions) %>
+  <table class="table table-bordered">
+
+    <thead>
+      <tr>
+        <th>Node</th>        
+        <th>Type</th>
+        <th>Page</th>
+        <th>Contributions</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+      <%- @metacontributions.each do |node| -%>
+      <tr>
+        <td><%= node_title_display(node) %></td>
+        <td><%= node.node_type %></td>
+        <td><%= node_page_title_display(node) %></td>
+        <td><%= NodeMetacontribution.contributions_display(node.metacontributions).html_safe %></td>
+      </tr>
+      <%- end -%>
+    </tbody>
+  </table>
+  </div>
+</div>

@@ -1,0 +1,34 @@
+<% @page_title = "Direct Create Contributions for #{@contributor.fullname}" %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+<div class="row">
+  <div class="span12">
+      <%= paginate(@contributions) %>
+  <table class="table table-bordered">
+
+    <thead>
+      <tr>
+        <th>Node</th>        
+        <th>Type</th>
+        <th>Page</th>
+        <th>Contributions</th>
+        <th>Last Contribution</th>
+      </tr>
+    </thead>
+  
+    <tbody>
+      <%- @contributions.each do |node| -%>
+      <tr>
+        <td><%= node_title_display(node) %></td>
+        <td><%= node.node_type %></td>
+        <td><%= node_page_title_display(node) %></td>
+        <td><%= NodeActivity.contributions_display(node.contributions).html_safe %></td>
+        <td><%= node.last_contribution_at.to_s %></td>
+      </tr>
+      <%- end -%>
+    </tbody>
+  </table>
+  </div>
+</div>

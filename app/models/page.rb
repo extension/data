@@ -41,6 +41,19 @@ class Page < ActiveRecord::Base
     joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
   }
   
+
+  def display_title(options = {})
+    truncate_it = options[:truncate].nil? ? true : options[:truncate]
+
+    if(self.title.blank?)
+      display_title = '(blank)'
+    elsif(truncate_it)
+      display_title = self.title.truncate(80, :separator => ' ')
+    else
+      display_title = self.title
+    end
+    display_title
+  end
   
   def self.earliest_year_week
     if(@yearweek.blank?)

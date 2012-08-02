@@ -29,38 +29,32 @@
 </div> 
 
 <div class="row">
-  <div class="span4">
-    <h3>Publishable <small>Articles, Faqs, and News</small></h3>
-    <%- publishables_count = @contributor.contributions_count('publishables') -%>
-    <%- if(publishables_count[:items] > 0 ) -%>
+  <div class="span6">
+    <h3>Direct Contributions <small>Direct edits, comments, reviews, etc.</small></h3>
+    <%- contributions_count = @contributor.contributions_count('all_nodes') -%>
+    <%- if(contributions_count[:items] > 0 ) -%>
+    <p>
+    <%= link_to("<i class='icon-th'></i>Details".html_safe,contributions_contributor_path(@contributor),:class => 'btn btn-info') %>      
+    <%= link_to("<i class='icon-file'></i>Download (.csv)".html_safe,contributions_contributor_path(@contributor, :download => 'csv'),:class => 'btn btn-info') %>      
+    </p>
      <dl>
-      <dt><span class='regnumber'><%= publishables_count[:actions] %></span> actions on <span class='regnumber'><%= publishables_count[:items] %></span> nodes</dt>
-      <%- publishables_count[:byaction].keys.each do |action| -%>
-      <dd><span class='regnumber'><%= publishables_count[:byaction][action] %></span> <%= NodeActivity.event_to_s(action) %></dd>
+      <dt><span class='regnumber'><%= contributions_count[:actions] %></span> actions on <span class='regnumber'><%= contributions_count[:items] %></span> nodes</dt>
+      <%- contributions_count[:byaction].keys.each do |action| -%>
+      <dd><span class='regnumber'><%= contributions_count[:byaction][action] %></span> <%= NodeActivity.event_to_s(action) %></dd>
       <%- end -%>
     <%- else -%>
       <p>none</p>
     <%- end -%>
   </div>
 
-  <div class="span4">
-    <h3>Other <small>Public Articles, Help Documents, Forums, etc.</small></h3>
-    <%- nonpublishables_count = @contributor.contributions_count('nonpublishables') -%>
-    <%- if(nonpublishables_count[:items] > 0 ) -%>
-     <dl>
-      <dt><span class='regnumber'><%= nonpublishables_count[:actions] %></span> actions on <span class='regnumber'><%= nonpublishables_count[:items] %></span> nodes</dt>
-      <%- nonpublishables_count[:byaction].keys.each do |action| -%>
-      <dd><span class='regnumber'><%= nonpublishables_count[:byaction][action] %></span> <%= NodeActivity.event_to_s(action) %></dd>
-      <%- end -%>
-    <%- else -%>
-      <p>none</p>
-    <%- end -%>
-  </div>
-
-    <div class="span4">
+  <div class="span6">
     <h3>Listed Contributions <small>recorded in node metadata</small></h3>
     <%- metacontributions_count = @contributor.metacontributions_count('publishables') -%>
     <%- if(metacontributions_count[:items] > 0 ) -%>
+    <p>
+    <%= link_to("<i class='icon-th'></i>Details".html_safe,metacontributions_contributor_path(@contributor),:class => 'btn btn-info') %>      
+    <%= link_to("<i class='icon-file'></i>Download (.csv)".html_safe,metacontributions_contributor_path(@contributor, :download => 'csv'),:class => 'btn btn-info') %>   
+    </p>
      <dl>
       <dt><span class='regnumber'><%= metacontributions_count[:actions] %></span> actions on <span class='regnumber'><%= metacontributions_count[:items] %></span> nodes</dt>
       <%- metacontributions_count[:byaction].keys.each do |action| -%>

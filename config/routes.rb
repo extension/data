@@ -31,8 +31,14 @@ Positronic::Application.routes.draw do
 
   match '/nodes/graphs' => 'nodes#graphs', :as => 'graphs_nodes', :via => :get
 
-  resources :contributors, :only => [:index, :show] 
+  resources :contributors, :only => [:index, :show] do
+    member do
+      get :contributions
+      get :metacontributions
+    end    
+  end
 
-  resources :nodes, :only => [:index, :show] 
-  
+  resources :nodes, :only => [:index, :show] do
+  end
+
 end
