@@ -19,11 +19,7 @@
     <%- if @node -%>
       <div class="span6">
         <h3>Node ID results</h3>
-      <%- if @node.page -%>
-      <p>Found page #<%= @node.page.id %> for node #<%= @node.id%>: <%= link_to(@node.page.title,page_path(@node.page))%></p>
-      <%- else -%>
-        <p>Found node #<%= @node.id%> but there's no published page for this node</p>
-      <%- end -%>
+        <p>Found node #<%= @node.id%>: <%= link_to(@node.title,node_path(@node))%></p>
       </div>  
     <%- end -%>
   <%- elsif(@pagelist) -%>

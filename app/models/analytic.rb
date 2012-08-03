@@ -25,6 +25,7 @@ class Analytic < ActiveRecord::Base
   URL_SEARCH = 'search'
   URL_ASK = 'ask'
   URL_OTHER = 'other'
+  URL_LANDING = 'landing'
   
   def set_url_type
     if(analytics_url == '/')
@@ -72,6 +73,27 @@ class Analytic < ActiveRecord::Base
       self.url_type = URL_ASK
     elsif(analytics_url =~ %r{^/main/search})
       self.url_type = URL_SEARCH
+    elsif(analytics_url =~ %r{^/category/(.+)})
+      check_for_tag($1)
+    else
+      check_for_tag(analytics_url)
+    end
+  end
+
+  def check_for_tag(checkstring)
+    paths = checkstring.split('/').reject(&:empty?)
+    if(paths.size == 1)
+      begin
+        tagname = CGI.unescape(paths[0]).gsub('_',' ')    
+        if(tag = Tag.find_by_name(tagname))
+          self.tag_id = tag.id
+          self.url_type = URL_LANDING
+        else
+          self.url_type = URL_OTHER
+        end
+      rescue
+        self.url_type = URL_OTHER
+      end    
     else
       self.url_type = URL_OTHER
     end

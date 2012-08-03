@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class Tag < ActiveRecord::Base
+  has_many :analytics
   has_many :page_taggings
   has_many :pages, :through => :page_taggings
   has_many :analytics, :through => :pages

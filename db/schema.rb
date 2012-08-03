@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120629114955) do
+ActiveRecord::Schema.define(:version => 20120803165723) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -41,9 +41,11 @@ ActiveRecord::Schema.define(:version => 20120629114955) do
     t.integer  "new_visits"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "tag_id"
   end
 
   add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
+  add_index "analytics", ["tag_id"], :name => "tag_id_ndx"
   add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
   create_table "contributors", :force => true do |t|
