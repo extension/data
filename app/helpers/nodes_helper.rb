@@ -28,7 +28,7 @@ module NodesHelper
 
 	def node_page_title_display(node,options = {})
 		if(node.has_page?)
-			link_to(node.page.display_title(options),page_path(node)).html_safe
+			link_to("Page ##{node.page.id}",page_path(node.page)).html_safe
 		else
 			'not published'
 		end

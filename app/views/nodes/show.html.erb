@@ -40,7 +40,8 @@
   </div>
 
   <div class="span8">
-    <%= render(:partial => 'graphs_plot', :locals => {:data => NodeActivity.stats_to_graph_data(@node.node_activities.stats_by_yearweek('all_activity'),:total), :datakey => @node.id })%>     
+    <h3>Contributions by week</h3>
+    <%= render(:partial => 'graphs_plot', :locals => {:data => NodeActivity.stats_to_graph_data(@node.node_activities.stats_by_yearweek('all_activity'),:total,false), :datakey => @node.id })%>     
   </div>
 </div>
 
@@ -84,15 +85,13 @@
             <p>
               <%= link_to(contributor.fullname, contributor_path(contributor)) %>
               : <%= NodeActivity.contributions_display(contributor.contributions).html_safe %>
-            
-                    <td><%= NodeActivity.contributions_display(node.contributions).html_safe %></td>
-
             </p>
           <%- end -%>
         </td>
       </tr>
       <tr> 
         <td>Listed contributors</td>
+        <%- if (Node::PUBLISHED_TYPES.include?(@node.node_type)) and (meta_activity_counts[:contributors] > 0 ) -%>
         <td>
           <%- @node.meta_contributions_by_contributor.each do |contributor| -%>
             <p>
@@ -101,6 +100,9 @@
             </p>
           <%- end -%>
         </td>
+        <%- else -%>
+        <td>n/a</td>
+        <%- end -%>
       </tr>
 	  </tbody>
 	</table>

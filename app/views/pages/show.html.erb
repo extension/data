@@ -67,6 +67,7 @@
         <td>Source URL</td>
         <td><%= link_to(@page.source_url,@page.source_url)%></td>
       </tr>
+
       <tr>
         <td>Source Published At</td>
         <td><%= @page.source_created_at %></td>
@@ -75,6 +76,40 @@
         <td>Source Updated At</td>
         <td><%= @page.source_updated_at %></td>
       </tr>
+      <%- if(!@page.node.nil?) -%>
+      <tr>
+        <td>Node Data</td>
+        <td><%= link_to("Node ##{@page.node.id}",node_path(@page.node))%></td>
+      </tr>
+      <tr> 
+        <td>Contributors</td>
+        <td>
+          <%- @page.node.contributions_by_contributor.each do |contributor| -%>
+            <p>
+              <%= link_to(contributor.fullname, contributor_path(contributor)) %>
+              : <%= NodeActivity.contributions_display(contributor.contributions).html_safe %>
+            </p>
+          <%- end -%>
+        </td>
+      </tr>
+      <%- meta_activity_counts = @page.node.metacontributions_count -%>
+      <tr> 
+        <td>Listed contributors</td>
+        <%- if(meta_activity_counts[:contributors] > 0 ) -%>
+        <td>
+          <%- @page.node.meta_contributions_by_contributor.each do |contributor| -%>
+            <p>
+              <%= link_to(contributor.fullname, contributor_path(contributor)) %>
+              : <%= NodeMetacontribution.contributions_display(contributor.metacontributions).html_safe %>
+            </p>
+          <%- end -%>
+        </td>
+        <%- else -%>
+        <td>n/a</td>
+        <%- end -%>
+      </tr>
+      <%- end -%>
+      <tr>
         <td>More Information</td>
         <td><%= link_to("http://www.extension.org/pageinfo/#{@page.id}","http://www.extension.org/pageinfo/#{@page.id}")%></td>
       </tr>
@@ -82,6 +117,9 @@
 	</table>
   </div>
 </div>
+
+
+
 
 
 

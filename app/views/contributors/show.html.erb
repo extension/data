@@ -6,20 +6,10 @@
 
 <div class="row">
   <div class="span12">
-       <h3>Contributor Information</h3>
-  <table class="table table-bordered">
- 
-    <tbody>
-      <tr>
-        <td>Title</td>
-        <td><%= @contributor.title %></td>
-      </tr>
-      <tr>
-        <td>Last login at</td>
-        <td><%= @contributor.last_login_at %></td>
-      </tr>
-    </tbody>
-  </table>
+    <address>
+    <strong><%= @contributor.title %></strong><br/>
+    Last login: <%= @contributor.last_login_at %>
+    </address>
   </div>
 </div>
 
