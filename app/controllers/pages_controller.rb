@@ -41,8 +41,6 @@ class PagesController < ApplicationController
       # ToDo: error out
       @datatype = 'Article'
     end
-    @graph_data = Page.graph_data_by_datatype(@datatype)
-    (@percentiles_labels,@percentiles_data) = Page.traffic_stats_data_by_datatype_with_percentiles(@datatype)
   end
     
   

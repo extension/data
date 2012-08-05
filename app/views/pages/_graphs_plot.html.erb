@@ -1,9 +1,13 @@
-  <div id="plot_for_<%= datakey %>"></div> 
+  <%- if !local_assigns.has_key?(:datalabel) 
+        datalabel = datakey
+      end -%>
+
+  <div id="plot_for_<%= datalabel %>"></div> 
   <script class="code" type="text/javascript">
     $(document).ready(function(){
       setTimeout(function(){
       var data = <%= data[datakey].to_json.html_safe %>;
-      var plot1 = jQuery.jqplot("plot_for_<%= datakey %>", [data], 
+      var plot1 = jQuery.jqplot("plot_for_<%= datalabel %>", [data], 
         {
           axesDefaults: {
             pad: 0
@@ -19,7 +23,9 @@
               <%- if datakey != 'change' -%>
               min: 0,
               <%- end -%>
-              <%- if datakey == 'seen_pct' -%>
+              <%- if local_assigns.has_key?(:ymax) -%>
+              max: <%= ymax %>,
+              <%- elsif datakey == 'seen_pct' -%>
               max: 100,
               <%- end -%>
             } 

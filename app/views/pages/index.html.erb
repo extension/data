@@ -6,19 +6,36 @@
   <%= render(:partial => 'date_changing_lead')%>
 </header>
 
-
-<div class="row">
-<%- Page::DATATYPES.each do |datatype| -%>
-    <div class="span3">
-      <h3><%= datatype.pluralize %>
-      </h3>
-      <hr/>
-         
-      <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => Page.stats_for_week_for_datatype(datatype)}) %>
-      <p>
-        <%= link_to("<i class='icon-th'></i> #{datatype.pluralize} details".html_safe,datatype_pages_path(:datatype => datatype),:class => 'btn btn-info') %>      
-      </p>
-    <hr/>
+  <div class="page-header">
+    <h2>Home Page</h2>
+  </div>  
+  <div class="row">
+    <div class="span4">
+      <%- index_stats = LandingDiff.overall.latest_week.by_metric('views').first -%>
+      <p><span class='bignumber'><%=number_with_precision(index_stats.total, :precision => 0)%></span> views for week</p>
+      <p><%= pct_change(index_stats.pct_change_week,'mednumber') %> from previous week</p>
+      <p><%= pct_change(index_stats.pct_change_year,'mednumber') %> from previous year</p>
+      <p><%= trend(index_stats.recent_pct_change,'mednumber') %> trend/week (last <%=Settings.recent_weeks%> weeks)</p>
     </div>
+  
+    <div class="span8">
+      <h3>Views per week over time</h3>
+      <%= render(:partial => 'data_plot', :locals => {:data => LandingDiff.overall.by_metric('views').stats_to_graph_data, :datalabel => 'index'})%> 
+    </div>
+  </div>
+
+<%- Page::DATATYPES.each do |datatype| -%>
+  <div class="page-header">
+    <h2><%= datatype.pluralize %></h2>
+  </div>  
+  <div class="row">
+    <div class="span4">
+      <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => Page.stats_for_week_for_datatype(datatype)}) %>
+    </div>
+  
+    <div class="span8">
+      <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype))%></small></h3>
+      <%= render(:partial => 'graphs_plot', :locals => {:data => Page.graph_data_by_datatype(datatype), :datakey => "views", :datalabel => datatype, :ymax => TotalDiff.overall.max_views(5)})%>     
+    </div>
+  </div>
 <%- end -%>
-</div>

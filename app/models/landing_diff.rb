@@ -10,8 +10,10 @@ class LandingDiff < ActiveRecord::Base
   extend YearWeek
   
   scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
-  scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
   scope :overall, where(:group_id => 0)
+  scope :by_metric, lambda{|metric| where(:metric => metric)}
+  scope :latest_week, lambda{(year,week) = Analytic.latest_year_week; by_year_week(year,week)}
+
   
   
   def self.max_for_metric(metric,nearest = nil)
@@ -140,5 +142,28 @@ class LandingDiff < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} (#{columns.join(',')}) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end      
-  end  
+  end
+
+
+  def self.stats_to_graph_data(showrolling = true)
+    returndata = []
+    value_data = []
+    rolling_data = []
+    with_scope do
+      running_total = 0 
+      weekcount = 0
+      self.order('yearweek').each do |ld|
+        weekcount += 1
+        running_total += ld.total
+        rolling_data << [ld.yearweek_date,(running_total / weekcount)]
+        value_data << [ld.yearweek_date,ld.total]
+      end
+    end
+    if(showrolling)
+      returndata = [value_data,rolling_data]
+    else
+      returndata = [value_data]
+    end
+    returndata
+  end
 end

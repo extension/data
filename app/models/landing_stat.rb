@@ -9,7 +9,10 @@ class LandingStat < ActiveRecord::Base
   extend YearWeek
   belongs_to :group
 
+  scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
   scope :overall, where(:group_id => 0)
+  scope :by_metric, lambda{|metric| where(:metric => metric)}
+  scope :latest_week, lambda{(year,week) = Analytic.latest_year_week; by_year_week(year,week)}
 
 
   def self.rebuild
