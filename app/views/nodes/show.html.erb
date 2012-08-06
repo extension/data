@@ -125,7 +125,13 @@
           <tr>
             <td><%= ne.created_at.to_s %></td>
             <td><%= ne.event_to_s %></td>
-            <td><%= link_to(ne.contributor.fullname, contributor_path(ne.contributor)) %></td>
+            <td>
+              <%- if(ne.contributor.present?) -%>
+              <%= link_to(ne.contributor.fullname, contributor_path(ne.contributor)) %>
+              <%- else -%>
+              n/a
+              <%- end -%>
+            </td>
           </tr>
           <%- end -%>
         </tbody>
