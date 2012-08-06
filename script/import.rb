@@ -81,6 +81,8 @@ class GAImporter < Thor
       run_and_log(PageDiff,'rebuild','page weekly differences rebuild')
       run_and_log(TotalDiff,'rebuild','total weekly differences rebuild')      
       run_and_log(Percentile,'rebuild','percentiles rebuild')      
+      run_and_log(LandingStat,'rebuild','landing stats rebuild')      
+      run_and_log(LandingDiff,'rebuild','landing diffs rebuild')      
    end
 
    
