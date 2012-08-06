@@ -27,20 +27,6 @@ module PagesHelper
     end
   end
   
-  def jqplot_page_traffic_data(page)
-    page.traffic_stats_data.to_json.html_safe
-  end
-  
-  def jqplot_overall_traffic_data_by_datatype(datatype) 
-    Page.traffic_stats_data_by_datatype(datatype).to_json.html_safe
-  end
-    
-  def jqplot_overall_traffic_data_by_datatype_with_percentiles(datatype)
-    (labels,data) = Page.traffic_stats_data_by_datatype_with_percentiles(datatype)
-    [labels.to_json.html_safe,data.to_json.html_safe]
-  end
-
-  
   def week_picker_date
     (year,week) = Analytic.latest_year_week
     (sow,eow) = Analytic.date_pair_for_year_week(year,week)
