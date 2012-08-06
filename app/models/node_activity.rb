@@ -151,7 +151,7 @@ class NodeActivity < ActiveRecord::Base
       return returnstats
     end
     with_scope do
-      returnstats[:total] = self.send(activity).count
+      returnstats[:contributions] = self.send(activity).count
       returnstats[:contributors] = self.send(activity).count(:contributor_id,:distinct => true)
       returnstats[:items] = self.send(activity).count(:node_id,:distinct => true)
     end
@@ -169,7 +169,7 @@ class NodeActivity < ActiveRecord::Base
       self.eligible_year_weeks.each do |year,week|
         yearweek = self.yearweek(year,week)
         returnstats[yearweek] = {}
-        [:total,:items,:contributors].each do |column_value|
+        [:contributions,:items,:contributors].each do |column_value|
           if(by_yearweek_stats[column_value][yearweek])
             returnstats[yearweek][column_value] = by_yearweek_stats[column_value][yearweek]
           else

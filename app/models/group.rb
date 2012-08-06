@@ -18,6 +18,7 @@ class Group < ActiveRecord::Base
   has_many :percentiles
   has_many :landing_diffs
   has_many :landing_stats
+  has_many :node_activity_diffs
   
   scope :launched, where(:is_launched => true)
 

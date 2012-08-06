@@ -1,0 +1,21 @@
+<%- # TODO: there have to be better ways of doing this that utilize the action names -%>
+<ul class="breadcrumb">
+  <li>
+    <%- if local_assigns.has_key?(:endpoint) and endpoint == 'Nodes' -%>
+      Nodes<span class="divider">/</span>
+    <%- else -%>
+      <%= link_to('Nodes',nodes_path) %><span class="divider">/</span>
+    <%- end -%>
+  </li>
+  <%- if local_assigns.has_key?(:showgroups) -%>
+  <li>
+    <%= link_to('Groups',groups_nodes_path) %><span class="divider">/</span>
+  </li>
+  <%- end -%>
+  <%- if @group -%>
+    <%= breadcrumb_li('group') %><%= link_to(@group.name, group_nodes_path(@group)) %><span class="divider">/</span></li>
+  <%- end -%>
+  <%- if local_assigns.has_key?(:endpoint) and endpoint != 'Nodes'-%>
+  <li class='active'><%= endpoint %></li>
+  <%- end -%>
+</ul>

@@ -7,6 +7,11 @@
 
 class NodesController < ApplicationController
 
+  def index
+
+
+  end
+
   def show
     @node = Node.find(params[:id])
   end
@@ -29,9 +34,9 @@ class NodesController < ApplicationController
     end
 
     if(@group.nil?)
-      @yearweek_stats = NodeActivity.send(@node_scope).stats_by_yearweek(@activity_scope)
+      @stats_scope = NodeActivityDiff.overall.by_node_scope(@node_scope).by_activity_scope(@activity_scope)
     else
-      @yearweek_stats = @group.node_activities.send(@node_scope).stats_by_yearweek(@activity_scope)
+      @stats_scope = @group.node_activity_diffs.by_node_scope(@node_scope).by_activity_scope(@activity_scope)
     end
 
   end
