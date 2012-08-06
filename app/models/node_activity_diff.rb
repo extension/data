@@ -16,6 +16,7 @@ class NodeActivityDiff < ActiveRecord::Base
   scope :by_node_scope, lambda{|node_scope| where(:node_scope => node_scope)}
   scope :by_activity_scope, lambda{|activity_scope| where(:activity_scope => activity_scope)}
   scope :latest_week, lambda{(year,week) = Analytic.latest_year_week; by_year_week(year,week)}
+  scope :by_n_a_m, lambda{|n,a,m| by_node_scope(n).by_activity_scope(a).by_metric(m)}
 
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
@@ -149,8 +150,7 @@ class NodeActivityDiff < ActiveRecord::Base
     end      
   end
 
-
-  def self.stats_to_graph_data(showrolling = true)
+  def self.c(showrolling = true)
     returndata = []
     value_data = []
     rolling_data = []

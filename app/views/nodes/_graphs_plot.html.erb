@@ -1,9 +1,9 @@
-  <div id="plot_for_<%= datakey %>"></div> 
+  <div id="plot_for_<%= datalabel %>"></div> 
   <script class="code" type="text/javascript">
     $(document).ready(function(){
       setTimeout(function(){
       var plotdata = <%= data.to_json.html_safe %>;
-      var plot1 = jQuery.jqplot("plot_for_<%= datakey %>", plotdata, 
+      var plot1 = jQuery.jqplot("plot_for_<%= datalabel %>", plotdata, 
         {
           axesDefaults: {
             pad: 0

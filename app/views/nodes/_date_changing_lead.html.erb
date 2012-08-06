@@ -1,0 +1,9 @@
+<%= form_tag(setdate_pages_path,{:class => 'form-inline'}) do -%>
+<p class="lead">
+  Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)
+  <%= hidden_field_tag('currenturi',Base64.encode64(request.fullpath),{:class => 'inline'}) -%>
+  <%- # commented out for now. ToDo: complete -%>
+  <!-- <%= hidden_field_tag('date',week_picker_date,{:class => 'inline week-picker'} ) -%> -->  
+</p>
+<%- end -%>
+

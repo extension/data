@@ -1,4 +1,4 @@
-<% @page_title = "Page Information" %>
+<% @page_title = "Node Activity Information" %>
 <%= render(:partial => 'node_breadcrumbs', :locals => {:endpoint => 'Nodes'}) %>
 
 <header class="jumbotron subhead" id="overview">
@@ -7,41 +7,35 @@
 </header>
 
 
-
-
   <div class="page-header">
-    <h2>All</h2>
+    <h2>All Nodes</h2>
   </div>  
   <div class="row">
     <div class="span4">
-      <h3>
-      <%- index_stats = LandingDiff.overall.latest_week.by_metric('views').first -%>
-      <p><span class='bignumber'><%=number_with_precision(index_stats.total, :precision => 0)%></span> views for week</p>
-      <p><%= pct_change(index_stats.pct_change_week,'mednumber') %> from previous week</p>
-      <p><%= pct_change(index_stats.pct_change_year,'mednumber') %> from previous year</p>
-      <p><%= trend(index_stats.recent_pct_change,'mednumber') %> trend/week (last <%=Settings.recent_weeks%> weeks)</p>
+      <h3>Overall</h3>
 
+      <h3>Last Week</h3>
     </div>
   
     <div class="span8">
-      <h3>Views per week over time</h3>
-      <%= render(:partial => 'data_plot', :locals => {:data => LandingDiff.overall.by_metric('views').stats_to_graph_data, :datalabel => 'index'})%> 
+      <h3>Contributors per week over time</h3>
+      <%= render(:partial => 'graphs_plot', :locals => {:data => NodeActivityDiff.overall.by_n_a_m('all_nodes','all_activity','contributors').stats_to_graph_data, :datalabel => 'all_contributors' })%>     
     </div>
   </div>
 
-<%- Page::DATATYPES.each do |datatype| -%>
   <div class="page-header">
-    <h2><%= datatype.pluralize %></h2>
+    <h2>Articles</h2>
   </div>  
   <div class="row">
     <div class="span4">
-      <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => Page.stats_for_week_for_datatype(datatype)}) %>
-      <p><%= link_to("<i class='icon-th'></i> #{datatype.pluralize} list".html_safe,list_pages_path(:datatype => datatype),:class => 'btn btn-info') %></p>   
+      <h3>Overall</h3>
+
+      <h3>Last Week</h3>
     </div>
   
     <div class="span8">
-      <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype))%></small></h3>
-      <%= render(:partial => 'graphs_plot', :locals => {:data => Page.graph_data_by_datatype(datatype), :datakey => "views", :datalabel => datatype, :ymax => TotalDiff.overall.max_views(5)})%>     
+      <h3>Contributors per week over time</h3>
+      <%= render(:partial => 'graphs_plot', :locals => {:data => NodeActivityDiff.overall.by_n_a_m('articles','all_activity','contributors').stats_to_graph_data, :datalabel => 'articles_contributors' })%>     
     </div>
   </div>
-<%- end -%>
+

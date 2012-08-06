@@ -18,7 +18,7 @@
 </div>
 <div class="row">
   <div class="span12">
-    <%= render(:partial => 'graphs_plot', :locals => {:data => @stats_scope.by_metric(metric).stats_to_graph_data, :datakey => metric })%>     
+    <%= render(:partial => 'graphs_plot', :locals => {:data => @stats_scope.by_metric(metric).stats_to_graph_data, :datalabel => metric })%>     
   </div>
 </div>
 <%- end -%>
