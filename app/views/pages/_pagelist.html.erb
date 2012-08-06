@@ -2,8 +2,6 @@
   <thead>
     <tr>
         <th>Page</th>
-        <th>Page ID</th>
-        <th>Node ID</th>
         <th>Views</th>
         <th>% Change Week</th>
         <th>% Change Year</th>
@@ -20,16 +18,6 @@
           title = page.title.truncate(80, :separator => ' ')
         end -%>
       <td><%= link_to(title,page_path(page)) %></td>
-      <td><%= page.id %></td>
-      <td>
-        <%- if(page.node) -%>
-          <%= page.node.id %>
-        <%- elsif(page.source != 'create') -%>
-          n/a
-        <%- else -%>
-          <span class="label label-important">Unknown!</span>
-        <%- end -%>
-      </td>
       <%- if !page.last_diff -%>
         <td>n/a</td>
         <td>n/a</td>

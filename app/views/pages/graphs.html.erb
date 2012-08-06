@@ -6,7 +6,7 @@
       @page_title_display = "#{@datatype.pluralize} Graphs for #{@group.name}"
     end
 -%>
-<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => 'graphs'}) %>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => "#{@datatype} graphs"}) %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title_display %></h1>
   <%= render(:partial => 'date_changing_lead')%>
