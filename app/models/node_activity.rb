@@ -169,7 +169,7 @@ class NodeActivity < ActiveRecord::Base
       self.eligible_year_weeks.each do |year,week|
         yearweek = self.yearweek(year,week)
         returnstats[yearweek] = {}
-        [:contributions,:items,:contributors].each do |column_value|
+        ['contributions','items','contributors'].each do |column_value|
           if(by_yearweek_stats[column_value][yearweek])
             returnstats[yearweek][column_value] = by_yearweek_stats[column_value][yearweek]
           else
@@ -209,7 +209,7 @@ class NodeActivity < ActiveRecord::Base
         date = self.yearweek_date(yearweek)
         weekcount += 1
         value = yearweek_stats[yearweek][column_value]
-        running_total += value
+        running_total += value.nil? ? 0 : value
         rolling_data << [date,(running_total / weekcount)]
         value_data << [date,value]
       end
