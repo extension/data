@@ -150,7 +150,7 @@ class NodeActivityDiff < ActiveRecord::Base
     end      
   end
 
-  def self.c(showrolling = true)
+  def self.stats_to_graph_data(showrolling = true)
     returndata = []
     value_data = []
     rolling_data = []
