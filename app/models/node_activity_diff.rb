@@ -9,6 +9,7 @@ class NodeActivityDiff < ActiveRecord::Base
   belongs_to :group
   extend YearWeek
   
+  METRICS = ['contributors','items','contributions']
 
   scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
   scope :overall, where(:group_id => 0)
@@ -17,6 +18,7 @@ class NodeActivityDiff < ActiveRecord::Base
   scope :by_activity_scope, lambda{|activity_scope| where(:activity_scope => activity_scope)}
   scope :latest_week, lambda{(year,week) = Analytic.latest_year_week; by_year_week(year,week)}
   scope :by_n_a_m, lambda{|n,a,m| by_node_scope(n).by_activity_scope(a).by_metric(m)}
+  scope :by_n_a, lambda{|n,a| by_node_scope(n).by_activity_scope(a)}
 
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
@@ -148,6 +150,26 @@ class NodeActivityDiff < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} (#{columns.join(',')}) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end      
+  end
+
+  def self.metrics_for_year_week(year,week)
+    returnmetrics  = {}
+    with_scope do
+      METRICS.each do |metric|
+        returnmetrics[metric] = self.by_year_week(year,week).by_metric(metric).sum(:metric_value).to_i
+      end
+    end
+    returnmetrics
+  end
+
+  def self.metrics_latest_week
+    returnmetrics  = {}
+    with_scope do
+      METRICS.each do |metric|
+        returnmetrics[metric] = self.latest_week.by_metric(metric).sum(:metric_value).to_i
+      end
+    end
+    returnmetrics
   end
 
   def self.stats_to_graph_data(showrolling = true)

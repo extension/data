@@ -151,9 +151,9 @@ class NodeActivity < ActiveRecord::Base
       return returnstats
     end
     with_scope do
-      returnstats[:contributions] = self.send(activity).count
-      returnstats[:contributors] = self.send(activity).count(:contributor_id,:distinct => true)
-      returnstats[:items] = self.send(activity).count(:node_id,:distinct => true)
+      returnstats['contributions'] = self.send(activity).count
+      returnstats['contributors'] = self.send(activity).count(:contributor_id,:distinct => true)
+      returnstats['items'] = self.send(activity).count(:node_id,:distinct => true)
     end
     returnstats
   end

@@ -12,6 +12,12 @@
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
 </header>
 
+<ul class="nav nav-tabs">
+  <%- NodeActivity::ACTIVITY_SCOPES.each do |activity_scope| -%>
+  <%= graph_nav_li(activity_scope) %>
+  <%- end -%>
+</ul>
+
 <%- ['contributions','items','contributors'].each do |metric| -%>
 <div class="page-header">
   <h1><%= activity_scope_label(@activity_scope) %> - <%= metric.capitalize %></h1>
