@@ -1,5 +1,5 @@
 <% @page_title = "Page Information - Group ##{@group.id}" %>
-<%= render(:partial => 'page_breadcrumbs', :locals => {:showgroups=> true, :group => @group}) %>
+<%= render(:partial => 'group_breadcrumbs', :locals => {:group => @group}) %>
 <header class="jumbotron subhead" id="overview">
   <h1>Page Information for <%= @group.name %></h1>
   <p class="lead">
@@ -22,7 +22,7 @@
   
     <div class="span8">
       <h3>Views per week over time</h3>
-      <%= render(:partial => 'data_plot', :locals => {:data => @group.landing_diffs.by_metric('views').stats_to_graph_data, :datalabel => 'index'})%> 
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => @group.landing_diffs.by_metric('views').stats_to_graph_data, :datalabel => 'index'})%> 
     </div>
   </div>
 
@@ -34,9 +34,9 @@
     <div class="span4">
       <%- stats_for_week_for_datatype = @group.stats_for_week_for_datatype(datatype) -%>
       <%- if stats_for_week_for_datatype[:pages] and stats_for_week_for_datatype[:pages] > 0 -%>   
-        <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => stats_for_week_for_datatype}) %>
+        <%= render(:partial => 'shared/overall_views_information', :locals => {:datatype => datatype, :stats_for_week => stats_for_week_for_datatype}) %>
         <p>
-          <%= link_to("<i class='icon-th'></i> #{datatype.pluralize} list".html_safe,list_group_pages_path(:datatype => datatype, :group => @group.id),:class => 'btn btn-info') %>      
+          <%= link_to("<i class='icon-th'></i> #{datatype.pluralize} list".html_safe,pagelist_group_path(:datatype => datatype, :group => @group.id),:class => 'btn btn-info') %>      
         </p>
       <%- else -%>
         No data.
@@ -46,7 +46,7 @@
     <%- if stats_for_week_for_datatype[:pages] and stats_for_week_for_datatype[:pages] > 0 -%>   
     <div class="span8">
       <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype,:group => @group.id))%></small></h3>
-      <%= render(:partial => 'graphs_plot', :locals => {:data => @group.graph_data_by_datatype(datatype), :datakey => "views", :datalabel => datatype, :ymax => @group.total_diffs.max_views(5)})%>     
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => @group.graph_data_by_datatype(datatype)['views'], :datalabel => "views_#{datatype}", :ymax => @group.total_diffs.max_views(5)})%>     
     </div>
     <%- end -%>
   </div>

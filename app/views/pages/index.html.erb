@@ -20,7 +20,7 @@
   
     <div class="span8">
       <h3>Views per week over time</h3>
-      <%= render(:partial => 'data_plot', :locals => {:data => LandingDiff.overall.by_metric('views').stats_to_graph_data, :datalabel => 'index'})%> 
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => LandingDiff.overall.by_metric('views').stats_to_graph_data, :datalabel => 'index'})%> 
     </div>
   </div>
 
@@ -30,13 +30,13 @@
   </div>  
   <div class="row">
     <div class="span4">
-      <%= render(:partial => 'overall_views_information', :locals => {:datatype => datatype, :stats_for_week => Page.stats_for_week_for_datatype(datatype)}) %>
+      <%= render(:partial => 'shared/overall_views_information', :locals => {:datatype => datatype, :stats_for_week => Page.stats_for_week_for_datatype(datatype)}) %>
       <p><%= link_to("<i class='icon-th'></i> #{datatype.pluralize} list".html_safe,list_pages_path(:datatype => datatype),:class => 'btn btn-info') %></p>   
     </div>
   
     <div class="span8">
       <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype))%></small></h3>
-      <%= render(:partial => 'graphs_plot', :locals => {:data => Page.graph_data_by_datatype(datatype), :datakey => "views", :datalabel => datatype, :ymax => TotalDiff.overall.max_views(5)})%>     
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => Page.graph_data_by_datatype(datatype)['views'], :datalabel => "views_#{datatype}", :ymax => TotalDiff.overall.max_views(5)})%>     
     </div>
   </div>
 <%- end -%>

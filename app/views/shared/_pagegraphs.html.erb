@@ -1,0 +1,38 @@
+<div class="row">
+  <div class="span12">
+    <h3><%= @datatype %> growth</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => graph_data['pagegrowth'], :datalabel => 'pagegrowth'})%>     
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>% Viewed</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => graph_data['seen_pct'], :datalabel => 'seen_pct', :fill => true, :ymax => 100})%>     
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+  <h3>Views</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => graph_data['views'], :datalabel => 'views'})%>     
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+  <h3>Rolling views average</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => graph_data['rolling'], :datalabel => 'rolling'})%>     
+  </div>
+</div>
+
+  
+<div class="row">
+  <div class="span12">
+  <h3>Percentiles</h3>
+    <p><em>click the legend labels to toggle display of the given item</em></p>
+    <%= render(:partial => 'shared/percentiles_plot', :locals => {:data => percentiles_data, :labels => percentiles_labels})%>     
+  </div>
+</div>

@@ -93,7 +93,7 @@ module PagesHelper
   def number_list_link(number_text,params,number_class='mednumber')
     number_span = "<span class='#{number_class}'>#{number_text}</span>".html_safe
     if(@group)
-      link_to(number_span,list_group_pages_path(params.merge(:id => @group.id))).html_safe
+      link_to(number_span,pagelist_group_path(params.merge(:id => @group.id))).html_safe
     else
       link_to(number_span,list_pages_path(params)).html_safe
     end

@@ -114,11 +114,11 @@ class Group < ActiveRecord::Base
   
   def graph_data_by_datatype(datatype)
     returndata = {}
-    returndata['pagegrowth'] = []
-    returndata['views'] = []
-    returndata['change'] = []
-    returndata['rolling'] = []
-    returndata['seen_pct'] = []
+    return_pagegrowth = []
+    return_views = []
+    return_change = []
+    return_rolling = []
+    return_seen_pct = []
     
     week_stats = {}
     self.total_diffs.by_datatype(datatype).order('yearweek').map do |ws|
@@ -163,12 +163,18 @@ class Group < ActiveRecord::Base
       
       views_total += views
       rolling = (views_total / loopcount)        
-      returndata['pagegrowth'] << [date,pages]
-      returndata['views'] << [date,views]
-      returndata['change'] << [date,change*100]
-      returndata['rolling'] << [date,rolling]
-      returndata['seen_pct'] << [date,seen_pct*100]
+      return_pagegrowth << [date,pages]
+      return_views << [date,views]
+      return_change << [date,change*100]
+      return_rolling << [date,rolling]
+      return_seen_pct << [date,seen_pct*100]        
     end
+
+    returndata['pagegrowth'] = [return_pagegrowth]
+    returndata['views'] = [return_views]
+    returndata['change'] = [return_change]
+    returndata['rolling'] = [return_rolling]
+    returndata['seen_pct'] = [return_seen_pct]
     returndata
   end
   

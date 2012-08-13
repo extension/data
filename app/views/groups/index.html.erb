@@ -1,5 +1,5 @@
 <% @page_title = "Groups page information" %>
-<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => 'Groups'}) %>
+<%= render(:partial => 'group_breadcrumbs', :locals => {:endpoint => 'Groups'}) %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
@@ -14,7 +14,7 @@
       source: "/data/groups",
       minLength: 2,
       select: function(event, ui) { 
-        window.location = '/pages/group/' + ui.item.id
+        window.location = '/groups/' + ui.item.id
       } 
     });
   </script>
@@ -37,7 +37,7 @@
       <dl>
       <%- groupslist.each do |group| %>
         <%- group_stats = group.stats_for_week_for_datatype(datatype) -%>
-        <dt><%= link_to(group.name, group_pages_path(group))%></dt>
+        <dt><%= link_to(group.name, group_path(group))%></dt>
         <dd><span class='regnumber'><%= number_with_precision(group_stats[:views], :precision => 2) %></span> views</dd>
         <dd><span class='regnumber'><%= number_to_percentage(group_stats[:seen]/group_stats[:pages]*100, :precision => 1) %></span>
         of <span class='regnumber'><%= number_with_delimiter(group_stats[:pages])%></span> items viewed</dd>

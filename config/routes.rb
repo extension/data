@@ -17,9 +17,7 @@ Positronic::Application.routes.draw do
   match '/pages/graphs/:datatype/:group' => 'pages#graphs', :as => 'graphs_pages', :via => :get
   match '/pages/graphs/:datatype' => 'pages#graphs', :as => 'graphs_pages', :via => :get
   match '/pages/datatype/:datatype' => 'pages#datatype', :as => 'datatype_pages', :via => :get
-  match '/pages/group/:id' => 'pages#group', :as => 'group_pages', :via => :get
-  match '/pages/group/:id/list' => 'pages#grouplist', :as => 'list_group_pages', :via => :get
-  match '/pages/group/:id/:datatype' => 'pages#groupdatatype', :as => 'datatype_group_pages', :via => :get
+  match '/pages/group/:id/:datatype' => 'pages#groupdatatype', :as => 'datatype_group', :via => :get
   
   resources :groups, :only => [:index, :show] 
   
@@ -29,7 +27,6 @@ Positronic::Application.routes.draw do
   end
   
 
-  match '/nodes/graphs' => 'nodes#graphs', :as => 'graphs_nodes', :via => :get
 
   resources :contributors, :only => [:index, :show] do
     member do
@@ -39,6 +36,16 @@ Positronic::Application.routes.draw do
   end
 
   resources :nodes, :only => [:index, :show] do
+    collection do
+      get :graphs
+    end
+  end
+
+
+  resources :groups, :only => [:index, :show] do
+    member do
+      get :pagelist
+    end
   end
 
 end

@@ -1,0 +1,20 @@
+<%- # TODO: there have to be better ways of doing this that utilize the action names -%>
+<ul class="breadcrumb">
+  <li>
+    <%- if local_assigns.has_key?(:endpoint) and endpoint == 'Groups' -%>
+      Groups<span class="divider">/</span>
+    <%- else -%>
+      <%= link_to('Groups',groups_path) %><span class="divider">/</span>
+    <%- end -%>
+  </li>
+  <%- if @group -%>
+    <%- if params[:action] == 'show' %>
+      <li class="active"><%= @group.name %></li>
+    <%- else -%>
+      <li><%= link_to(@group.name, group_path(@group)) %><span class="divider">/</span></li>
+    <%- end -%>
+  <%- end -%>
+  <%- if local_assigns.has_key?(:endpoint) and endpoint != 'Groups'-%>
+    <li class='active'><%= endpoint %></li>
+  <%- end -%>
+</ul>

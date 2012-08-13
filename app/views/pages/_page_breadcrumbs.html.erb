@@ -7,14 +7,6 @@
       <%= link_to('Pages',pages_path) %><span class="divider">/</span>
     <%- end -%>
   </li>
-  <%- if local_assigns.has_key?(:showgroups) -%>
-  <li>
-    <%= link_to('Groups',groups_pages_path) %><span class="divider">/</span>
-  </li>
-  <%- end -%>
-  <%- if @group -%>
-    <%= breadcrumb_li('group') %><%= link_to(@group.name, group_pages_path(@group)) %><span class="divider">/</span></li>
-  <%- end -%>
   <%- if local_assigns.has_key?(:endpoint) and endpoint != 'Pages'-%>
   <li class='active'><%= endpoint %></li>
   <%- end -%>

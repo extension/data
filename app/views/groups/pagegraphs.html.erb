@@ -12,9 +12,7 @@
   <%= render(:partial => 'date_changing_lead')%>
 </header>
 
-<%= render(:partial => 'shared/pagegraphs', :locals => {:percentiles_data => @percentiles_data, :percentiles_labels => @percentiles_labels, :graph_data => @graph_data})%>     
-
-
+<%= render(:partial => 'graphs', :locals => {:percentiles_data => @percentiles_data, :percentiles_labels => @percentiles_labels, :graph_data => @graph_data})%>     
 
 
 
