@@ -64,7 +64,7 @@ class NodeActivityDiff < ActiveRecord::Base
         previous_week_key_string = self.yearweek(previous_year,previous_week)
         
         # metrics
-        [:contributions,:items,:contributors].each do |metric|
+        ['contributions','items','contributors'].each do |metric|
 
           metric_value = (week_stats[current_key_string] ? week_stats[current_key_string][metric] : 0)
           previous_week = (week_stats[previous_week_key_string]  ? week_stats[previous_week_key_string][metric] : 0)        
