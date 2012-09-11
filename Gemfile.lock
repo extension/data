@@ -193,7 +193,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  airbrake
+  airbrake (= 3.1.2)
   anjlab-bootstrap-rails (>= 2.0)
   capatross
   capistrano
