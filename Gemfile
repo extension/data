@@ -64,7 +64,7 @@ gem "google_visualr", ">= 2.1"
 gem 'jqplot-rails', :git => 'git://github.com/extension/jqplot-rails.git'
 
 # exception handling
-gem 'exception_notification'
+gem 'airbrake'
 
 group :development do
   # require the powder gem

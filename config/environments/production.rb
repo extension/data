@@ -64,12 +64,7 @@ Positronic::Application.configure do
   # Log the query plan for queries taking more than this (works
   # with SQLite, MySQL, and PostgreSQL)
   # config.active_record.auto_explain_threshold_in_seconds = 0.5
-  
-  # exception notification
-  config.middleware.use ExceptionNotifier,
-    :email_prefix => "[Positronic] ",
-    :sender_address => %{"extension error notifier" <errors@extension.org>},
-    :exception_recipients => %w{jayoung@extension.org}
+
 
   # email settings
   config.action_mailer.delivery_method = :smtp
