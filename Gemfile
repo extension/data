@@ -75,5 +75,8 @@ group :development do
   # moar advanced stats in dev only
   #gem 'gsl', :git => 'git://github.com/30robots/rb-gsl.git'
   #gem 'statsample-optimization', :require => 'statsample'
+
+  # footnotes
+  gem 'rails-footnotes', '>= 3.7.5.rc4', :group => :development
   
 end

@@ -144,6 +144,8 @@ GEM
       activesupport (= 3.2.8)
       bundler (~> 1.0)
       railties (= 3.2.8)
+    rails-footnotes (3.7.8)
+      rails (>= 3.0.0)
     rails_config (0.3.1)
       activesupport (>= 3.0)
     railties (3.2.8)
@@ -206,6 +208,7 @@ DEPENDENCIES
   powder
   pry
   rails (= 3.2.8)
+  rails-footnotes (>= 3.7.5.rc4)
   rails_config
   safe_attributes
   sass-rails (~> 3.2.3)
