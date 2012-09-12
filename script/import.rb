@@ -166,6 +166,7 @@ class GAImporter < Thor
 
   desc "weekly", "Weekly import of data from Darmok, Create, GA, and Internal Stat Rebuilds"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
   def weekly
     # currently equivalent to "all_the_things"
     load_rails(options[:environment])
