@@ -57,7 +57,8 @@ class GAImporter < Thor
       
       puts "\t Finished #{output}" if options[:verbose]
     end
-      
+
+
     def darmok_rebuilds    
       run_and_log(Page,'rebuild','darmok page import')
       run_and_log(Group,'rebuild','darmok group import')
@@ -84,19 +85,36 @@ class GAImporter < Thor
       run_and_log(LandingStat,'rebuild','landing stats rebuild')      
       run_and_log(LandingDiff,'rebuild','landing diffs rebuild')      
       run_and_log(NodeActivityDiff,'rebuild','node activity diffs rebuild')      
-   end
+    end
 
    
-   def item_rebuild(model)
-     if(model == 'WeekStat')
-       method = 'mass_rebuild_from_analytics'
-     else 
-       method = 'rebuild'
-     end
-     object = Object.const_get(model)
-     run_and_log(object,method,"#{model} #{method}")
-   end
+    def item_rebuild(model)
+      if(model == 'WeekStat')
+        method = 'mass_rebuild_from_analytics'
+      else 
+        method = 'rebuild'
+      end
+      object = Object.const_get(model)
+      run_and_log(object,method,"#{model} #{method}")
+    end
+
+    def import_analytics
+      # analytics
+      latest_year_week = Analytic._latest_year_week
+      if(latest_year_week.nil?)
+        yearweeks = Analytic.all_year_weeks
+      else
+        next_year_week = Analytic.next_year_week(latest_year_week[0],latest_year_week[1])
+        start_date = Analytic.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
+        end_date = (Date.today - 1)
+        yearweeks = Analytic.year_weeks_between_dates(start_date,end_date)
+      end
       
+      yearweeks.each do |year,week|
+        get_analytics_for_year_week(year,week)      
+        associate_analytics_for_year_week(year,week)
+      end
+    end
       
   end
   
@@ -122,24 +140,7 @@ class GAImporter < Thor
   method_option :associate,:default => true, :aliases => "-a", :desc => "Associate analytic with page (run Page.rebuild prior!)"
   def analytics
     load_rails(options[:environment])
-    
-    latest_year_week = Analytic._latest_year_week
-    if(latest_year_week.nil?)
-      yearweeks = Analytic.all_year_weeks
-    else
-      next_year_week = Analytic.next_year_week(latest_year_week[0],latest_year_week[1])
-      start_date = Analytic.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
-      end_date = (Date.today - 1)
-      yearweeks = Analytic.year_weeks_between_dates(start_date,end_date)
-    end
-    
-
-    yearweeks.each do |year,week|
-      get_analytics_for_year_week(year,week)      
-      if(options[:associate])
-        associate_analytics_for_year_week(year,week)
-      end
-    end
+    import_analytics
   end
   
   desc "pages", "Rebuild/reimport pages from Darmok"
@@ -159,27 +160,21 @@ class GAImporter < Thor
     load_rails(options[:environment])
     darmok_rebuilds
     create_rebuilds
-    
-    # analytics
-    latest_year_week = Analytic._latest_year_week
-    if(latest_year_week.nil?)
-      yearweeks = Analytic.all_year_weeks
-    else
-      next_year_week = Analytic.next_year_week(latest_year_week[0],latest_year_week[1])
-      start_date = Analytic.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
-      end_date = (Date.today - 1)
-      yearweeks = Analytic.year_weeks_between_dates(start_date,end_date)
-    end
-    
-    yearweeks.each do |year,week|
-      get_analytics_for_year_week(year,week)      
-      associate_analytics_for_year_week(year,week)
-    end
-
-    # internal data
+    import_analytics
     internal_rebuilds
   end
-  
+
+  desc "weekly", "Weekly import of data from Darmok, Create, GA, and Internal Stat Rebuilds"
+  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  def weekly
+    # currently equivalent to "all_the_things"
+    load_rails(options[:environment])
+    darmok_rebuilds
+    create_rebuilds
+    import_analytics
+    internal_rebuilds
+  end
+
   desc "darmok", "All Darmok Rebuilds"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
