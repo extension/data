@@ -11,6 +11,11 @@ class PageDiff < ActiveRecord::Base
   
   scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
   
+  scope :articles, includes(:page).where('pages.datatype = ?','Article')
+  scope :news, includes(:page).where('pages.datatype = ?','News')
+  scope :faqs, includes(:page).where('pages.datatype = ?','Faq') 
+  scope :events, includes(:page).where('pages.datatype = ?','Event') 
+  scope :indexed, includes(:page).where("pages.indexed = ?",Page::INDEXED)
   
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")
