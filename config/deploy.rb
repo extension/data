@@ -1,7 +1,7 @@
-set :stages, %w(prod)
-set :default_stage, "prod"
+set :stages, %w(prod demo)
+set :default_stage, "demo"
 require 'capistrano/ext/multistage'
-require 'capatross'
+#require 'capatross'
 require "bundler/capistrano"
 require "delayed/recipes"
 require './config/boot'
@@ -9,7 +9,6 @@ require "airbrake/capistrano"
  
 set :application, "positronic"
 set :repository,  "git@github.com:extension/positronic.git"
-set :branch, "master"
 set :scm, "git"
 set :user, "pacecar"
 set :use_sudo, false
