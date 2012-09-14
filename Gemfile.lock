@@ -37,8 +37,7 @@ GEM
     activesupport (3.2.8)
       i18n (~> 0.6)
       multi_json (~> 1.0)
-    airbrake (3.1.2)
-      activesupport
+    airbrake (3.1.4)
       builder
       girl_friday
     anjlab-bootstrap-rails (2.1.1.1)
@@ -193,7 +192,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  airbrake (= 3.1.2)
+  airbrake
   anjlab-bootstrap-rails (>= 2.0)
   capatross
   capistrano
