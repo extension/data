@@ -48,4 +48,11 @@ Positronic::Application.routes.draw do
     end
   end
 
+  # authentication
+  match '/logout', to:'auth#end', :as => 'logout'
+  match '/auth/:provider/callback', to: 'auth#success'
+
+  # catch all
+  match '/:controller(/:action(/:id))'
+
 end

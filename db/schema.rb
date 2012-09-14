@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120806165117) do
+ActiveRecord::Schema.define(:version => 20120914173934) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -50,6 +50,8 @@ ActiveRecord::Schema.define(:version => 20120806165117) do
 
   create_table "contributors", :force => true do |t|
     t.string   "idstring",           :limit => 80,                    :null => false
+    t.string   "openid_uid"
+    t.string   "openid"
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email",              :limit => 96
@@ -65,6 +67,8 @@ ActiveRecord::Schema.define(:version => 20120806165117) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "contributors", ["openid_uid"], :name => "openid_ndx"
 
   create_table "delayed_jobs", :force => true do |t|
     t.integer  "priority"

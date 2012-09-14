@@ -16,6 +16,20 @@ class Contributor < ActiveRecord::Base
   has_many :contributed_pages, :through => :contributed_nodes, :source => :page
 
 
+  def self.find_by_uid(uid,provider)
+    case provider
+    when 'extension'
+      Contributor.find_by_openid_uid(uid)
+    else
+      nil
+    end
+  end
+
+  def login
+    # do nothing
+    true
+  end
+
   def fullname 
     "#{self.first_name} #{self.last_name}"
   end
@@ -60,6 +74,7 @@ class Contributor < ActiveRecord::Base
       insert_list = []
       insert_list << da.id
       insert_list << ActiveRecord::Base.quote_value(da.login)
+      insert_list << ActiveRecord::Base.quote_value("https://people.extension.org/#{da.login}")
       insert_list << ActiveRecord::Base.quote_value(da.first_name)
       insert_list << ActiveRecord::Base.quote_value(da.last_name)
       insert_list << ActiveRecord::Base.quote_value(da.email)

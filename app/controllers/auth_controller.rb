@@ -3,49 +3,35 @@
 # === LICENSE:
 # see LICENSE file
 class AuthController < ApplicationController
-  # skip_before_filter :signin_required
+  skip_before_filter :signin_required
+  skip_before_filter :verify_authenticity_token
 
   def start
   end
     
   def end
-    @currentcoder = nil
-    session[:coder_id] = nil
+    @currentcontributor = nil
+    session[:contributor_id] = nil
     flash[:success] = "You have successfully signed out."
     return redirect_to(root_url)
   end
   
   def success
-    authresult = request.env["omniauth.auth"]    
+    authresult = request.env["omniauth.auth"]
+    provider = authresult['provider']    
     uid = authresult['uid']
-    email = authresult['info']['email']
-    name = authresult['info']['name']
-    nickname = authresult['info']['nickname']
+
+    contributor = Contributor.find_by_uid(uid,provider)
     
-    if(email.blank?)
-      flash[:error] = "You'll need to set a public email address for your GitHub account matched with your .gitconfig settings to sign in here."
-      return redirect_to(root_url)
-    end
-      
-    coder = Coder.find_by_email(email)
-    
-    if(coder)
-      # update uid, nickname, name, it's possible the coder was created
-      # from commits, and not via login
-      coder.update_attributes(:uid => uid, :nickname => nickname, :name => name)
-      coder.login
-      session[:coder_id] = coder.id
-      @currentcoder = coder
+    if(contributor)
+      contributor.login
+      session[:contributor_id] = contributor.id
+      @currentcontributor = contributor
+      flash[:success] = "You are signed in as #{@currentcontributor.fullname}"
     else
-      coder = Coder.create(:uid => uid, :email => email, :nickname => nickname, :name => name)
-      if(coder)
-        coder.login
-        session[:coder_id] = coder.id
-        @currentcoder = coder
-      end
+      flash[:error] = "Unable to find your account, please contact an Engineering staff member to create your account"
     end
   
-    flash[:success] = "You are signed in as #{@currentcoder.name}"
     return redirect_to(root_url)
 
   end
