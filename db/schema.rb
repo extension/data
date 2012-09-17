@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120914173934) do
+ActiveRecord::Schema.define(:version => 20120914182948) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -48,10 +48,17 @@ ActiveRecord::Schema.define(:version => 20120914173934) do
   add_index "analytics", ["tag_id"], :name => "tag_id_ndx"
   add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
+  create_table "contributor_groups", :force => true do |t|
+    t.integer  "contributor_id"
+    t.integer  "group_id"
+    t.datetime "created_at"
+  end
+
+  add_index "contributor_groups", ["group_id", "contributor_id"], :name => "connection_ndx", :unique => true
+
   create_table "contributors", :force => true do |t|
     t.string   "idstring",           :limit => 80,                    :null => false
     t.string   "openid_uid"
-    t.string   "openid"
     t.string   "first_name"
     t.string   "last_name"
     t.string   "email",              :limit => 96

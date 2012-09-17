@@ -20,6 +20,10 @@ class Group < ActiveRecord::Base
   has_many :landing_stats
   has_many :node_activity_diffs
   
+  has_many :contributor_groups
+  has_many :contributors, through: :contributor_groups
+
+
   scope :launched, where(:is_launched => true)
 
     

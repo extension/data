@@ -65,6 +65,7 @@ class GAImporter < Thor
       run_and_log(Tag,'rebuild','darmok tag import')
       run_and_log(PageTagging,'rebuild','darmok page tagging import')
       run_and_log(Contributor,'rebuild','darmok contributor import')
+      run_and_log(ContributorGroup,'rebuild','darmok contributor group import')
     end
     
     def create_rebuilds

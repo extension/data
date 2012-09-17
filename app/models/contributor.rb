@@ -15,6 +15,9 @@ class Contributor < ActiveRecord::Base
   has_many :contributed_nodes, :through => :node_activities, :source => :node
   has_many :contributed_pages, :through => :contributed_nodes, :source => :page
 
+  has_many :contributor_groups
+  has_many :groups, through: :contributor_groups
+
 
   def self.find_by_uid(uid,provider)
     case provider
