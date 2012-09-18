@@ -12,7 +12,7 @@ class Page < ActiveRecord::Base
   has_many :tags, :through => :page_taggings
   has_many :groups, :through => :tags
   belongs_to :node
-  has_many :week_stats
+  has_many :page_stats
   has_many :page_diffs
   has_one :page_total
   has_many :meta_contributors, :through => :node, :source => :meta_contributors
@@ -171,7 +171,7 @@ class Page < ActiveRecord::Base
     returnpercentiles = {}
     with_scope do
       pagecount = self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek_string).count
-      weekstats = self.joins(:week_stats).where("week_stats.year = ?",year).where("week_stats.week = ?",week).where("week_stats.unique_pageviews > 0").pluck("week_stats.unique_pageviews")
+      weekstats = self.joins(:page_stats).where("page_stats.year = ?",year).where("page_stats.week = ?",week).where("page_stats.unique_pageviews > 0").pluck("page_stats.unique_pageviews")
       if((pagecount > weekstats.length) and !seenonly)
         emptyset = Array.new((pagecount - weekstats.length),0)
         statsarray = (weekstats + emptyset).sort
@@ -193,7 +193,7 @@ class Page < ActiveRecord::Base
     
     pagecounts_by_yearweek = self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
     weekstats_by_yearweek = {}
-    self.joins(:week_stats).select("week_stats.yearweek as yearweek, week_stats.unique_pageviews as views").each do |ws|
+    self.joins(:page_stats).select("page_stats.yearweek as yearweek, page_stats.unique_pageviews as views").each do |ws|
       weekstats_by_yearweek[ws.yearweek] ||= []
       weekstats_by_yearweek[ws.yearweek] << ws.views
     end

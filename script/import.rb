@@ -78,7 +78,7 @@ class GAImporter < Thor
     end
     
     def internal_rebuilds
-      run_and_log(WeekStat,'mass_rebuild_from_analytics','week stat rebuild')
+      run_and_log(PageStat,'rebuild','week stat rebuild')
       run_and_log(PageTotal,'rebuild','page totals rebuild')
       run_and_log(PageDiff,'rebuild','page weekly differences rebuild')
       run_and_log(TotalDiff,'rebuild','total weekly differences rebuild')      
@@ -90,11 +90,6 @@ class GAImporter < Thor
 
    
     def item_rebuild(model)
-      if(model == 'WeekStat')
-        method = 'mass_rebuild_from_analytics'
-      else 
-        method = 'rebuild'
-      end
       object = Object.const_get(model)
       run_and_log(object,method,"#{model} #{method}")
     end

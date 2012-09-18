@@ -5,7 +5,7 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class WeekStat < ActiveRecord::Base
+class PageStat < ActiveRecord::Base
   extend YearWeek
   belongs_to :page
   attr_accessible :page_id, :pageviews, :unique_pageviews, :year, :week, :entrances, :time_on_page, :exits, :visitors, :new_visits
@@ -48,7 +48,7 @@ class WeekStat < ActiveRecord::Base
     end
   end
   
-  def self.mass_rebuild_from_analytics
+  def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")
     # don't insert records earlier than first yearweek
     (e_year,e_week) = Page.earliest_year_week

@@ -13,7 +13,7 @@ class Group < ActiveRecord::Base
   has_many :tags
   has_many :pages, :through => :tags
   has_many :analytics, :through => :tags
-  has_many :week_stats, :through => :tags  
+  has_many :page_stats, :through => :tags  
   has_many :total_diffs
   has_many :percentiles
   has_many :landing_diffs
