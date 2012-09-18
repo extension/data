@@ -492,11 +492,12 @@ class Page < ActiveRecord::Base
     with_scope do
       case(params[:filter])
       when 'viewed'
-        joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views > 0').order("page_diffs.views DESC")
+        joins(:page_stats).where("page_stats.yearweek = ?",yearweek).where('page_stats.unique_pageviews > 0').order("page_stats.unique_pageviews DESC")
       when 'unviewed'
-        joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).where('page_diffs.views = 0').order("pages.created_at ASC")
+        subquery = self.joins(:page_stats).where("page_stats.yearweek = ?",yearweek).where('page_stats.unique_pageviews > 0').select('pages.id')
+        self.where("id NOT IN (#{subquery.to_sql})").order('pages.created_at ASC')
       else
-        joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
+        includes(:page_stats).order("page_stats.unique_pageviews DESC")
       end
     end
   end
