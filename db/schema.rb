@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120914182948) do
+ActiveRecord::Schema.define(:version => 20120918133242) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -103,27 +103,6 @@ ActiveRecord::Schema.define(:version => 20120914182948) do
 
   add_index "groups", ["create_gid"], :name => "create_group_ndx"
 
-  create_table "landing_diffs", :force => true do |t|
-    t.integer  "group_id"
-    t.string   "metric"
-    t.integer  "yearweek"
-    t.integer  "year"
-    t.integer  "week"
-    t.date     "yearweek_date"
-    t.float    "total"
-    t.float    "previous_week"
-    t.float    "previous_year"
-    t.float    "pct_difference_week"
-    t.float    "pct_difference_year"
-    t.float    "recent_pct_difference"
-    t.float    "pct_change_week"
-    t.float    "pct_change_year"
-    t.float    "recent_pct_change"
-    t.datetime "created_at",            :null => false
-  end
-
-  add_index "landing_diffs", ["group_id", "metric", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
-
   create_table "landing_stats", :force => true do |t|
     t.integer  "group_id"
     t.integer  "yearweek"
@@ -156,29 +135,6 @@ ActiveRecord::Schema.define(:version => 20120914182948) do
   add_index "node_activities", ["event", "created_at"], :name => "event_activity_ndx"
   add_index "node_activities", ["node_id", "event", "created_at"], :name => "node_activity_ndx"
   add_index "node_activities", ["node_id"], :name => "node_ndx"
-
-  create_table "node_activity_diffs", :force => true do |t|
-    t.integer  "group_id"
-    t.string   "node_scope",            :limit => 50
-    t.string   "activity_scope",        :limit => 25
-    t.string   "metric",                :limit => 25
-    t.integer  "yearweek"
-    t.integer  "year"
-    t.integer  "week"
-    t.date     "yearweek_date"
-    t.float    "metric_value"
-    t.float    "previous_week"
-    t.float    "previous_year"
-    t.float    "pct_difference_week"
-    t.float    "pct_difference_year"
-    t.float    "recent_pct_difference"
-    t.float    "pct_change_week"
-    t.float    "pct_change_year"
-    t.float    "recent_pct_change"
-    t.datetime "created_at",                          :null => false
-  end
-
-  add_index "node_activity_diffs", ["group_id", "node_scope", "metric", "activity_scope", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "node_groups", :force => true do |t|
     t.integer  "node_id"
@@ -213,25 +169,24 @@ ActiveRecord::Schema.define(:version => 20120914182948) do
   add_index "nodes", ["has_page"], :name => "page_flag_ndx"
   add_index "nodes", ["node_type"], :name => "node_type_ndx"
 
-  create_table "page_diffs", :force => true do |t|
+  create_table "page_stats", :force => true do |t|
     t.integer  "page_id"
     t.integer  "yearweek"
     t.integer  "year"
     t.integer  "week"
     t.date     "yearweek_date"
-    t.integer  "views"
-    t.integer  "views_previous_week"
-    t.integer  "views_previous_year"
-    t.float    "pct_difference_week"
-    t.float    "pct_difference_year"
-    t.float    "recent_pct_difference"
-    t.float    "pct_change_week"
-    t.float    "pct_change_year"
-    t.float    "recent_pct_change"
-    t.datetime "created_at",            :null => false
+    t.integer  "pageviews"
+    t.integer  "unique_pageviews"
+    t.integer  "entrances"
+    t.integer  "time_on_page"
+    t.integer  "exits"
+    t.integer  "visitors"
+    t.integer  "new_visits"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
   end
 
-  add_index "page_diffs", ["page_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
+  add_index "page_stats", ["page_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
   create_table "page_taggings", :force => true do |t|
     t.integer  "page_id"
@@ -284,27 +239,6 @@ ActiveRecord::Schema.define(:version => 20120914182948) do
   add_index "pages", ["node_id"], :name => "node_ndx"
   add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
 
-  create_table "percentiles", :force => true do |t|
-    t.integer  "group_id"
-    t.string   "datatype",      :null => false
-    t.integer  "yearweek"
-    t.integer  "year"
-    t.integer  "week"
-    t.date     "yearweek_date"
-    t.integer  "total"
-    t.integer  "seen"
-    t.float    "pct_99"
-    t.float    "pct_95"
-    t.float    "pct_90"
-    t.float    "pct_75"
-    t.float    "pct_50"
-    t.float    "pct_25"
-    t.float    "pct_10"
-    t.datetime "created_at",    :null => false
-  end
-
-  add_index "percentiles", ["group_id", "datatype", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
-
   create_table "revisions", :force => true do |t|
     t.integer  "node_id"
     t.integer  "contributor_id"
@@ -324,33 +258,6 @@ ActiveRecord::Schema.define(:version => 20120914182948) do
   add_index "tags", ["group_id"], :name => "group_ndx"
   add_index "tags", ["name"], :name => "name_idx", :unique => true
 
-  create_table "total_diffs", :force => true do |t|
-    t.integer  "group_id"
-    t.string   "datatype",                  :null => false
-    t.integer  "yearweek"
-    t.integer  "year"
-    t.integer  "week"
-    t.date     "yearweek_date"
-    t.integer  "pages"
-    t.integer  "pages_previous_week"
-    t.integer  "pages_previous_year"
-    t.integer  "total_views"
-    t.integer  "total_views_previous_week"
-    t.integer  "total_views_previous_year"
-    t.float    "views"
-    t.float    "views_previous_week"
-    t.float    "views_previous_year"
-    t.float    "pct_difference_week"
-    t.float    "pct_difference_year"
-    t.float    "recent_pct_difference"
-    t.float    "pct_change_week"
-    t.float    "pct_change_year"
-    t.float    "recent_pct_change"
-    t.datetime "created_at",                :null => false
-  end
-
-  add_index "total_diffs", ["group_id", "datatype", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
-
   create_table "update_times", :force => true do |t|
     t.string   "item"
     t.string   "operation"
@@ -360,24 +267,5 @@ ActiveRecord::Schema.define(:version => 20120914182948) do
   end
 
   add_index "update_times", ["item"], :name => "item_ndx"
-
-  create_table "week_stats", :force => true do |t|
-    t.integer  "page_id"
-    t.integer  "yearweek"
-    t.integer  "year"
-    t.integer  "week"
-    t.date     "yearweek_date"
-    t.integer  "pageviews"
-    t.integer  "unique_pageviews"
-    t.integer  "entrances"
-    t.integer  "time_on_page"
-    t.integer  "exits"
-    t.integer  "visitors"
-    t.integer  "new_visits"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
-  end
-
-  add_index "week_stats", ["page_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
 end

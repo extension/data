@@ -148,20 +148,99 @@ class Page < ActiveRecord::Base
       self.connection.execute(insert_sql)
     end
   end
-  
-  def self.pagecount_for_yearweek(year,week)
-    yearweek_string = self.yearweek_string(year,week)
+
+  def self.earliest_created_at
     with_scope do
-      self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek_string).count
+      self.minimum(:created_at)
     end
   end
   
+  def self.pagecount_for_year_week(year,week)
+    yearweek = self.yearweek(year,week)
+    with_scope do
+      self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek).count
+    end
+  end
+  
+
   def self.page_counts_by_yearweek
     with_scope do
-      self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
+      yearweek_condition = "YEARWEEK(#{self.table_name}.created_at,3)"
+      pagecounts = self.group(yearweek_condition).count
     end
   end
-  
+
+  def self.page_totals_by_yearweek
+    pagetotals = {}
+    with_scope do
+      eca = self.earliest_created_at
+      if(eca.blank?)
+        return pagetotals
+      end
+
+      yearweek_condition = "YEARWEEK(#{self.table_name}.created_at,3)"
+      pagecounts = self.page_counts_by_yearweek
+      yearweeks = Analytic.year_weeks_from_date(eca.to_date)
+      yearweeks.each do |year,week|
+        yearweek = self.yearweek(year,week)
+        pagetotals[yearweek] = pagecounts.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum
+      end
+    end
+    pagetotals
+  end
+
+  def self.stats_by_yearweek(metric,cache_options = {})
+    stats = {}
+    cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope.to_sql})
+    Rails.cache.fetch(cache_key,cache_options) do 
+      with_scope do
+        eca = self.earliest_created_at
+        if(eca.blank?)
+          return stats
+        end
+
+        metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
+        yearweeks = Analytic.year_weeks_from_date(eca.to_date)
+        pagetotals = self.page_totals_by_yearweek
+
+        yearweeks.each do |year,week|
+          yearweek = self.yearweek(year,week)
+          stats[yearweek] = {}
+          total = metric_by_yearweek[yearweek] || 0
+          stats[yearweek]['total'] = total
+          per_page = ((pagetotals[yearweek] and  pagetotals[yearweek] > 0) ? total / pagetotals[yearweek] : 0)
+          stats[yearweek]['per_page'] = per_page
+
+          previous_year_key = self.yearweek(year-1,week)
+          (previous_year,previous_week) = Analytic.previous_year_week(year,week)
+          previous_week_key = self.yearweek(previous_year,previous_week)
+
+          previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)        
+          previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+
+          previous_week = ((pagetotals[previous_week_key] and  pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
+          previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? total / pagetotals[previous_year_key] : 0)      
+
+          # pct_change
+          if(previous_week == 0)
+            stats[yearweek]['pct_change_week'] = nil
+          else
+            stats[yearweek]['pct_change_week'] = (per_page - previous_week) / previous_week
+          end
+
+          if(previous_year == 0)
+            stats[yearweek]['pct_change_year'] = nil
+          else
+            stats[yearweek]['pct_change_year'] = (per_page - previous_year) / previous_year
+          end
+        end
+      end
+      stats
+    end
+  end
+
+
+
   
   def self.percentiles_for_year_week(year,week, options = {})
     percentiles = options[:percentiles] || Percentile::TRACKED
@@ -423,7 +502,11 @@ class Page < ActiveRecord::Base
   end
   
 
-    
+  def self.get_cache_key(method_name,optionshash={})
+   optionshashval = Digest::SHA1.hexdigest(optionshash.inspect)
+   cache_key = "#{self.name}::#{method_name}::#{optionshashval}"
+   return cache_key
+  end  
 
   
   

@@ -18,7 +18,7 @@ class LandingDiff < ActiveRecord::Base
   
   def self.max_for_metric(metric,nearest = nil)
     with_scope do
-      max = where(:metric => metric).maximum(:total)
+      max = where(:metric => metric).maximum(:stat)
       if(nearest)
         max = max + nearest - (max % nearest)
       end

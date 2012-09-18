@@ -12,7 +12,13 @@ class PageStat < ActiveRecord::Base
   
   
   scope :by_year_week, lambda {|year,week| where(:year => year).where(:week => week) }
-      
+  scope :articles, includes(:page).where('pages.datatype = ?','Article')
+  scope :news, includes(:page).where('pages.datatype = ?','News')
+  scope :faqs, includes(:page).where('pages.datatype = ?','Faq') 
+  scope :events, includes(:page).where('pages.datatype = ?','Event') 
+  scope :indexed, includes(:page).where("pages.indexed = ?",Page::INDEXED)
+  
+
   def self.mass_create_or_update_for_pages(year,week)
     select_statement = <<-END
     page_id,yearweek,year,week, 
@@ -81,51 +87,8 @@ class PageStat < ActiveRecord::Base
     
   end
 
-  def self.sums_by_yearweek
-    select_statement = <<-END
-    year,
-    week,
-    SUM(pageviews) as pageviews, 
-    SUM(entrances) as entrances, 
-    SUM(unique_pageviews) as unique_pageviews, 
-    SUM(time_on_page) as time_on_page, 
-    SUM(exits) AS exits
-    END
-    
-    (maxyear,maxweek) = self.max_yearweek    
-    yearweek_string = "#{maxyear}" + "%02d" % maxweek
-    
-    (minyear,minweek) = Page.earliest_year_week    
-    min_yearweek_string = "#{minyear}" + "%02d" % minweek
-    
-    with_scope do
-      select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("year,week")
-    end
-  end
-  
 
-  def self.sums_by_yearweek_by_datatype
-    select_statement = <<-END
-    pages.datatype as datatype,
-    year,
-    week,
-    SUM(pageviews) as pageviews, 
-    SUM(entrances) as entrances, 
-    SUM(unique_pageviews) as unique_pageviews, 
-    SUM(time_on_page) as time_on_page, 
-    SUM(exits) AS exits
-    END
-    
-    (maxyear,maxweek) = self.max_yearweek    
-    yearweek_string = "#{maxyear}" + "%02d" % maxweek
-    
-    (minyear,minweek) = Page.earliest_year_week    
-    min_yearweek_string = "#{minyear}" + "%02d" % minweek
-    
-    with_scope do
-      joins(:page).select(select_statement).where("yearweek >= #{min_yearweek_string} AND yearweek <= #{yearweek_string}").group("pages.datatype,year,week")
-    end
-  end
+
 
 
   def self.sum_upv_by_yearweek_by_datatype
