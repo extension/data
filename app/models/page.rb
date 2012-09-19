@@ -192,66 +192,69 @@ class Page < ActiveRecord::Base
 
   def self.stats_by_yearweek(metric,cache_options = {})
     stats = YearWeekStats.new
-    with_scope do
-      eca = self.earliest_created_at
-      if(eca.blank?)
-        return stats
-      end
-
-      metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
-      metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
-      yearweeks = Analytic.year_weeks_from_date(eca.to_date)
-      pagetotals = self.page_totals_by_yearweek
-
-      per_page_totals  = 0
-      loopcount = 0
-      yearweeks.each do |year,week|
-        loopcount += 1
-        yearweek = self.yearweek(year,week)
-        stats[yearweek] = {}
-        pages = pagetotals[yearweek] || 0
-        total = metric_by_yearweek[yearweek] || 0
-        seen = metric_counts_by_yearweek[yearweek] || 0
-
-        stats[yearweek]['pages'] = pages
-        stats[yearweek]['seen'] = seen
-        stats[yearweek]['total'] = total
-
-        per_page = ((pages > 0) ? total / pages : 0)
-        per_page_totals += per_page
-        stats[yearweek]['per_page'] = per_page
-        stats[yearweek]['rolling'] = per_page_totals / loopcount
-
-        previous_year_key = self.yearweek(year-1,week)
-        (previous_year,previous_week) = self.previous_year_week(year,week)
-        previous_week_key = self.yearweek(previous_year,previous_week)
-
-        previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
-        stats[yearweek]['previous_week_total'] = previous_week_total
-        previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
-        stats[yearweek]['previous_year_total'] = previous_year_total
-
-        previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
-        stats[yearweek]['previous_week'] = previous_week
-        previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? total / pagetotals[previous_year_key] : 0)
-        stats[yearweek]['previous_year'] = previous_year
-
-
-        # pct_change
-        if(previous_week == 0)
-          stats[yearweek]['pct_change_week'] = nil
-        else
-          stats[yearweek]['pct_change_week'] = (per_page - previous_week) / previous_week
+    cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope.to_sql})
+    Rails.cache.fetch(cache_key,cache_options) do
+      with_scope do
+        eca = self.earliest_created_at
+        if(eca.blank?)
+          return stats
         end
 
-        if(previous_year == 0)
-          stats[yearweek]['pct_change_year'] = nil
-        else
-          stats[yearweek]['pct_change_year'] = (per_page - previous_year) / previous_year
+        metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
+        metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
+        yearweeks = Analytic.year_weeks_from_date(eca.to_date)
+        pagetotals = self.page_totals_by_yearweek
+
+        per_page_totals  = 0
+        loopcount = 0
+        yearweeks.each do |year,week|
+          loopcount += 1
+          yearweek = self.yearweek(year,week)
+          stats[yearweek] = {}
+          pages = pagetotals[yearweek] || 0
+          total = metric_by_yearweek[yearweek] || 0
+          seen = metric_counts_by_yearweek[yearweek] || 0
+
+          stats[yearweek]['pages'] = pages
+          stats[yearweek]['seen'] = seen
+          stats[yearweek]['total'] = total
+
+          per_page = ((pages > 0) ? total / pages : 0)
+          per_page_totals += per_page
+          stats[yearweek]['per_page'] = per_page
+          stats[yearweek]['rolling'] = per_page_totals / loopcount
+
+          previous_year_key = self.yearweek(year-1,week)
+          (previous_year,previous_week) = self.previous_year_week(year,week)
+          previous_week_key = self.yearweek(previous_year,previous_week)
+
+          previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
+          stats[yearweek]['previous_week_total'] = previous_week_total
+          previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+          stats[yearweek]['previous_year_total'] = previous_year_total
+
+          previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
+          stats[yearweek]['previous_week'] = previous_week
+          previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? total / pagetotals[previous_year_key] : 0)
+          stats[yearweek]['previous_year'] = previous_year
+
+
+          # pct_change
+          if(previous_week == 0)
+            stats[yearweek]['pct_change_week'] = nil
+          else
+            stats[yearweek]['pct_change_week'] = (per_page - previous_week) / previous_week
+          end
+
+          if(previous_year == 0)
+            stats[yearweek]['pct_change_year'] = nil
+          else
+            stats[yearweek]['pct_change_year'] = (per_page - previous_year) / previous_year
+          end
         end
       end
+      stats
     end
-    stats
   end
 
 

@@ -173,30 +173,6 @@ class ResetTables < ActiveRecord::Migration
 
     add_index "page_stats", ["page_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
-    create_table "collected_page_stats", :force => true do |t|
-      t.integer  "statable_id"
-      t.string   "statable_type", limit: 25, null: false
-      t.string   "datatype", limit: 25, null: false
-      t.string   "metric", limit: 25, null: false
-      t.integer  "yearweek"
-      t.integer  "year"
-      t.integer  "week"
-      t.date     "yearweek_date"
-      t.integer  "pages"
-      t.integer  "seen"
-      t.float    "total"
-      t.float    "per_page"
-      t.float    "rolling"
-      t.float    "previous_week"
-      t.float    "previous_year"
-      t.float    "pct_change_week"
-      t.float    "pct_change_year"
-      t.datetime "created_at", null: false
-    end
-
-    add_index "collected_page_stats", ["statable_id", "statable_type", "datatype", "metric", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
-
-
     create_table "page_taggings", :force => true do |t|
       t.integer  "page_id"
       t.integer  "tag_id"

@@ -25,4 +25,12 @@ class YearWeekStats < Hash
     returndata
   end
 
+  def max_for_hashvalue(hashvalue,nearest = nil)
+    max = self.values.collect{|yearweek_data| yearweek_data[hashvalue]}.max
+    if(nearest)
+      max = max + nearest - (max % nearest)
+    end
+    max
+  end
+
 end

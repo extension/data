@@ -23,3 +23,22 @@
   </div>
 
 
+<%- Page::DATATYPES.each do |datatype| -%>  <div class="page-header">
+  <%- datatype_stats = Page.by_datatype(datatype).stats_by_yearweek('unique_pageviews') -%>
+
+    <h2><%= datatype.pluralize %></h2>
+  </div>
+  <div class="row">
+    <div class="span4">
+      <%= render(:partial => 'shared/overall_views_information', :locals => {:datatype => datatype, :stats_for_week => datatype_stats[@latest_yearweek]}) %>
+      <p><%= link_to("<i class='icon-th'></i> #{datatype.pluralize} list".html_safe,list_pages_path(:datatype => datatype),:class => 'btn btn-info') %></p>
+    </div>
+
+    <div class="span8">
+      <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype))%></small></h3>
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => datatype_stats.to_graph_data('per_page'), :datalabel => "views_#{datatype}"})%>
+    </div>
+  </div>
+
+<%- end -%>
+

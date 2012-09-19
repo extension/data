@@ -1,8 +1,7 @@
 <%-
-  pages = (stats_for_week[:pages] || 0)
-  seen = (stats_for_week[:seen] || 0)
-  new_pages = stats_for_week[:new_pages]
-  views = (stats_for_week[:views] || 0)  
+  pages = (stats_for_week['pages'] || 0)
+  seen = (stats_for_week['seen'] || 0)
+  views = (stats_for_week['per_page'] || 0)  
   if(pages > 0)
     seen_pct = ((seen/pages)*100).to_f
   else
@@ -10,12 +9,11 @@
   end
 -%>
 
-<p><span class='mednumber'><%= number_with_delimiter(pages)%></span> total ( <span class='regnumber'><%= new_pages%></span> new )</p>
+<p><span class='mednumber'><%= number_with_delimiter(pages)%></span> pages</p>
 <p><span class='mednumber'><%=number_with_precision(views, :precision => 2)%></span> views/page for week</p>
 <p><span class='mednumber'><%=number_to_percentage(seen_pct, :precision => 2)%></span> viewed for week</p>
-<p><%= pct_change(stats_for_week[:change_week],'mednumber') %> from previous week</p>
-<p><%= pct_change(stats_for_week[:change_year],'mednumber') %> from previous year</p>
-<p><%= trend(stats_for_week[:recent_change],'mednumber') %> trend/week (last <%=Settings.recent_weeks%> weeks)</p>
+<p><%= pct_change(stats_for_week['pct_change_week'],'mednumber') %> from previous week</p>
+<p><%= pct_change(stats_for_week['pct_change_year'],'mednumber') %> from previous year</p>
 
 
 
