@@ -7,6 +7,7 @@
 
 class Analytic < ActiveRecord::Base
   extend Garb::Model
+  extend CacheTools
   extend YearWeek
   metrics :entrances, :pageviews, :unique_pageviews, :exits, :time_on_page, :visitors, :new_visits
   dimensions :page_path
@@ -222,17 +223,17 @@ class Analytic < ActiveRecord::Base
     yearweek(year,week)
   end
   
-  def self.latest_year_week
-    if(!@latest_year_week)
+  def self.latest_year_week(cache_options = {})
+    cachekey = self.get_cache_key(__method__)
+    Rails.cache.fetch(cachekey,cache_options) do 
       if(yearweek = self._latest_year_week)
         latest_year = yearweek[0]
         latest_week = yearweek[1]
       else
         (latest_year,latest_week) = self.last_year_week
       end
-      @latest_year_week = [latest_year,latest_week]
+      [latest_year,latest_week]
     end
-    @latest_year_week
   end
 
   def self.latest_date
@@ -256,17 +257,17 @@ class Analytic < ActiveRecord::Base
   end
   
   
-  def self.earliest_year_week
-    if(!@earliest_year_week)    
+  def self.earliest_year_week(cache_options = {})
+    cachekey = self.get_cache_key(__method__)
+    Rails.cache.fetch(cachekey,cache_options) do 
       if(yearweek = self._earliest_year_week)
        earliest_year = yearweek[0]
        earliest_week = yearweek[1]
       else
        (earliest_year,earliest_week) = self.year_week_for_date(Date.parse(Settings.googleapps_traffic_start))
       end
-      @earliest_year_week = [earliest_year,earliest_week]
+      [earliest_year,earliest_week]
     end
-    @earliest_year_week
   end
   
   def self._earliest_year_week
