@@ -78,5 +78,5 @@ group :development do
 
   # footnotes
   gem 'rails-footnotes', '>= 3.7.5.rc4', :group => :development
-  
+  gem 'quiet_assets'
 end
