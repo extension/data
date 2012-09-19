@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class LandingStat < ActiveRecord::Base
+  extend CacheTools
   extend YearWeek
   belongs_to :group
 
@@ -21,6 +22,7 @@ class LandingStat < ActiveRecord::Base
     Group.launched.each do |group|
       self.rebuild_group(group)
     end
+    true
   end
 
   def self.rebuild_root
@@ -30,13 +32,13 @@ class LandingStat < ActiveRecord::Base
     select_statement = <<-END
     0,
     yearweek,
-    year, 
+    year,
     week,
     STR_TO_DATE(CONCAT(yearweek,' Sunday'), '%X%V %W'),
-    SUM(pageviews) as pageviews, 
-    SUM(entrances) as entrances, 
-    SUM(unique_pageviews) as unique_pageviews, 
-    SUM(time_on_page) as time_on_page, 
+    SUM(pageviews) as pageviews,
+    SUM(entrances) as entrances,
+    SUM(unique_pageviews) as unique_pageviews,
+    SUM(time_on_page) as time_on_page,
     SUM(exits) AS exits,
     SUM(visitors) AS visitors,
     SUM(new_visits) AS new_visits,
@@ -61,13 +63,13 @@ class LandingStat < ActiveRecord::Base
     select_statement = <<-END
     #{group.id},
     yearweek,
-    year, 
+    year,
     week,
     STR_TO_DATE(CONCAT(yearweek,' Sunday'), '%X%V %W'),
-    SUM(pageviews) as pageviews, 
-    SUM(entrances) as entrances, 
-    SUM(unique_pageviews) as unique_pageviews, 
-    SUM(time_on_page) as time_on_page, 
+    SUM(pageviews) as pageviews,
+    SUM(entrances) as entrances,
+    SUM(unique_pageviews) as unique_pageviews,
+    SUM(time_on_page) as time_on_page,
     SUM(exits) AS exits,
     SUM(visitors) AS visitors,
     SUM(new_visits) AS new_visits,
@@ -81,16 +83,58 @@ class LandingStat < ActiveRecord::Base
     self.connection.execute(insert_sql)
   end
 
-
-  def self.sum_metric_by_yearweek(metric)
-    case metric
-    when 'views'
-      qcolumn = 'unique_pageviews'
-    else
-      qcolumn = 'metric'
-    end        
+  def self.earliest_yearweek_date
     with_scope do
-      group(:yearweek).sum(qcolumn)
+      self.minimum(:yearweek_date)
     end
   end
+
+  def self.stats_by_yearweek(metric,cache_options = {})
+    stats = YearWeekStats.new
+    with_scope do
+      metric_by_yearweek = self.group(:yearweek).sum(metric)
+      yearweeks = Analytic.year_weeks_from_date(self.earliest_yearweek_date)
+      metric_totals  = 0
+      loopcount = 0
+      yearweeks.each do |year,week|
+        loopcount += 1
+        yearweek = self.yearweek(year,week)
+        stats[yearweek] = {}
+        total = metric_by_yearweek[yearweek] || 0
+        stats[yearweek]['total'] = total
+        metric_totals += total
+        stats[yearweek]['rolling'] = metric_totals / loopcount
+
+        previous_year_key = self.yearweek(year-1,week)
+        (previous_year,previous_week) = self.previous_year_week(year,week)
+        previous_week_key = self.yearweek(previous_year,previous_week)
+
+        previous_week = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
+        stats[yearweek]['previous_week'] = previous_week
+        previous_year = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+        stats[yearweek]['previous_year'] = previous_year
+
+        # pct_change
+        if(previous_week == 0)
+          stats[yearweek]['pct_change_week'] = nil
+        else
+          stats[yearweek]['pct_change_week'] = (total - previous_week) / previous_week
+        end
+
+        if(previous_year == 0)
+          stats[yearweek]['pct_change_year'] = nil
+        else
+          stats[yearweek]['pct_change_year'] = (total - previous_year) / previous_year
+        end
+      end
+    end
+    stats
+  end
+
+
+
+
+
+
+
 end

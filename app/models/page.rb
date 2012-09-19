@@ -17,7 +17,7 @@ class Page < ActiveRecord::Base
   has_many :page_diffs
   has_one :page_total
   has_many :meta_contributors, :through => :node, :source => :meta_contributors
-  
+
   # index settings
   NOT_INDEXED = 0
   INDEXED = 1
@@ -41,7 +41,7 @@ class Page < ActiveRecord::Base
     yearweek = Analytic.latest_yearweek
     joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
   }
-  
+
 
   def display_title(options = {})
     truncate_it = options[:truncate].nil? ? true : options[:truncate]
@@ -55,15 +55,15 @@ class Page < ActiveRecord::Base
     end
     display_title
   end
-  
+
   def self.earliest_year_week
     if(@yearweek.blank?)
       earliest_date = self.minimum(:created_at).to_date
       @yearweek = [earliest_date.cwyear,earliest_date.cweek]
     end
     @yearweek
-  end      
-      
+  end
+
   def eligible_weeks(fractional = false)
     if(fractional)
       eligible_year_weeks.size + ((7-self.created_at.to_date.cwday) / 7)
@@ -71,12 +71,12 @@ class Page < ActiveRecord::Base
       eligible_year_weeks.size
     end
   end
-  
+
   def eligible_year_weeks
     start_date = self.created_at.to_date
     Analytic.year_weeks_from_date(start_date)
   end
-  
+
   def last_diff
     if(!@last_diff)
       (year,week) = Analytic.latest_year_week
@@ -84,7 +84,7 @@ class Page < ActiveRecord::Base
     end
     @last_diff
   end
-  
+
   def last_percentile
     # overall
     (year,week) = Analytic.latest_year_week
@@ -103,9 +103,9 @@ class Page < ActiveRecord::Base
       return 0
     end
   end
-    
-      
-        
+
+
+
   def self.find_by_title_url(url)
    return nil unless url
    real_title = url.gsub(/_/, ' ')
@@ -113,7 +113,7 @@ class Page < ActiveRecord::Base
   end
 
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
+    self.connection.execute("truncate table #{self.table_name};")
     DarmokPage.find_in_batches do |group|
       insert_values = []
       group.each do |page|
@@ -155,14 +155,14 @@ class Page < ActiveRecord::Base
       self.minimum(:created_at)
     end
   end
-  
+
   def self.pagecount_for_year_week(year,week)
     yearweek = self.yearweek(year,week)
     with_scope do
       self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek).count
     end
   end
-  
+
 
   def self.page_counts_by_yearweek
     with_scope do
@@ -191,80 +191,77 @@ class Page < ActiveRecord::Base
   end
 
   def self.stats_by_yearweek(metric,cache_options = {})
-    stats = {}
-    cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope.to_sql})
-    Rails.cache.fetch(cache_key,cache_options) do 
-      with_scope do
-        eca = self.earliest_created_at
-        if(eca.blank?)
-          return stats
+    stats = YearWeekStats.new
+    with_scope do
+      eca = self.earliest_created_at
+      if(eca.blank?)
+        return stats
+      end
+
+      metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
+      metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
+      yearweeks = Analytic.year_weeks_from_date(eca.to_date)
+      pagetotals = self.page_totals_by_yearweek
+
+      per_page_totals  = 0
+      loopcount = 0
+      yearweeks.each do |year,week|
+        loopcount += 1
+        yearweek = self.yearweek(year,week)
+        stats[yearweek] = {}
+        pages = pagetotals[yearweek] || 0
+        total = metric_by_yearweek[yearweek] || 0
+        seen = metric_counts_by_yearweek[yearweek] || 0
+
+        stats[yearweek]['pages'] = pages
+        stats[yearweek]['seen'] = seen
+        stats[yearweek]['total'] = total
+
+        per_page = ((pages > 0) ? total / pages : 0)
+        per_page_totals += per_page
+        stats[yearweek]['per_page'] = per_page
+        stats[yearweek]['rolling'] = per_page_totals / loopcount
+
+        previous_year_key = self.yearweek(year-1,week)
+        (previous_year,previous_week) = self.previous_year_week(year,week)
+        previous_week_key = self.yearweek(previous_year,previous_week)
+
+        previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
+        stats[yearweek]['previous_week_total'] = previous_week_total
+        previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+        stats[yearweek]['previous_year_total'] = previous_year_total
+
+        previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
+        stats[yearweek]['previous_week'] = previous_week
+        previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? total / pagetotals[previous_year_key] : 0)
+        stats[yearweek]['previous_year'] = previous_year
+
+
+        # pct_change
+        if(previous_week == 0)
+          stats[yearweek]['pct_change_week'] = nil
+        else
+          stats[yearweek]['pct_change_week'] = (per_page - previous_week) / previous_week
         end
 
-        metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
-        metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
-        yearweeks = Analytic.year_weeks_from_date(eca.to_date)
-        pagetotals = self.page_totals_by_yearweek
-
-        per_page_totals  = 0
-        loopcount = 0
-        yearweeks.each do |year,week|
-          loopcount += 1
-          yearweek = self.yearweek(year,week)
-          stats[yearweek] = {}
-          pages = pagetotals[yearweek] || 0
-          total = metric_by_yearweek[yearweek] || 0
-          seen = metric_counts_by_yearweek[yearweek] || 0
-
-          stats[yearweek]['pages'] = pages
-          stats[yearweek]['seen'] = seen
-          stats[yearweek]['total'] = total
-
-          per_page = ((pages > 0) ? total / pages : 0)
-          per_page_totals += per_page
-          stats[yearweek]['per_page'] = per_page
-          stats[yearweek]['per_page_rolling'] = per_page_totals / loopcount
-
-          previous_year_key = self.yearweek(year-1,week)
-          (previous_year,previous_week) = Analytic.previous_year_week(year,week)
-          previous_week_key = self.yearweek(previous_year,previous_week)
-
-          previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
-          stats[yearweek]['previous_week_total'] = previous_week_total        
-          previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
-          stats[yearweek]['previous_year_total'] = previous_year_total        
-
-          previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
-          stats[yearweek]['previous_week'] = previous_week
-          previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? total / pagetotals[previous_year_key] : 0)      
-          stats[yearweek]['previous_year'] = previous_year        
-
-
-          # pct_change
-          if(previous_week == 0)
-            stats[yearweek]['pct_change_week'] = nil
-          else
-            stats[yearweek]['pct_change_week'] = (per_page - previous_week) / previous_week
-          end
-
-          if(previous_year == 0)
-            stats[yearweek]['pct_change_year'] = nil
-          else
-            stats[yearweek]['pct_change_year'] = (per_page - previous_year) / previous_year
-          end
+        if(previous_year == 0)
+          stats[yearweek]['pct_change_year'] = nil
+        else
+          stats[yearweek]['pct_change_year'] = (per_page - previous_year) / previous_year
         end
       end
-      stats
     end
+    stats
   end
 
 
 
-  
+
   def self.percentiles_for_year_week(year,week, options = {})
     percentiles = options[:percentiles] || Percentile::TRACKED
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]
     yearweek_string = self.yearweek_string(year,week)
-    
+
     returnpercentiles = {}
     with_scope do
       pagecount = self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek_string).count
@@ -283,18 +280,18 @@ class Page < ActiveRecord::Base
     end
     returnpercentiles
   end
-  
+
   def self.percentiles(options = {})
     percentiles = options[:percentiles] || Percentile::TRACKED
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]
-    
+
     pagecounts_by_yearweek = self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
     weekstats_by_yearweek = {}
     self.joins(:page_stats).select("page_stats.yearweek as yearweek, page_stats.unique_pageviews as views").each do |ws|
       weekstats_by_yearweek[ws.yearweek] ||= []
       weekstats_by_yearweek[ws.yearweek] << ws.views
     end
-    
+
     returnpercentiles = {}
     earliest_created_at = self.minimum(:created_at)
     if(!earliest_created_at.nil?)
@@ -303,7 +300,7 @@ class Page < ActiveRecord::Base
       year_weeks.each do |year,week|
         yearweek = self.yearweek(year,week)
         returnpercentiles[yearweek] = {}
-        pagecount = pagecounts_by_yearweek.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum      
+        pagecount = pagecounts_by_yearweek.select{|yearweek,count| yearweek <= self.yearweek(year,week)}.values.sum
         weekstats = weekstats_by_yearweek[yearweek] || []
         if((pagecount > weekstats.length) and !seenonly)
           emptyset = Array.new((pagecount - weekstats.length),0)
@@ -320,17 +317,17 @@ class Page < ActiveRecord::Base
     end
     returnpercentiles
   end
-  
+
   def traffic_stats_data(showrolling = true)
     returndata = []
     upv_data = []
     rolling_data = []
     week_stats = {}
     self.week_stats.order('yearweek').map do |ws|
-      yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
+      yearweek_string = "#{ws.year}-" + "%02d" % ws.week
       week_stats[yearweek_string] = ws.unique_pageviews
     end
-    
+
     year_weeks = self.eligible_year_weeks
     weekcount = 0
     running_upv = 0
@@ -340,7 +337,7 @@ class Page < ActiveRecord::Base
       date = self.class.year_week_date(year,week)
       upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
       running_upv = running_upv+upv
-      rolling_data << [date,(running_upv / weekcount)] 
+      rolling_data << [date,(running_upv / weekcount)]
       upv_data << [date,upv]
     end
     if(showrolling)
@@ -350,15 +347,15 @@ class Page < ActiveRecord::Base
     end
     returndata
   end
-  
+
   def self.traffic_stats_data_by_datatype(datatype)
     returndata = []
     week_stats = {}
     TotalDiff.by_datatype(datatype).overall.order('yearweek').map do |ws|
-      yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
+      yearweek_string = "#{ws.year}-" + "%02d" % ws.week
       week_stats[yearweek_string] = ws.views
     end
-    
+
     start_date = Page.by_datatype(datatype).minimum(:created_at).to_date
     year_weeks = Analytic.year_weeks_from_date(start_date)
     year_weeks.each do |year,week|
@@ -369,13 +366,13 @@ class Page < ActiveRecord::Base
     end
     returndata
   end
-  
-  
-  
+
+
+
   def self.traffic_stats_data_by_datatype_with_percentiles(datatype)
     percentiles = Percentile.overall_percentile_data_by_datatype(datatype)
     averages = self.traffic_stats_data_by_datatype(datatype)
-    
+
     data = []
     data << averages
     Settings.display_percentiles.each do |pct|
@@ -383,7 +380,7 @@ class Page < ActiveRecord::Base
     end
     labels = ['Average Views'] + Settings.display_percentiles_labels
     [labels,data]
-  end 
+  end
 
   def stats_for_week
     (year,week) = Analytic.latest_year_week
@@ -398,7 +395,7 @@ class Page < ActiveRecord::Base
       change_year = pd.pct_change_year
       recent = pd.recent_pct_change.nil? ? nil : pd.recent_pct_change / Settings.recent_weeks
     end
-    
+
     if(total_views = self.page_total.unique_pageviews and eligible_weeks = self.page_total.eligible_weeks)
       average = (total_views / eligible_weeks)
     else
@@ -406,8 +403,8 @@ class Page < ActiveRecord::Base
     end
     {:views => views, :change_week => change_week, :change_year => change_year, :recent_change => recent, :average => average, :weeks => eligible_weeks.round }
   end
-  
-  
+
+
   def self.stats_for_week_for_datatype(datatype)
     returndata = {}
     (year,week) = Analytic.latest_year_week
@@ -417,9 +414,9 @@ class Page < ActiveRecord::Base
     weeks = TotalDiff.by_datatype(datatype).overall.count
     pages = td.pages
     new_pages = td.pages - td.pages_previous_week
-    
+
     pctile = Percentile.by_datatype(datatype).by_year_week(year,week).overall.first
-    
+
     returndata[:pages] = pages
     returndata[:new_pages] = new_pages
     returndata[:views] =  td.views
@@ -436,8 +433,8 @@ class Page < ActiveRecord::Base
     end
     returndata
   end
-  
-  
+
+
   def self.graph_data_by_datatype(datatype)
     returndata = {}
     return_pagegrowth = []
@@ -445,15 +442,15 @@ class Page < ActiveRecord::Base
     return_change = []
     return_rolling = []
     return_seen_pct = []
-    
+
     week_stats = {}
     TotalDiff.by_datatype(datatype).overall.order('yearweek').map do |ws|
-      yearweek_string = "#{ws.year}-" + "%02d" % ws.week 
+      yearweek_string = "#{ws.year}-" + "%02d" % ws.week
       week_stats[yearweek_string] = {:pages => ws.pages, :views => ws.views, :change => ws.pct_change_week}
     end
-    
+
     Percentile.by_datatype(datatype).overall.order('yearweek').map do |pctile|
-      yearweek_string = "#{pctile.year}-" + "%02d" % pctile.week 
+      yearweek_string = "#{pctile.year}-" + "%02d" % pctile.week
       week_stats[yearweek_string] ||= {}
       if(pctile.total > 0)
         week_stats[yearweek_string][:seen_pct] = (pctile.seen / pctile.total)
@@ -465,8 +462,8 @@ class Page < ActiveRecord::Base
         week_stats[yearweek_string][column_name] = pctile.send(column_name)
       end
     end
-      
-    
+
+
     start_date = Page.by_datatype(datatype).minimum(:created_at).to_date
     year_weeks = Analytic.year_weeks_from_date(start_date)
     views_total = 0
@@ -486,14 +483,14 @@ class Page < ActiveRecord::Base
         pages = week_stats[yearweek_string][:pages].nil? ? 0 : week_stats[yearweek_string][:pages]
         seen_pct = week_stats[yearweek_string][:seen_pct].nil? ? 0 : week_stats[yearweek_string][:seen_pct]
       end
-      
+
       views_total += views
       rolling = (views_total / loopcount)
       return_pagegrowth << [date,pages]
       return_views << [date,views]
       return_change << [date,change*100]
       return_rolling << [date,rolling]
-      return_seen_pct << [date,seen_pct*100]        
+      return_seen_pct << [date,seen_pct*100]
     end
 
     returndata['pagegrowth'] = [return_pagegrowth]
@@ -503,8 +500,8 @@ class Page < ActiveRecord::Base
     returndata['seen_pct'] = [return_seen_pct]
     returndata
   end
-  
-  
+
+
   def self.filtered_pagelist(params)
     yearweek = Analytic.latest_yearweek
     with_scope do
@@ -519,5 +516,5 @@ class Page < ActiveRecord::Base
       end
     end
   end
-    
+
 end
