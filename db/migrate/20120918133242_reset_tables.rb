@@ -174,26 +174,6 @@ class ResetTables < ActiveRecord::Migration
     add_index "nodes", ["has_page"], :name => "page_flag_ndx"
     add_index "nodes", ["node_type"], :name => "node_type_ndx"
 
-    # create_table "page_diffs", :force => true do |t|
-    #   t.integer  "page_id"
-    #   t.string   "metric"
-    #   t.integer  "yearweek"
-    #   t.integer  "year"
-    #   t.integer  "week"
-    #   t.date     "yearweek_date"
-    #   t.float    "stat"
-    #   t.float    "previous_week"
-    #   t.float    "previous_year"
-    #   t.float    "pct_difference_week"
-    #   t.float    "pct_difference_year"
-    #   t.float    "recent_pct_difference"
-    #   t.float    "pct_change_week"
-    #   t.float    "pct_change_year"
-    #   t.float    "recent_pct_change"
-    #   t.datetime "created_at",            :null => false
-    # end
-
-    # add_index "page_diffs", ["page_id", "metric", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
     create_table "page_stats", :force => true do |t|
       t.integer  "page_id"
@@ -214,6 +194,28 @@ class ResetTables < ActiveRecord::Migration
 
     add_index "page_stats", ["page_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
+    create_table "collected_page_stats", :force => true do |t|
+      t.integer  "statable_id"
+      t.string   "statable_type", limit: 25, null: false
+      t.string   "datatype", limit: 25, null: false
+      t.string   "metric", limit: 25, null: false
+      t.integer  "yearweek"
+      t.integer  "year"
+      t.integer  "week"
+      t.date     "yearweek_date"
+      t.integer  "pages"
+      t.integer  "seen"
+      t.float    "total"
+      t.float    "per_page"
+      t.float    "per_page_rolling"
+      t.float    "previous_week"
+      t.float    "previous_year"
+      t.float    "pct_change_week"
+      t.float    "pct_change_year"
+      t.datetime "created_at", null: false
+    end
+
+    add_index "collected_page_stats", ["statable_id", "statable_type", "datatype", "metric", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
 
     create_table "page_taggings", :force => true do |t|
@@ -224,20 +226,6 @@ class ResetTables < ActiveRecord::Migration
     end
 
     add_index "page_taggings", ["page_id", "tag_id"], :name => "pt_ndx"
-
-    create_table "page_totals", :force => true do |t|
-      t.integer  "page_id"
-      t.float    "eligible_weeks"
-      t.integer  "pageviews"
-      t.integer  "unique_pageviews"
-      t.integer  "entrances"
-      t.integer  "time_on_page"
-      t.integer  "exits"
-      t.datetime "created_at",       :null => false
-      t.datetime "updated_at",       :null => false
-    end
-
-    add_index "page_totals", ["page_id"], :name => "page_ndx", :unique => true
 
     create_table "pages", :force => true do |t|
       t.integer  "migrated_id"
@@ -307,32 +295,6 @@ class ResetTables < ActiveRecord::Migration
     add_index "tags", ["group_id"], :name => "group_ndx"
     add_index "tags", ["name"], :name => "name_idx", :unique => true
 
-    # create_table "total_diffs", :force => true do |t|
-    #   t.integer  "group_id"
-    #   t.string   "datatype",                  :null => false
-    #   t.integer  "yearweek"
-    #   t.integer  "year"
-    #   t.integer  "week"
-    #   t.date     "yearweek_date"
-    #   t.integer  "pages"
-    #   t.integer  "pages_previous_week"
-    #   t.integer  "pages_previous_year"
-    #   t.integer  "total_views"
-    #   t.integer  "total_views_previous_week"
-    #   t.integer  "total_views_previous_year"
-    #   t.float    "views"
-    #   t.float    "views_previous_week"
-    #   t.float    "views_previous_year"
-    #   t.float    "pct_difference_week"
-    #   t.float    "pct_difference_year"
-    #   t.float    "recent_pct_difference"
-    #   t.float    "pct_change_week"
-    #   t.float    "pct_change_year"
-    #   t.float    "recent_pct_change"
-    #   t.datetime "created_at",                :null => false
-    # end
-
-    # add_index "total_diffs", ["group_id", "datatype", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
 
     create_table "update_times", :force => true do |t|
       t.string   "item"

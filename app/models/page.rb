@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class Page < ActiveRecord::Base
+  extend CacheTools
   extend YearWeek
   has_many :analytics
   has_many :page_taggings
@@ -200,26 +201,43 @@ class Page < ActiveRecord::Base
         end
 
         metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
+        metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
         yearweeks = Analytic.year_weeks_from_date(eca.to_date)
         pagetotals = self.page_totals_by_yearweek
 
+        per_page_totals  = 0
+        loopcount = 0
         yearweeks.each do |year,week|
+          loopcount += 1
           yearweek = self.yearweek(year,week)
           stats[yearweek] = {}
+          pages = pagetotals[yearweek] || 0
           total = metric_by_yearweek[yearweek] || 0
+          seen = metric_counts_by_yearweek[yearweek] || 0
+
+          stats[yearweek]['pages'] = pages
+          stats[yearweek]['seen'] = seen
           stats[yearweek]['total'] = total
-          per_page = ((pagetotals[yearweek] and  pagetotals[yearweek] > 0) ? total / pagetotals[yearweek] : 0)
+
+          per_page = ((pages > 0) ? total / pages : 0)
+          per_page_totals += per_page
           stats[yearweek]['per_page'] = per_page
+          stats[yearweek]['per_page_rolling'] = per_page_totals / loopcount
 
           previous_year_key = self.yearweek(year-1,week)
           (previous_year,previous_week) = Analytic.previous_year_week(year,week)
           previous_week_key = self.yearweek(previous_year,previous_week)
 
-          previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)        
+          previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
+          stats[yearweek]['previous_week_total'] = previous_week_total        
           previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+          stats[yearweek]['previous_year_total'] = previous_year_total        
 
-          previous_week = ((pagetotals[previous_week_key] and  pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
+          previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
+          stats[yearweek]['previous_week'] = previous_week
           previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? total / pagetotals[previous_year_key] : 0)      
+          stats[yearweek]['previous_year'] = previous_year        
+
 
           # pct_change
           if(previous_week == 0)
@@ -501,14 +519,5 @@ class Page < ActiveRecord::Base
       end
     end
   end
-  
-
-  def self.get_cache_key(method_name,optionshash={})
-   optionshashval = Digest::SHA1.hexdigest(optionshash.inspect)
-   cache_key = "#{self.name}::#{method_name}::#{optionshashval}"
-   return cache_key
-  end  
-
-  
-  
+    
 end

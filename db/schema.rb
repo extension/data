@@ -48,6 +48,29 @@ ActiveRecord::Schema.define(:version => 20120918133242) do
   add_index "analytics", ["tag_id"], :name => "tag_id_ndx"
   add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
+  create_table "collected_page_stats", :force => true do |t|
+    t.integer  "statable_id"
+    t.string   "statable_type",    :limit => 25, :null => false
+    t.string   "datatype",         :limit => 25, :null => false
+    t.string   "metric",           :limit => 25, :null => false
+    t.integer  "yearweek"
+    t.integer  "year"
+    t.integer  "week"
+    t.date     "yearweek_date"
+    t.integer  "pages"
+    t.integer  "seen"
+    t.float    "total"
+    t.float    "per_page"
+    t.float    "per_page_rolling"
+    t.float    "previous_week"
+    t.float    "previous_year"
+    t.float    "pct_change_week"
+    t.float    "pct_change_year"
+    t.datetime "created_at",                     :null => false
+  end
+
+  add_index "collected_page_stats", ["statable_id", "statable_type", "datatype", "metric", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
+
   create_table "contributor_groups", :force => true do |t|
     t.integer  "contributor_id"
     t.integer  "group_id"
@@ -196,20 +219,6 @@ ActiveRecord::Schema.define(:version => 20120918133242) do
   end
 
   add_index "page_taggings", ["page_id", "tag_id"], :name => "pt_ndx"
-
-  create_table "page_totals", :force => true do |t|
-    t.integer  "page_id"
-    t.float    "eligible_weeks"
-    t.integer  "pageviews"
-    t.integer  "unique_pageviews"
-    t.integer  "entrances"
-    t.integer  "time_on_page"
-    t.integer  "exits"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
-  end
-
-  add_index "page_totals", ["page_id"], :name => "page_ndx", :unique => true
 
   create_table "pages", :force => true do |t|
     t.integer  "migrated_id"
