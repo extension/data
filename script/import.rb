@@ -86,7 +86,7 @@ class GAImporter < Thor
     end
 
 
-    def item_rebuild(model)
+    def item_rebuild(model,method='rebuild')
       object = Object.const_get(model)
       run_and_log(object,method,"#{model} #{method}")
     end
