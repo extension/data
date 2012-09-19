@@ -62,11 +62,20 @@ module YearWeek
     Date.commercial(year,week,7) 
   end
 
-  def yearweek_date(yearweek)
+  def yearweek_year_week(yearweek)
     if(yearweek.to_s =~ %r{(\d{4})(\d{2})})
       year = $1.to_i
       week = $2.to_i
-      Date.commercial(year,week,7)
+      [year,week]
+    else
+      nil
+    end
+  end
+
+  def yearweek_date(yearweek)
+    if(ywarray = yearweek_year_week(yearweek))
+      (year,week) = ywarray
+      year_week_date(year,week)
     else
       nil
     end
