@@ -13,6 +13,8 @@ class GroupsController < ApplicationController
 
 	def show
     @group = Group.find(params[:id])
+    @index_stats = @group.landing_stats.stats_by_yearweek('unique_pageviews')
+    @latest_yearweek = Analytic.latest_yearweek
   end
 
 
