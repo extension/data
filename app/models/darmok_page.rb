@@ -12,13 +12,13 @@ class DarmokPage < ActiveRecord::Base
   JOINER = ", " 
   SPLITTER = Regexp.new(/\s*,\s*/)
   
-  has_one :link_stat, :foreign_key => "page_id"
+  has_one :darmok_link_stat, :foreign_key => "page_id"
   
   def link_counts
     linkcounts = {:total => 0, :external => 0,:local => 0, :wanted => 0, :internal => 0, :broken => 0, :redirected => 0, :warning => 0}
-    if(!self.link_stat.nil?)
+    if(!self.darmok_link_stat.nil?)
       linkcounts.keys.each do |key|
-        linkcounts[key] = self.link_stat.send(key)
+        linkcounts[key] = self.darmok_link_stat.send(key)
       end
     end
     return linkcounts
