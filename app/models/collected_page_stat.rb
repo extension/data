@@ -39,6 +39,7 @@ class CollectedPageStat < ActiveRecord::Base
     datatypes.each do |datatype|
       insert_values = []
       stats = scope.by_datatype(datatype).stats_by_yearweek(metric,{force: true})
+      percentiles = scope.by_datatype(datatype).percentiles_by_yearweek(metric,{},{force: true})
       stats.keys.sort.each do |yearweek|
         insert_list = []
         insert_list << statable_id
@@ -55,6 +56,13 @@ class CollectedPageStat < ActiveRecord::Base
             insert_list << 'NULL'
           else
             insert_list << stats[yearweek][value]
+          end
+        end
+        Page::PERCENTILES.each do |pct|
+          if(percentiles[yearweek] and percentiles[yearweek][pct])
+            insert_list << percentiles[yearweek][pct]
+          else
+            insert_list << 'NULL'
           end
         end
         insert_list << 'NOW()'

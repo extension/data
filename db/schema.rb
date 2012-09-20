@@ -65,6 +65,13 @@ ActiveRecord::Schema.define(:version => 20120918133242) do
     t.float    "previous_year"
     t.float    "pct_change_week"
     t.float    "pct_change_year"
+    t.float    "pct_99"
+    t.float    "pct_95"
+    t.float    "pct_90"
+    t.float    "pct_75"
+    t.float    "pct_50"
+    t.float    "pct_25"
+    t.float    "pct_10"
     t.datetime "created_at",                    :null => false
   end
 
