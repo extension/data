@@ -23,7 +23,7 @@ class Page < ActiveRecord::Base
   INDEXED = 1
   NOT_GOOGLE_INDEXED = 2
 
-
+  PERCENTILES = [99,95,90,75,50,25,10]
   DATATYPES = ['Article','Faq','Event','News']
 
   scope :not_ignored, where("indexed != ?",NOT_INDEXED )
@@ -261,7 +261,7 @@ class Page < ActiveRecord::Base
   end
 
   def self.percentiles_by_yearweek(metric,options = {},cache_options = {})
-    percentiles = options[:percentiles] || Percentile::TRACKED
+    percentiles = options[:percentiles] || PERCENTILES
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]
 
     returnpercentiles = YearWeekStats.new

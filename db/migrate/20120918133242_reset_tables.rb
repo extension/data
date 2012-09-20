@@ -210,27 +210,6 @@ class ResetTables < ActiveRecord::Migration
     add_index "pages", ["node_id"], :name => "node_ndx"
     add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
 
-    # create_table "percentiles", :force => true do |t|
-    #   t.integer  "group_id"
-    #   t.string   "datatype",      :null => false
-    #   t.integer  "yearweek"
-    #   t.integer  "year"
-    #   t.integer  "week"
-    #   t.date     "yearweek_date"
-    #   t.integer  "total"
-    #   t.integer  "seen"
-    #   t.float    "pct_99"
-    #   t.float    "pct_95"
-    #   t.float    "pct_90"
-    #   t.float    "pct_75"
-    #   t.float    "pct_50"
-    #   t.float    "pct_25"
-    #   t.float    "pct_10"
-    #   t.datetime "created_at",    :null => false
-    # end
-
-    # add_index "percentiles", ["group_id", "datatype", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
-
     create_table "revisions", :force => true do |t|
       t.integer  "node_id"
       t.integer  "contributor_id"
