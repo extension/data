@@ -3,7 +3,7 @@
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
-  
+
 </header>
 
 
@@ -13,9 +13,9 @@
     $('#groupfinder').autocomplete({
       source: "/data/groups",
       minLength: 2,
-      select: function(event, ui) { 
+      select: function(event, ui) {
         window.location = '/groups/' + ui.item.id
-      } 
+      }
     });
   </script>
 </div>
@@ -25,24 +25,24 @@
   <h1>Top Groups for Week
     <small>by average views/page</small>
   </h1>
-</div> 
+</div>
 
 <div class="row">
   <%- Page::DATATYPES.each do |datatype| -%>
     <div class="span3">
       <div class="page-header">
         <h3><%= datatype.pluralize%></h3>
-      </div> 
+      </div>
       <%- groupslist = Group.launched.top_views(:datatype => datatype) -%>
       <dl>
       <%- groupslist.each do |group| %>
-        <%- group_stats = group.stats_for_week_for_datatype(datatype) -%>
+        <%- group_stats = group.pages.by_datatype(datatype).stats_by_yearweek('unique_pageviews') -%>
         <dt><%= link_to(group.name, group_path(group))%></dt>
-        <dd><span class='regnumber'><%= number_with_precision(group_stats[:views], :precision => 2) %></span> views</dd>
-        <dd><span class='regnumber'><%= number_to_percentage(group_stats[:seen]/group_stats[:pages]*100, :precision => 1) %></span>
-        of <span class='regnumber'><%= number_with_delimiter(group_stats[:pages])%></span> items viewed</dd>
+        <dd><span class='regnumber'><%= number_with_precision(group_stats[@latest_yearweek]['per_page'], :precision => 2) %></span> views</dd>
+        <dd><span class='regnumber'><%= seen_pct(group_stats[@latest_yearweek]) %></span>
+        of <span class='regnumber'><%= number_with_delimiter(group_stats[@latest_yearweek]['pages'])%></span> items viewed</dd>
       <%- end -%>
-      </dl>      
+      </dl>
     </div>
   <%- end -%>
 </div>

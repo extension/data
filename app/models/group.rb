@@ -16,6 +16,7 @@ class Group < ActiveRecord::Base
   has_many :page_stats, :through => :tags
   has_many :landing_stats
   has_many :node_activity_diffs
+  has_many :collected_page_stats, :as => :statable
 
   has_many :contributor_groups
   has_many :contributors, through: :contributor_groups
@@ -43,18 +44,23 @@ class Group < ActiveRecord::Base
   def self.top_or_bottom_by_views(top_or_bottom,options = {})
     case top_or_bottom
     when 'top'
-      sortorder = 'total_diffs.views DESC'
+      sortorder = 'collected_page_stats.per_page DESC'
     when 'bottom'
-      sortorder = 'total_diffs.views ASC,total_diffs.pages DESC'
+      sortorder = 'collected_page_stats.per_page ASC,collected_page_stats.pages DESC'
     else
-      sortorder = 'total_diffs.views ASC,total_diffs.pages DESC'
+      sortorder = 'collected_page_stats.per_page ASC,collected_page_stats.pages DESC'
     end
     yearweek = options[:yearweek] || Analytic.latest_yearweek
     pagecount = options[:pagecount] || 10
     limit = options[:limit] || 5
     datatype = options[:datatype] || 'Article'
     with_scope do
-      joins(:total_diffs).where("total_diffs.datatype = ?",datatype).where("total_diffs.yearweek = ?",yearweek).where("total_diffs.pages >= ?",pagecount).order(sortorder).limit(limit)
+      joins(:collected_page_stats)
+      .where("collected_page_stats.datatype = ?",datatype)
+      .where("collected_page_stats.metric = 'unique_pageviews'")
+      .where("collected_page_stats.yearweek = ?",yearweek)
+      .where("collected_page_stats.pages >= ?",pagecount)
+      .order(sortorder).limit(limit)
     end
   end
 

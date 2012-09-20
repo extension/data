@@ -7,6 +7,11 @@
 
 class ApplicationController < ActionController::Base
   protect_from_forgery
-  include AuthLib    
-  before_filter :signin_optional    
+  include AuthLib
+  before_filter :signin_optional, :set_latest_yearweek
+
+  def set_latest_yearweek
+    @latest_yearweek = Analytic.latest_yearweek
+  end
+
 end

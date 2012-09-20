@@ -9,7 +9,6 @@ class PagesController < ApplicationController
 
   def index
     @index_stats = LandingStat.overall.stats_by_yearweek('unique_pageviews')
-    @latest_yearweek = Analytic.latest_yearweek
   end
 
   def show
