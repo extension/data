@@ -6,16 +6,16 @@
 #  see LICENSE file
 
 class PagesController < ApplicationController
-  
+
   def index
     @index_stats = LandingStat.overall.stats_by_yearweek('unique_pageviews')
     @latest_yearweek = Analytic.latest_yearweek
   end
-   
+
   def show
     @page = Page.includes(:node).find(params[:id])
   end
-   
+
   def groupdatatype
     @group = Group.find(params[:id])
     @datatype = params[:datatype]
@@ -23,12 +23,12 @@ class PagesController < ApplicationController
       # ToDo: error out
       @datatype = 'Article'
     end
-    
+
     @graph_data = @group.graph_data_by_datatype(@datatype)
-    (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)  
+    (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)
   end
-  
-  
+
+
   def datatype
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
@@ -36,8 +36,8 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
   end
-    
-  
+
+
   def list
     @scope = Page
     @datatype = params[:datatype]
@@ -47,7 +47,7 @@ class PagesController < ApplicationController
       @scope = @scope.by_datatype(@datatype)
     end
     @pagelist = @scope.filtered_pagelist(params).page(params[:page])
-    
+
     list_type = @datatype.nil? ? 'Pages' : @datatype.pluralize
     case(params[:filter])
     when 'viewed'
@@ -62,21 +62,21 @@ class PagesController < ApplicationController
       @page_title = "All #{list_type}"
       @page_title_display = "All #{list_type}"
       @endpoint = "All #{@datatype.pluralize}"
-    end      
+    end
 
   end
-    
+
   def graphs
     if(params[:group])
       @group = Group.find(params[:group])
     end
-    
+
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
       # for now, error later
       @datatype = 'Article'
     end
-    
+
     if(@group)
       @graph_data = @group.graph_data_by_datatype(@datatype)
       (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)
@@ -94,8 +94,8 @@ class PagesController < ApplicationController
     end
     @diffs = TotalDiff.panda_impacts(@panda_comparison_weeks)
   end
-  
-  
+
+
   def setdate
     if(params[:date])
       begin
@@ -112,10 +112,10 @@ class PagesController < ApplicationController
       return redirect_to(root_url)
     end
   end
-  
-  
+
+
   def search
-    if(params[:q])      
+    if(params[:q])
       if(params[:q].to_i > 0)
         @id_number = params[:q].to_i
         @page = Page.find_by_id(@id_number)
