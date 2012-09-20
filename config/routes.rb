@@ -17,22 +17,21 @@ Positronic::Application.routes.draw do
   match '/pages/graphs/:datatype/:group', to: 'pages#graphs', :as => 'graphs_pages', :via => :get
   match '/pages/graphs/:datatype', to: 'pages#graphs', :as => 'graphs_pages', :via => :get
   match '/pages/datatype/:datatype', to:'pages#datatype', :as => 'datatype_pages', :via => :get
-  match '/pages/group/:id/:datatype', to:'pages#groupdatatype', :as => 'datatype_group', :via => :get
-  
-  resources :groups, :only => [:index, :show] 
-  
+
+  resources :groups, :only => [:index, :show]
+
   # data routes
   scope "data" do
     match "/groups", to: "data#groups", :as => 'data_groups'
   end
-  
+
 
 
   resources :contributors, :only => [:index, :show] do
     member do
       get :contributions
       get :metacontributions
-    end    
+    end
   end
 
   resources :nodes, :only => [:index, :show] do

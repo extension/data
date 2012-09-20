@@ -16,19 +16,6 @@ class PagesController < ApplicationController
     @page = Page.includes(:node).find(params[:id])
   end
 
-  def groupdatatype
-    @group = Group.find(params[:id])
-    @datatype = params[:datatype]
-    if(!Page::DATATYPES.include?(@datatype))
-      # ToDo: error out
-      @datatype = 'Article'
-    end
-
-    @graph_data = @group.graph_data_by_datatype(@datatype)
-    (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)
-  end
-
-
   def datatype
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
