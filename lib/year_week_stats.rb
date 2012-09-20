@@ -9,21 +9,31 @@ class YearWeekStats < Hash
   extend YearWeek
 
   def to_graph_data(hashvalue,options = {})
-    showrolling = options[:showrolling].blank? ? true : options[:showrolling]
+    showrolling = options[:showrolling].nil? ? true : options[:showrolling]
+    relative_to = options[:relative_to]
+    relative_percentage = options[:relative_percentage].nil? ? false : options[:relative_percentage]
     returndata = []
     value_data = []
     rolling_data = []
     running_total = 0
     loopcount = 0
     self.yearweeks.each do |yearweek|
+      value = 0
       loopcount += 1
       yearweek_date = self.class.yearweek_date(yearweek)
-      value = self[yearweek][hashvalue] || 0
-      value_data << [yearweek_date,value]
+      if(relative_to)
+        dividend = self[yearweek][hashvalue] || 0
+        divisor = self[yearweek][relative_to] || 0
+        value = (divisor > 0) ? dividend/divisor : 0
+        value = (value * 100) if relative_percentage
+      else
+        value = self[yearweek][hashvalue] || 0
+      end
+      value_data << [yearweek_date,value.to_f]
       if(showrolling)
         running_total += value
         rolling = running_total / loopcount
-        rolling_data << [yearweek_date,rolling]
+        rolling_data << [yearweek_date,rolling.to_f]
       end
     end
 
