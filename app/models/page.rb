@@ -293,7 +293,7 @@ class Page < ActiveRecord::Base
           returnpercentiles[yearweek][:total] = pagecount
           returnpercentiles[yearweek][:seen] = seen
           distributionsum = distribution.sum
-          returnpercentiles[yearweek][:mean] = (distributionsum > 0 ? pagecount / distributionsum : 0 )
+          returnpercentiles[yearweek][:mean] = (pagecount > 0 ? distributionsum / pagecount : 0 )
           percentiles.each do |percentile|
             returnpercentiles[yearweek][percentile] = distribution.nist_percentile(percentile)
           end
