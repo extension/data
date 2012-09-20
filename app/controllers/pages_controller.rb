@@ -77,13 +77,20 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    if(@group)
-      @graph_data = @group.graph_data_by_datatype(@datatype)
-      (@percentiles_labels,@percentiles_data) = @group.traffic_stats_data_by_datatype_with_percentiles(@datatype)
-    else
-      @graph_data = Page.graph_data_by_datatype(@datatype)
-      (@percentiles_labels,@percentiles_data) = Page.traffic_stats_data_by_datatype_with_percentiles(@datatype)
+    @metric = params[:metric]
+    if(!PageStat.column_names.include?(@metric))
+      @metric = 'unique_pageviews'
     end
+
+    # todo: contributor, tags
+    if(@group)
+      scope = @group.pages.by_datatype(@datatype)
+    else
+      scope = Page.by_datatype(@datatype)
+    end
+
+    @stats = scope.stats_by_yearweek(@metric)
+    @percentiles = scope.percentiles_by_yearweek(@metric)
   end
 
   def panda_impact_summary
