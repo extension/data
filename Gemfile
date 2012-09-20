@@ -74,7 +74,7 @@ group :development do
   gem 'powder'
   gem 'net-http-spy'
   gem 'pry'
-  
+
   # moar advanced stats in dev only
   #gem 'gsl', :git => 'git://github.com/30robots/rb-gsl.git'
   #gem 'statsample-optimization', :require => 'statsample'
