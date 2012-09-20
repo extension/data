@@ -13,25 +13,26 @@ class YearWeekStats < Hash
     returndata = []
     value_data = []
     rolling_data = []
+    running_total = 0
+    loopcount = 0
     self.yearweeks.each do |yearweek|
+      loopcount += 1
       yearweek_date = self.class.yearweek_date(yearweek)
-      if(showrolling)
-        # if no rolling value, mark showrolling false
-        if self[yearweek]['rolling'].nil?
-          showrolling = false
-        else
-          rolling = self[yearweek]['rolling']
-          rolling_data << [yearweek_date,rolling]
-        end
-      end
       value = self[yearweek][hashvalue] || 0
       value_data << [yearweek_date,value]
+      if(showrolling)
+        running_total += value
+        rolling = running_total / loopcount
+        rolling_data << [yearweek_date,rolling]
+      end
     end
+
     if(showrolling)
       returndata = [value_data,rolling_data]
     else
       returndata = [value_data]
     end
+
     returndata
   end
 

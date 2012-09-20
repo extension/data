@@ -208,10 +208,7 @@ class Page < ActiveRecord::Base
         year_weeks = Analytic.year_weeks_from_date(eca.to_date)
         pagetotals = self.page_totals_by_yearweek
 
-        per_page_totals  = 0
-        loopcount = 0
         year_weeks.each do |year,week|
-          loopcount += 1
           yearweek = self.yearweek(year,week)
           stats[yearweek] = {}
           pages = pagetotals[yearweek] || 0
@@ -223,9 +220,7 @@ class Page < ActiveRecord::Base
           stats[yearweek]['total'] = total
 
           per_page = ((pages > 0) ? total / pages : 0)
-          per_page_totals += per_page
           stats[yearweek]['per_page'] = per_page
-          stats[yearweek]['rolling'] = per_page_totals / loopcount
 
           previous_year_key = self.yearweek(year-1,week)
           (previous_year,previous_week) = self.previous_year_week(year,week)
