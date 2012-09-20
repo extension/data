@@ -267,7 +267,7 @@ class Page < ActiveRecord::Base
       with_scope do
         eca = self.earliest_created_at
         if(eca.blank?)
-          return stats
+          return returnpercentiles
         end
 
         week_stats_query = self.joins(:page_stats).group('page_stats.yearweek').select("page_stats.yearweek as yearweek, GROUP_CONCAT(page_stats.#{metric}) as distribution")
