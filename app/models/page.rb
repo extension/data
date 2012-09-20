@@ -263,10 +263,10 @@ class Page < ActiveRecord::Base
   def self.percentiles_by_yearweek(metric,options = {},cache_options = {})
     percentiles = options[:percentiles] || PERCENTILES
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]
-
-    returnpercentiles = YearWeekStats.new
     cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope.to_sql, percentiles: percentiles, seenonly: seenonly})
     Rails.cache.fetch(cache_key,cache_options) do
+      returnpercentiles = YearWeekStats.new
+      returnpercentiles[:flags] = {percentiles: true}
       set_group_concat_size_query = "SET SESSION group_concat_max_len = #{Settings.group_concat_max_len};"
       self.connection.execute(set_group_concat_size_query)
       with_scope do
@@ -297,6 +297,8 @@ class Page < ActiveRecord::Base
           distribution.sort!
           returnpercentiles[yearweek][:total] = pagecount
           returnpercentiles[yearweek][:seen] = seen
+          distributionsum = distribution.sum
+          returnpercentiles[yearweek][:mean] = (distributionsum > 0 ? pagecount / distributionsum : 0 )
           percentiles.each do |percentile|
             returnpercentiles[yearweek][percentile] = distribution.nist_percentile(percentile)
           end

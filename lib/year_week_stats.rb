@@ -64,4 +64,25 @@ class YearWeekStats < Hash
     end
   end
 
+  def to_percentile_graph_data(options = {})
+    return [] if !flags[:percentiles]
+    hashed_data = {}
+    self.yearweeks.each do |yearweek|
+      yearweek_date = self.class.yearweek_date(yearweek)
+      hashed_data[:mean] ||= []
+      hashed_data[:mean] << [yearweek_date,self[yearweek][:mean]]
+      Settings.display_percentiles.each do |pct|
+        hashed_data[pct] ||= []
+        hashed_data[pct] << [yearweek_date,self[yearweek][pct]]
+      end
+
+    end
+    hashed_data.values
+  end
+
+  def to_percentile_graph_labels(options = {})
+    return [] if !flags[:percentiles]
+    ['Average Views'] + Settings.display_percentiles_labels
+  end
+
 end
