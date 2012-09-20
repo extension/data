@@ -66,6 +66,9 @@ gem 'jqplot-rails', :git => 'git://github.com/extension/jqplot-rails.git'
 # exception handling
 gem 'airbrake'
 
+# memcached
+gem 'dalli'
+
 group :development do
   # require the powder gem
   gem 'powder'
