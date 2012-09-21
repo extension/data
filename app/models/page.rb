@@ -187,6 +187,23 @@ class Page < ActiveRecord::Base
     end
   end
 
+  def stats_by_yearweek(metric,cache_options = {})
+    self.class.where(id: self.id).stats_by_yearweek(metric,cache_options = {})
+  end
+
+  def stats_for_week(metric,cache_options = {})
+    stats = stats_by_yearweek(metric,cache_options)
+    yearweek = Analytic.latest_yearweek
+    weeks = self.eligible_weeks(true)
+    if(stats[yearweek] and stats[yearweek]['total'] and weeks)
+      average = stats.sum_for_hashvalue('total') / weeks.to_f
+    else
+      average = nil
+    end
+    stats[yearweek].merge({'average' => average, 'weeks' => weeks.round})
+  end
+
+
   def self.stats_by_yearweek(metric,cache_options = {})
     stats = YearWeekStats.new
     cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope.to_sql})
@@ -329,27 +346,7 @@ class Page < ActiveRecord::Base
     returndata
   end
 
-  def stats_for_week
-    (year,week) = Analytic.latest_year_week
-    pd = self.page_diffs.by_year_week(year,week).first
-    if(pd.nil?)
-      views = 0
-      change_week = nil
-      change_year = nil
-    else
-      views = pd.views
-      change_week = pd.pct_change_week
-      change_year = pd.pct_change_year
-      recent = pd.recent_pct_change.nil? ? nil : pd.recent_pct_change / Settings.recent_weeks
-    end
 
-    if(total_views = self.page_total.unique_pageviews and eligible_weeks = self.page_total.eligible_weeks)
-      average = (total_views / eligible_weeks)
-    else
-      average = nil
-    end
-    {:views => views, :change_week => change_week, :change_year => change_year, :recent_change => recent, :average => average, :weeks => eligible_weeks.round }
-  end
 
   def self.filtered_pagelist(params)
     yearweek = Analytic.latest_yearweek
