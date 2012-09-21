@@ -227,7 +227,7 @@ class Page < ActiveRecord::Base
 
           previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
           stats[yearweek]['previous_week'] = previous_week
-          previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? total / pagetotals[previous_year_key] : 0)
+          previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? previous_year_total / pagetotals[previous_year_key] : 0)
           stats[yearweek]['previous_year'] = previous_year
 
 
