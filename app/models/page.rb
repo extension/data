@@ -14,7 +14,6 @@ class Page < ActiveRecord::Base
   has_many :groups, :through => :tags
   belongs_to :node
   has_many :page_stats
-  has_many :page_diffs
   has_one :page_total
   has_many :meta_contributors, :through => :node, :source => :meta_contributors
 
@@ -37,11 +36,6 @@ class Page < ActiveRecord::Base
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
   scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
-  scope :last_week_view_ordered, lambda{
-    yearweek = Analytic.latest_yearweek
-    joins(:page_diffs).where("page_diffs.yearweek = ?",yearweek).order("page_diffs.views DESC")
-  }
-
 
   def display_title(options = {})
     truncate_it = options[:truncate].nil? ? true : options[:truncate]

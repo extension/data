@@ -15,7 +15,6 @@ class Group < ActiveRecord::Base
   has_many :analytics, :through => :tags
   has_many :page_stats, :through => :tags
   has_many :landing_stats
-  has_many :node_activity_diffs
   has_many :collected_page_stats, :as => :statable
 
   has_many :contributor_groups
