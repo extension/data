@@ -314,40 +314,6 @@ class Page < ActiveRecord::Base
     end # cache
   end
 
-
-
-  def traffic_stats_data(showrolling = true)
-    returndata = []
-    upv_data = []
-    rolling_data = []
-    week_stats = {}
-    self.week_stats.order('yearweek').map do |ws|
-      yearweek_string = "#{ws.year}-" + "%02d" % ws.week
-      week_stats[yearweek_string] = ws.unique_pageviews
-    end
-
-    year_weeks = self.eligible_year_weeks
-    weekcount = 0
-    running_upv = 0
-    year_weeks.each do |year,week|
-      weekcount +=1
-      yearweek_string = "#{year}-" + "%02d" % week
-      date = self.class.year_week_date(year,week)
-      upv = week_stats[yearweek_string].nil? ? 0 : week_stats[yearweek_string]
-      running_upv = running_upv+upv
-      rolling_data << [date,(running_upv / weekcount)]
-      upv_data << [date,upv]
-    end
-    if(showrolling)
-      returndata = [upv_data,rolling_data]
-    else
-      returndata = [upv_data]
-    end
-    returndata
-  end
-
-
-
   def self.filtered_pagelist(params)
     yearweek = Analytic.latest_yearweek
     with_scope do
