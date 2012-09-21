@@ -41,7 +41,7 @@
 
   <div class="span8">
     <h3>Contributions by week</h3>
-    <%= render(:partial => 'shared/line_plot', :locals => {:data => NodeActivity.stats_to_graph_data(@node.node_activities.stats_by_yearweek('all_activity'),'contributions',false), :datalabel => @node.id })%>     
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @node.stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributions,{showrolling:false}), :datalabel => @node.id })%>     
   </div>
 </div>
 
