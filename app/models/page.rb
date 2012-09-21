@@ -71,35 +71,6 @@ class Page < ActiveRecord::Base
     Analytic.year_weeks_from_date(start_date)
   end
 
-  def last_diff
-    if(!@last_diff)
-      (year,week) = Analytic.latest_year_week
-      @last_diff = self.page_diffs.by_year_week(year,week).first
-    end
-    @last_diff
-  end
-
-  def last_percentile
-    # overall
-    (year,week) = Analytic.latest_year_week
-    overall_percentiles = Percentile.overall_percentile_for_year_week_datatype(year,week,self.datatype)
-    ld = self.last_diff
-    if(ld.nil?)
-      nil
-    else
-      views = ld.views
-      Percentile::TRACKED.each do |pct|
-        column_name = "pct_#{pct}"
-        if(views >= overall_percentiles.send(column_name))
-          return pct
-        end
-      end
-      return 0
-    end
-  end
-
-
-
   def self.find_by_title_url(url)
    return nil unless url
    real_title = url.gsub(/_/, ' ')

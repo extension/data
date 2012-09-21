@@ -130,11 +130,4 @@ class LandingStat < ActiveRecord::Base
     end
     stats
   end
-
-
-
-
-
-
-
 end

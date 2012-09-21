@@ -82,7 +82,6 @@ class GAImporter < Thor
       run_and_log(PageStat,'rebuild','page stats rebuild')
       run_and_log(CollectedPageStat,'rebuild','page stats for collections rebuild')
       run_and_log(LandingStat,'rebuild','landing stats rebuild')
-      #run_and_log(NodeActivityDiff,'rebuild','node activity diffs rebuild')
     end
 
 

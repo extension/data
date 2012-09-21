@@ -191,32 +191,6 @@ class NodeActivity < ActiveRecord::Base
     end
   end
 
-
-
-  def self.stats_to_graph_data(yearweek_stats,column_value,showrolling = true)
-    returndata = []
-    value_data = []
-    rolling_data = []
-    with_scope do
-      running_total = 0
-      weekcount = 0
-      yearweek_stats.keys.sort.each do |yearweek|
-        date = self.yearweek_date(yearweek)
-        weekcount += 1
-        value = yearweek_stats[yearweek][column_value]
-        running_total += value.nil? ? 0 : value
-        rolling_data << [date,(running_total / weekcount)]
-        value_data << [date,value]
-      end
-    end
-    if(showrolling)
-      returndata = [value_data,rolling_data]
-    else
-      returndata = [value_data]
-    end
-    returndata
-  end
-
   def self.contributions_display(contributions)
     list = contributions.split(',')
     list.uniq.map{|contribution| self.event_to_s(contribution.to_i)}.join(', ')
