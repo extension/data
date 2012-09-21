@@ -22,23 +22,15 @@ class NodesController < ApplicationController
     end
     
     @node_scope = params[:node_scope]
-    if(!NodeActivity::NODE_SCOPES.include?(@node_scope))
-      # for now, error later
+    if(!Node::NODE_SCOPES.include?(@node_scope))
       @node_scope = 'all_nodes'
     end
 
-    @activity_scope = params[:activity_scope]
-    if(!NodeActivity::ACTIVITY_SCOPES.include?(@activity_scope))
+    @activity = params[:activity]
+    if(!NodeActivity::ACTIVITIES.include?(@activity))
       # for now, error later
-      @activity_scope = 'all_activity'
+      @activity =  NodeActivity::ALL_ACTIVITY
     end
-
-    if(@group.nil?)
-      @stats_scope = NodeActivityDiff.overall.by_node_scope(@node_scope).by_activity_scope(@activity_scope)
-    else
-      @stats_scope = @group.node_activity_diffs.by_node_scope(@node_scope).by_activity_scope(@activity_scope)
-    end
-
   end
 
 end

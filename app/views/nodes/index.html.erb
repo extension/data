@@ -9,7 +9,7 @@
 
   <div class="page-header">
     <h2>All Nodes</h2>
-  </div>  
+  </div>
   <div class="row">
     <div class="span4">
       <h3>Overall</h3>
@@ -19,17 +19,17 @@
       <%= last_week_c_i_c_stats('all_nodes') %>
 
     </div>
-  
+
     <div class="span8">
       <h3>Contributors per week over time <small><%= link_to('more graphs...',graphs_nodes_path())%></small></h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => NodeActivityDiff.overall.by_n_a_m('all_nodes','all_activity','contributors').stats_to_graph_data, :datalabel => 'all_contributors' })%>     
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => Node.stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributors), :datalabel => 'all_contributors' })%>
     </div>
   </div>
 
   <%- ['articles','faqs','news'].each do |node_scope| -%>
   <div class="page-header">
     <h2><%= node_scope.capitalize %></h2>
-  </div>  
+  </div>
   <div class="row">
     <div class="span4">
       <h3>Overall</h3>
@@ -39,10 +39,10 @@
       <%= last_week_c_i_c_stats(node_scope) %>
 
     </div>
-  
+
     <div class="span8">
       <h3>Contributors per week over time <small><%= link_to('more graphs...',graphs_nodes_path(:node_scope => node_scope))%></small></h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => NodeActivityDiff.overall.by_n_a_m(node_scope,'all_activity','contributors').stats_to_graph_data, :datalabel => "#{node_scope}_contributors" })%>     
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => Node.send(node_scope).stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributors), :datalabel => "#{node_scope}_contributors" })%>
     </div>
   </div>
   <%- end -%>
@@ -50,7 +50,7 @@
   <% node_scope = 'nonpublishables' %>
   <div class="page-header">
     <h2>Other</h2>
-  </div>  
+  </div>
   <div class="row">
     <div class="span4">
       <h3>Overall</h3>
@@ -60,10 +60,10 @@
       <%= last_week_c_i_c_stats(node_scope) %>
 
     </div>
-  
+
     <div class="span8">
       <h3>Contributors per week over time <small><%= link_to('more graphs...',graphs_nodes_path(:node_scope => node_scope))%></small></h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => NodeActivityDiff.overall.by_n_a_m(node_scope,'all_activity','contributors').stats_to_graph_data, :datalabel => "#{node_scope}_contributors" })%>     
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => Node.send(node_scope).stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributors), :datalabel => "#{node_scope}_contributors" })%>
     </div>
   </div>
 

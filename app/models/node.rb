@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class Node < ActiveRecord::Base
+  extend CacheTools
   extend YearWeek
   has_one :page
   has_many :node_groups
@@ -15,7 +16,7 @@ class Node < ActiveRecord::Base
   has_many :node_metacontributions
   has_many :meta_contributors, :through => :node_metacontributions, :source => :contributor
   has_many :activity_contributors, :through => :node_activities, :source => :contributor
-  
+
   # datatypes that we care about
   PUBLISHED_TYPES = ['article','faq','news']
 
@@ -23,18 +24,29 @@ class Node < ActiveRecord::Base
     case datatype
     when 'all'
       where(1)
-    else 
+    else
       where("node_type = ?",datatype)
     end
   }
 
-  scope :articles, where(:node_type => 'article')
-  scope :faqs,     where(:node_type => 'faq')
-  scope :news,     where(:node_type => 'news')
-  
+  # used as a sanitycheck list
+  NODE_SCOPES = ['all_nodes','articles','faqs','news','publishables','nonpublishables','forums']
+
+  scope :all_nodes, where(1) # just a convenience scope for scoping node types and activity types
+  scope :articles, where(node_type: 'article')
+  scope :faqs,     where(node_type: 'faq')
+  scope :news,     where(node_type: 'news')
+  scope :forums,   where(node_type: 'forum')
+  scope :publishables, where("node_type IN (#{PUBLISHED_TYPES.collect{|type| quote_value(type)}.join(', ')})")
+  scope :nonpublishables, where("node_type NOT IN (#{PUBLISHED_TYPES.collect{|type| quote_value(type)}.join(', ')})")
+
   scope :has_page, where(:has_page => true)
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date).order("#{self.table_name}.created_at")}
 
+  scope :latest_activity, lambda{
+    yearweek = Analytic.latest_yearweek
+    joins(:node_activities).where("YEARWEEK(node_activities.created_at,3) = ?",yearweek)
+  }
 
   def display_title(options = {})
     truncate_it = options[:truncate].nil? ? true : options[:truncate]
@@ -60,7 +72,7 @@ class Node < ActiveRecord::Base
   def contributions_count
     counts = {}
     counts[:contributors] = self.node_activities.count('contributor_id',:distinct => true)
-    counts[:actions] = self.node_activities.count    
+    counts[:actions] = self.node_activities.count
     counts[:byaction] = self.node_activities.group('event').count
     counts
   end
@@ -68,13 +80,13 @@ class Node < ActiveRecord::Base
   def metacontributions_count
     counts = {}
     counts[:contributors] = self.node_metacontributions.count('contributor_id',:distinct => true)
-    counts[:actions] = self.node_metacontributions.count    
+    counts[:actions] = self.node_metacontributions.count
     counts[:byaction] = self.node_metacontributions.group('role').count
     counts
-  end 
+  end
 
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
+    self.connection.execute("truncate table #{self.table_name};")
     CreateNode.find_in_batches do |group|
       insert_values = []
       group.each do |node|
@@ -90,11 +102,11 @@ class Node < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} (id,revision_id,node_type,title,created_at,updated_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
-    
+
     # set page flag
     update_sql = "UPDATE #{self.table_name},#{Page.table_name} SET #{self.table_name}.has_page = 1 WHERE #{self.table_name}.id = #{Page.table_name}.node_id and #{Page.table_name}.source = 'create'"
     self.connection.execute(update_sql)
-    
+
   end
 
   def self.counts_by_yearweek
@@ -102,16 +114,89 @@ class Node < ActiveRecord::Base
       self.group("YEARWEEK(#{self.table_name}.created_at,3)").count
     end
   end
-  
+
   def self.published_since(date)
     joins(:node_activities).where("node_activities.event = #{NodeActivity::PUBLISHED}").where("node_activities.created_at > ?",date).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
   end
-  
-  
+
+  def self.earliest_created_at
+    with_scope do
+      self.minimum(:created_at)
+    end
+  end
+
+  def self.overall_stats(activity,cache_options = {})
+    cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
+    Rails.cache.fetch(cache_key,cache_options) do
+      stats = {}
+      with_scope do
+        eca = self.earliest_created_at
+        if(eca.blank?)
+          return stats
+        end
+
+        contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+        contributions_count =  "COUNT(node_activities.id) as contributions"
+        items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
+
+        scope = self.joins(:node_activities)
+        if(activity != NodeActivity::ALL_ACTIVITY)
+          scope = scope.where('node_activities.activity = ?',activity)
+        end
+        result = scope.select("#{contributions_count}, #{contributors_count}, #{items_count}").first
+        stats = {contributions: result.contributions, contributors: result.contributors, items: result.items}
+      end
+      stats
+    end
+  end
+
+
+  def self.stats_by_yearweek(activity,cache_options = {})
+    stats = YearWeekStats.new
+    cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
+    Rails.cache.fetch(cache_key,cache_options) do
+      with_scope do
+        eca = self.earliest_created_at
+        if(eca.blank?)
+          return stats
+        end
+
+        yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
+        contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+        contributions_count =  "COUNT(node_activities.id) as contributions"
+        items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
+
+        scope = self.joins(:node_activities).group(yearweek_condition)
+        if(activity != NodeActivity::ALL_ACTIVITY)
+          scope = scope.where('node_activities.activity = ?',activity)
+        end
+        week_stats_query = scope.select("#{yearweek_condition} as yearweek, #{contributions_count}, #{contributors_count}, #{items_count}")
+        year_weeks = Analytic.year_weeks_from_date(eca.to_date)
+
+        weekstats_by_yearweek = {}
+        week_stats_query.each do |ws|
+          weekstats_by_yearweek[ws.yearweek] = {contributions: ws.contributions, contributors: ws.contributors, items: ws.items}
+        end
+
+        year_weeks = Analytic.year_weeks_from_date(eca.to_date)
+
+        year_weeks.each do |year,week|
+          yearweek = self.yearweek(year,week)
+          if(weekstats_by_yearweek[yearweek])
+            stats[yearweek] = weekstats_by_yearweek[yearweek]
+          else
+            stats[yearweek] = {contributions: 0, contributors: 0, items: 0}
+          end
+        end
+      end
+      stats
+    end
+  end
+
   def self.published_workflow_stats_since_migration
     published_workflow_stats_since_date(EpochDate::CREATE_FINAL_WIKI_MIGRATION)
   end
-  
+
   def self.published_workflow_stats_since_date(date,rawnodecounts=false)
     nodelist = []
     with_scope do
@@ -146,14 +231,14 @@ class Node < ActiveRecord::Base
       stats
     end
   end
-  
+
   def self.earliest_year_week
     if(@yearweek.blank?)
       earliest_date = self.minimum(:created_at).to_date
       @yearweek = [earliest_date.cwyear,earliest_date.cweek]
     end
     @yearweek
-  end 
+  end
 
 
 end

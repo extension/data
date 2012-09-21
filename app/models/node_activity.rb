@@ -19,10 +19,10 @@ class NodeActivity < ActiveRecord::Base
   INACTIVATED = 7
   ACTIVATED = 8
   READY_FOR_COPYEDIT = 9
-  
+
   EDIT = 101
   COMMENT = 102
-  
+
   REVIEWED_EVENTS = [READY_FOR_REVIEW,REVIEWED,READY_FOR_PUBLISH,READY_FOR_COPYEDIT]
 
   EVENT_STRINGS = {
@@ -38,33 +38,19 @@ class NodeActivity < ActiveRecord::Base
     EDIT => 'edited',
     COMMENT => 'added comment'
   }
-  
+
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
 
-
-  
-
-  PUBLISHABLE_NODES = ['article','faq','news']
-
-  scope :all_nodes, where(1) # just a convenience scope for scoping node types and activity types
-  scope :articles, joins(:node).where("nodes.node_type = 'article'")
-  scope :faqs, joins(:node).where("nodes.node_type = 'faq'")
-  scope :news, joins(:node).where("nodes.node_type = 'news'")
-  scope :forums, joins(:node).where("nodes.node_type = 'forum'")
-  scope :publishables, joins(:node).where("nodes.node_type IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
-  scope :nonpublishables, joins(:node).where("nodes.node_type NOT IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
-  
-  # used as a sanitycheck list
-  NODE_SCOPES = ['all_nodes','articles','faqs','news','publishables','nonpublishables','forums']
-
-  scope :all_activity, where(1) # just a convenience scope for scoping node types and activity types
-  scope :edits, where(:event => EDIT) 
-  scope :comments, where(:event => COMMENT)
-  scope :reviews, where("event IN (#{REVIEWED_EVENTS.join(',')})")
-  scope :publishes, where(:event => PUBLISHED)
+  # event groups
+  ALL_ACTIVITY = 'all'
+  EDIT_ACTIVITY = 'edit'
+  COMMENT_ACTIVITY = 'comment'
+  REVIEW_ACTIVITY = 'review'
+  PUBLISH_ACTIVITY = 'publish'
+  OTHER_ACTIVITY = 'other'
 
   # used as a sanitycheck list
-  ACTIVITY_SCOPES = ['all_activity','edits','comments','reviews','publishes']
+  ACTIVITIES = ['all','edit','comment','review','publish','other']
 
 
   def self.event_to_s(event)
@@ -78,18 +64,18 @@ class NodeActivity < ActiveRecord::Base
   def event_to_s
     self.class.event_to_s(self.event)
   end
-  
+
   def self.earliest_year_week
     if(@yearweek.blank?)
       earliest_date = self.minimum(:created_at).to_date
       @yearweek = [earliest_date.cwyear,earliest_date.cweek]
     end
     @yearweek
-  end 
-  
+  end
+
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
-    
+    self.connection.execute("truncate table #{self.table_name};")
+
     # revisions
     CreateRevision.find_in_batches do |group|
       insert_values = []
@@ -99,14 +85,15 @@ class NodeActivity < ActiveRecord::Base
         insert_list << revision.uid
         insert_list << revision.vid
         insert_list << EDIT
+        insert_list << ActiveRecord::Base.quote_value(EDIT_ACTIVITY)
         insert_list << ActiveRecord::Base.quote_value(revision.log)
         insert_list << ActiveRecord::Base.quote_value(revision.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,log,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,activity,log,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
-        
+
     # workflow events
     CreateWorkflowEvent.find_in_batches do |group|
       insert_values = []
@@ -116,14 +103,21 @@ class NodeActivity < ActiveRecord::Base
         insert_list << cwe.user_id
         insert_list << cwe.revision_id
         insert_list << cwe.event_id
+        if(REVIEWED_EVENTS.include?(cwe.event_id))
+          insert_list << ActiveRecord::Base.quote_value(REVIEW_ACTIVITY)
+        elsif cwe.event_id == PUBLISHED
+          insert_list << ActiveRecord::Base.quote_value(PUBLISH_ACTIVITY)
+        else
+          insert_list << ActiveRecord::Base.quote_value(OTHER_ACTIVITY)
+        end
         insert_list << ActiveRecord::Base.quote_value(cwe.description)
         insert_list << ActiveRecord::Base.quote_value(cwe.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,log,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,node_revision_id,event,activity,log,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
-    
+
     # comments
     CreateComment.find_in_batches do |group|
       insert_values = []
@@ -132,17 +126,18 @@ class NodeActivity < ActiveRecord::Base
         insert_list << comment.nid
         insert_list << comment.uid
         insert_list << COMMENT
+        insert_list << ActiveRecord::Base.quote_value(COMMENT_ACTIVITY)
         insert_list << ActiveRecord::Base.quote_value(comment.created_at.to_s(:db))
         insert_values << "(#{insert_list.join(',')})"
       end
-      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,event,created_at) VALUES #{insert_values.join(',')};"
+      insert_sql = "INSERT INTO #{self.table_name} (node_id,contributor_id,event,activity,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
-      
+
   end
-  
+
   def is_reviewed_event?
-    REVIEWED_EVENTS.include?(self.event)
+    event_group == REVIEW_EVENT
   end
 
   def self.stats(activity)
@@ -184,7 +179,7 @@ class NodeActivity < ActiveRecord::Base
 
   def self.eligible_year_weeks
     latest_date = Analytic.latest_date
-    with_scope do 
+    with_scope do
       # scoped start date
       earliest_created_at = self.minimum(:created_at)
       if(!earliest_created_at.nil?)
@@ -203,7 +198,7 @@ class NodeActivity < ActiveRecord::Base
     value_data = []
     rolling_data = []
     with_scope do
-      running_total = 0 
+      running_total = 0
       weekcount = 0
       yearweek_stats.keys.sort.each do |yearweek|
         date = self.yearweek_date(yearweek)
@@ -229,5 +224,5 @@ class NodeActivity < ActiveRecord::Base
 
 
 
-  
-end	
+
+end

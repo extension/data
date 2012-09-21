@@ -34,51 +34,51 @@ module NodesHelper
 		end
 	end
 
-	def graph_nav_li(activity_scope)
-		listclass = 'active' if activity_scope == @activity_scope
-		if(activity_scope == 'all_activity')
-			label = 'All Activity'
+	def graph_nav_li(activity)
+		listclass = 'active' if activity == @activity
+		if(activity == NodeActivity::ALL_ACTIVITY)
+			label = 'All'
 		else
-			label = activity_scope.capitalize
+			label = activity.pluralize.capitalize
 		end
 		nav_li = '<li'
 		if(listclass.present?)
 			nav_li += " class=#{listclass}"
 		end
 		nav_li += '>'
-		nav_li += link_to(label,graphs_nodes_path(:node_scope => @node_scope, :activity_scope => activity_scope))
+		nav_li += link_to(label,graphs_nodes_path(:node_scope => @node_scope, :activity => activity))
 		nav_li += '</li>'
 		nav_li.html_safe
 	end
 
-	def overall_c_i_c_stats(node_scope,activity_scope = 'all_activity')
+	def overall_c_i_c_stats(node_scope,activity_scope = NodeActivity::ALL_ACTIVITY)
 		if(@group.nil?)
-      stats_scope = NodeActivity.send(node_scope)
+      stats_scope = Node.send(node_scope)
     else
-      stats_scope = @group.node_activities.send(node_scope)
+      stats_scope = @group.nodes.send(node_scope)
     end
 
-    stats = stats_scope.stats(activity_scope)
+    stats = stats_scope.overall_stats(activity_scope)
     returnstring = <<-END
-    <p><span class='mednumber'>#{stats['contributions']}</span> contributions</p>
-    <p>of <span class='mednumber'>#{stats['items']}</span> items</p>
-    <p>by <span class='mednumber'>#{stats['contributors']}</span> contributors</p>
+    <p><span class='mednumber'>#{stats[:contributions]}</span> contributions</p>
+    <p>of <span class='mednumber'>#{stats[:items]}</span> items</p>
+    <p>by <span class='mednumber'>#{stats[:contributors]}</span> contributors</p>
     END
     returnstring.html_safe
   end
 
-	def last_week_c_i_c_stats(node_scope,activity_scope = 'all_activity')
+	def last_week_c_i_c_stats(node_scope,activity_scope = NodeActivity::ALL_ACTIVITY)
 		if(@group.nil?)
-      stats_scope = NodeActivityDiff.overall.by_n_a(node_scope,activity_scope)
+      stats_scope = Node.send(node_scope)
     else
-      stats_scope = @group.node_activity_diffs.by_n_a(node_scope,activity_scope)
+      stats_scope = @group.nodes.send(node_scope)
     end
 
-    stats = stats_scope.metrics_latest_week
+    stats = stats_scope.latest_activity.overall_stats(activity_scope)
     returnstring = <<-END
-    <p><span class='mednumber'>#{stats['contributions']}</span> contributions</p>
-    <p>of <span class='mednumber'>#{stats['items']}</span> items</p>
-    <p>by <span class='mednumber'>#{stats['contributors']}</span> contributors</p>
+    <p><span class='mednumber'>#{stats[:contributions]}</span> contributions</p>
+    <p>of <span class='mednumber'>#{stats[:items]}</span> items</p>
+    <p>by <span class='mednumber'>#{stats[:contributors]}</span> contributors</p>
     END
     returnstring.html_safe
   end

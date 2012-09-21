@@ -1,5 +1,5 @@
-<%- 
-	if @group.nil? 
+<%-
+	if @group.nil?
       @page_title = "#{node_scope_label(@node_scope)} Activity Graphs "
       @page_title_display = "#{node_scope_label(@node_scope)} Activity Graphs "
     else
@@ -13,18 +13,23 @@
 </header>
 
 <ul class="nav nav-tabs">
-  <%- NodeActivity::ACTIVITY_SCOPES.each do |activity_scope| -%>
-  <%= graph_nav_li(activity_scope) %>
+  <%- NodeActivity::ACTIVITIES.each do |activity| -%>
+  <%= graph_nav_li(activity) %>
   <%- end -%>
 </ul>
 
 <%- ['contributions','items','contributors'].each do |metric| -%>
 <div class="page-header">
-  <h1><%= activity_scope_label(@activity_scope) %> - <%= metric.capitalize %></h1>
+  <h1><%= activity_scope_label(@activity) %> - <%= metric.capitalize %></h1>
 </div>
 <div class="row">
   <div class="span12">
-    <%= render(:partial => 'shared/line_plot', :locals => {:data => @stats_scope.by_metric(metric).stats_to_graph_data, :datalabel => metric })%>     
+    <%- if(@group.nil?)
+          stats_scope = Node.send(@node_scope)
+        else
+          stats_scope = @group.nodes.send(@node_scope)
+        end %>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => stats_scope.stats_by_yearweek(@activity).to_graph_data(metric.to_sym), :datalabel => metric })%>
   </div>
 </div>
 <%- end -%>
