@@ -53,11 +53,22 @@ class YearWeekStats < Hash
         distribution << self[yearweek][hashvalue]
       end
     end
-    max = distribution.max
+    returnmax = distribution.max
     if(nearest)
-      max = max + nearest - (max % nearest)
+      returnmax = returnmax + nearest - (max % nearest)
     end
-    max
+    returnmax
+  end
+
+  def sum_for_hashvalue(hashvalue)
+    distribution = []
+    self.yearweeks.each do |yearweek|
+      if(!self[yearweek][hashvalue].nil?)
+        distribution << self[yearweek][hashvalue]
+      end
+    end
+    returnsum = distribution.sum
+    returnsum
   end
 
   def yearweeks
