@@ -150,17 +150,15 @@ class Node < ActiveRecord::Base
     end
   end
 
+  def stats_by_yearweek(activity,cache_options = {})
+    self.class.where(id: self.id).stats_by_yearweek(activity,cache_options = {})
+  end
 
   def self.stats_by_yearweek(activity,cache_options = {})
     stats = YearWeekStats.new
     cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
     Rails.cache.fetch(cache_key,cache_options) do
       with_scope do
-        eca = self.earliest_created_at
-        if(eca.blank?)
-          return stats
-        end
-
         yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
         contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
         contributions_count =  "COUNT(node_activities.id) as contributions"
@@ -171,16 +169,13 @@ class Node < ActiveRecord::Base
           scope = scope.where('node_activities.activity = ?',activity)
         end
         week_stats_query = scope.select("#{yearweek_condition} as yearweek, #{contributions_count}, #{contributors_count}, #{items_count}")
-        year_weeks = Analytic.year_weeks_from_date(eca.to_date)
 
         weekstats_by_yearweek = {}
         week_stats_query.each do |ws|
           weekstats_by_yearweek[ws.yearweek] = {contributions: ws.contributions, contributors: ws.contributors, items: ws.items}
         end
 
-        year_weeks = Analytic.year_weeks_from_date(eca.to_date)
-
-        year_weeks.each do |year,week|
+        self.eligible_year_weeks.each do |year,week|
           yearweek = self.yearweek(year,week)
           if(weekstats_by_yearweek[yearweek])
             stats[yearweek] = weekstats_by_yearweek[yearweek]
@@ -240,5 +235,18 @@ class Node < ActiveRecord::Base
     @yearweek
   end
 
+  def self.eligible_year_weeks
+    latest_date = Analytic.latest_date
+    with_scope do
+      # scoped start date
+      earliest_created_at = self.minimum(:created_at)
+      if(!earliest_created_at.nil?)
+        start_date = earliest_created_at.to_date
+        self.year_weeks_between_dates(start_date,latest_date)
+      else
+        []
+      end
+    end
+  end
 
 end
