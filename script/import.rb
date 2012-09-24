@@ -80,9 +80,9 @@ class GAImporter < Thor
     def internal_rebuilds
       Rails.cache.clear
       run_and_log(PageStat,'rebuild','page stats rebuild')
-      run_and_log(CollectedPageStat,'rebuild','page stats for collections rebuild')
       run_and_log(LandingStat,'rebuild','landing stats rebuild')
       run_and_log(PageTotal,'rebuild','page totals rebuild')
+      run_and_log(CollectedPageStat,'rebuild','page stats for collections rebuild')
       run_and_log(Node,'rebuild_activity_cache','Node activity cache rebuild')
     end
 
