@@ -85,7 +85,7 @@ class PagesController < ApplicationController
     else
       @panda_comparison_weeks = 3
     end
-    @diffs = TotalDiff.panda_impacts(@panda_comparison_weeks)
+    @diffs = CollectedPageStat.panda_impacts(@panda_comparison_weeks)
   end
 
 

@@ -26,8 +26,13 @@
           <tr>
             <td><%= group.name %></td>
             <%- Page::DATATYPES.each do |datatype| -%>
-            <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change]) %></td>
-            <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change_year]) %></td>
+              <%- if(@diffs[group.id] and @diffs[group.id][datatype]) -%>
+                <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change]) %></td>
+                <td><%= percentage_if_applicable(@diffs[group.id][datatype][:pct_change_year]) %></td>
+            <%- else -%>
+              <td>n/a</td>
+              <td>n/a</td>
+            <%- end -%>
             <%- end -%>
           </tr>
           <%- end -%>
