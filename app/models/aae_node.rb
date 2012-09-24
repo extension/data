@@ -9,7 +9,7 @@ class AaeNode < ActiveRecord::Base
   belongs_to :node
 
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
+    self.connection.execute("truncate table #{self.table_name};")
     insert_values = []
     CreateAaeMap.all.each do |aae_map|
       insert_list = []
@@ -20,5 +20,5 @@ class AaeNode < ActiveRecord::Base
     insert_sql = "INSERT INTO #{self.table_name} (node_id,aae_id) VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
   end
-  
+
 end

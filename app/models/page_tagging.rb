@@ -26,5 +26,5 @@ class PageTagging < ActiveRecord::Base
       self.connection.execute(insert_sql)
     end
   end
-  
+
 end

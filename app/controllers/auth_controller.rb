@@ -8,21 +8,21 @@ class AuthController < ApplicationController
 
   def start
   end
-    
+
   def end
     @currentcontributor = nil
     session[:contributor_id] = nil
     flash[:success] = "You have successfully signed out."
     return redirect_to(root_url)
   end
-  
+
   def success
     authresult = request.env["omniauth.auth"]
-    provider = authresult['provider']    
+    provider = authresult['provider']
     uid = authresult['uid']
 
     contributor = Contributor.find_by_uid(uid,provider)
-    
+
     if(contributor)
       contributor.login
       session[:contributor_id] = contributor.id
@@ -31,15 +31,15 @@ class AuthController < ApplicationController
     else
       flash[:error] = "Unable to find your account, please contact an Engineering staff member to create your account"
     end
-  
+
     return redirect_to(root_url)
 
   end
-  
+
   def failure
     raise request.env
   end
-  
-  
+
+
 
 end

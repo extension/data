@@ -18,11 +18,11 @@ class NodeMetacontribution < ActiveRecord::Base
   scope :forums, joins(:node).where("nodes.node_type = 'forum'")
   scope :publishables, joins(:node).where("nodes.node_type IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
   scope :nonpublishables, joins(:node).where("nodes.node_type NOT IN (#{PUBLISHABLE_NODES.collect{|type| quote_value(type)}.join(', ')})")
-  
+
   # used as a sanitycheck list
   NODE_SCOPES = ['all_nodes','articles','faqs','news','publishables','nonpublishables','forums']
 
-  
+
   def associate_with_contributor
     checkstring = self.author.downcase
     if(contributor = Contributor.where('idstring = ?',checkstring).first)
@@ -34,11 +34,11 @@ class NodeMetacontribution < ActiveRecord::Base
         contributor = contributors.first
         self.update_attribute(:contributor_id, contributor.id)
       end
-    end    
+    end
   end
 
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
+    self.connection.execute("truncate table #{self.table_name};")
     insert_values = []
     CreateContributor.where('entity_type = ?','node').where('deleted = 0').each do |contribution|
       next if contribution.field_contributors_contribution_author.nil?
@@ -53,11 +53,11 @@ class NodeMetacontribution < ActiveRecord::Base
     end
     insert_sql = "INSERT INTO #{self.table_name} (node_id,node_revision_id,role,author,contributed_at,created_at) VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
-    
+
     # associate
     self.associate_all_with_contributors
   end
-  
+
   def self.associate_all_with_contributors
     self.find_each do |nc|
       nc.associate_with_contributor
@@ -68,5 +68,5 @@ class NodeMetacontribution < ActiveRecord::Base
     list = contributions.split(',')
     list.uniq.join(', ')
   end
-  
+
 end

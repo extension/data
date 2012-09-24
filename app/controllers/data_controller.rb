@@ -3,7 +3,7 @@
 # === LICENSE:
 # see LICENSE file
 class DataController < ApplicationController
-  
+
   def groups
     if params[:term]
       like= "%".concat(params[:term].concat("%"))

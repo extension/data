@@ -33,7 +33,7 @@ class Contributor < ActiveRecord::Base
     true
   end
 
-  def fullname 
+  def fullname
     "#{self.first_name} #{self.last_name}"
   end
 
@@ -56,7 +56,7 @@ class Contributor < ActiveRecord::Base
   def contributions_count(node_type)
     counts = {}
     counts[:items] = self.contributed_nodes.send(node_type).count('node_id',:distinct => true)
-    counts[:actions] = self.contributed_nodes.send(node_type).count    
+    counts[:actions] = self.contributed_nodes.send(node_type).count
     counts[:byaction] = self.contributed_nodes.send(node_type).group('event').count
     counts
   end
@@ -64,14 +64,14 @@ class Contributor < ActiveRecord::Base
   def metacontributions_count(node_type)
     counts = {}
     counts[:items] = self.meta_contributed_nodes.send(node_type).count('node_id',:distinct => true)
-    counts[:actions] = self.meta_contributed_nodes.send(node_type).count    
+    counts[:actions] = self.meta_contributed_nodes.send(node_type).count
     counts[:byaction] = self.meta_contributed_nodes.send(node_type).group('role').count
     counts
-  end 
+  end
 
 
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
+    self.connection.execute("truncate table #{self.table_name};")
     insert_values = []
     DarmokAccount.where(:vouched => true).where(:type => 'User').all.each do |da|
       insert_list = []
@@ -92,7 +92,7 @@ class Contributor < ActiveRecord::Base
       insert_list << da.is_admin
       insert_list << (da.primary_account_id || 0)
       insert_list << ActiveRecord::Base.quote_value(da.created_at.to_s(:db))
-      insert_list << ActiveRecord::Base.quote_value(da.updated_at.to_s(:db))      
+      insert_list << ActiveRecord::Base.quote_value(da.updated_at.to_s(:db))
       insert_values << "(#{insert_list.join(',')})"
     end
     insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"

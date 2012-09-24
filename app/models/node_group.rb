@@ -8,10 +8,10 @@
 class NodeGroup < ActiveRecord::Base
   belongs_to :node
 	belongs_to :group
-	
-	
+
+
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
+    self.connection.execute("truncate table #{self.table_name};")
     insert_values = []
     group_mappings = {}
     Group.all.map{|g| group_mappings[g.create_gid] = g.id}
@@ -25,5 +25,5 @@ class NodeGroup < ActiveRecord::Base
     insert_sql = "INSERT INTO #{self.table_name} (node_id,group_id,created_at) VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
   end
-  
+
 end

@@ -10,12 +10,12 @@
         <th>% Change Year</th>
     </tr>
   </thead>
-  
+
   <tbody>
     <%- for page in pagelist -%>
   	<tr>
-      <%- if page.title.blank? 
-          title = '(blank)' 
+      <%- if page.title.blank?
+          title = '(blank)'
         else
           title = page.title.truncate(80, :separator => ' ')
         end -%>

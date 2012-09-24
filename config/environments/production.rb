@@ -3,7 +3,7 @@ Positronic::Application.configure do
 
   # Code is not reloaded between requests
   config.cache_classes = true
-  
+
   # memcached
   config.cache_store = :dalli_store
 
@@ -77,5 +77,5 @@ Positronic::Application.configure do
     domain: "extension.org",
     enable_starttls_auto: false
   }
-  
+
 end

@@ -41,7 +41,7 @@
 
   <div class="span8">
     <h3>Contributions by week</h3>
-    <%= render(:partial => 'shared/line_plot', :locals => {:data => @node.stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributions,{showrolling:false}), :datalabel => @node.id })%>     
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @node.stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributions,{showrolling:false}), :datalabel => @node.id })%>
   </div>
 </div>
 
@@ -49,7 +49,7 @@
   <div class="span12">
 	 <h3>Node Information</h3>
 	<table class="table table-bordered">
- 
+
 	  <tbody>
       <tr>
         <td>Title</td>
@@ -74,11 +74,11 @@
         <td><%= @node.groups.map{|g| g.name}.join(', ').html_safe %></td>
       </tr>
       <tr>
-      <tr> 
+      <tr>
         <td>@ Create</td>
         <td><%= link_to("http://create.extension.org/node/#{@node.id}","http://create.extension.org/node/#{@node.id}")%></td>
       </tr>
-      <tr> 
+      <tr>
         <td>Contributors</td>
         <td>
           <%- @node.contributions_by_contributor.each do |contributor| -%>
@@ -89,7 +89,7 @@
           <%- end -%>
         </td>
       </tr>
-      <tr> 
+      <tr>
         <td>Listed contributors</td>
         <%- if (Node::PUBLISHED_TYPES.include?(@node.node_type)) and (meta_activity_counts[:contributors] > 0 ) -%>
         <td>

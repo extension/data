@@ -7,9 +7,9 @@
 
 class Revision < ActiveRecord::Base
   belongs_to :node
-  
+
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};")    
+    self.connection.execute("truncate table #{self.table_name};")
     CreateRevision.find_in_batches do |group|
       insert_values = []
       group.each do |revision|
@@ -25,5 +25,5 @@ class Revision < ActiveRecord::Base
       self.connection.execute(insert_sql)
     end
   end
-  
+
 end

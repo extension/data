@@ -1,7 +1,7 @@
 <%-
   case Settings.app_location
       when 'production'   then @gaprofile = "UA-155321-48"
-      when 'demo'         then @gaprofile = "UA-155321-0" 
+      when 'demo'         then @gaprofile = "UA-155321-0"
       when 'localdev'     then @gaprofile = "UA-155321-0"
       else                     @gaprofile = "UA-155321-0"
   end

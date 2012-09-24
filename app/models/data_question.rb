@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class DataQuestion
-  
+
   def self.page_totals_for_new_content
     returndata = {}
     nodes = Node.created_and_published_since(EpochDate::CREATE_FINAL_WIKI_MIGRATION)
@@ -25,10 +25,10 @@ class DataQuestion
         else
           returndata[page.id][:aup_week] = 0
         end
-      end        
+      end
     end
     return returndata
   end
-  
+
 
 end

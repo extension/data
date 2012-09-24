@@ -1,7 +1,7 @@
 <%-
   pages = (stats_for_week['pages'] || 0)
   seen = (stats_for_week['seen'] || 0)
-  views = (stats_for_week['per_page'] || 0)  
+  views = (stats_for_week['per_page'] || 0)
   if(pages > 0)
     seen_pct = ((seen/pages)*100).to_f
   else

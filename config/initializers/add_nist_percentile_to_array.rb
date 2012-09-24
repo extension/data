@@ -21,8 +21,8 @@ class Array
       sorted[k-1]
     else
       d = (p_sub_n) - k
-      (sorted[k-1] + d * (sorted[k] - sorted[k-1]))        
+      (sorted[k-1] + d * (sorted[k] - sorted[k-1]))
     end
   end
-  
+
 end

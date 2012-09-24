@@ -11,8 +11,8 @@ class ContributorGroup < ActiveRecord::Base
 
 
   def self.rebuild
-    self.connection.execute("truncate table #{self.table_name};") 
-    insert_values = []   
+    self.connection.execute("truncate table #{self.table_name};")
+    insert_values = []
     DarmokCommunityconnection.joined.each do |community_connection|
       insert_list = []
       insert_list << community_connection.community_id

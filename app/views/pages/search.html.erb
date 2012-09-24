@@ -20,7 +20,7 @@
       <div class="span6">
         <h3>Node ID results</h3>
         <p>Found node #<%= @node.id%>: <%= link_to(@node.title,node_path(@node))%></p>
-      </div>  
+      </div>
     <%- end -%>
   <%- elsif(@pagelist) -%>
   <div class="span12">
@@ -36,5 +36,5 @@
     <p>No results. Please search again</p>
   </div>
   <%- end -%>
-  
+
 </div>

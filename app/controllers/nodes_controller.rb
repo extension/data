@@ -20,7 +20,7 @@ class NodesController < ApplicationController
     if(params[:group])
       @group = Group.find(params[:group])
     end
-    
+
     @node_scope = params[:node_scope]
     if(!Node::NODE_SCOPES.include?(@node_scope))
       @node_scope = 'all_nodes'

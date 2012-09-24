@@ -15,7 +15,7 @@
 <div class="page-header">
   <h1>Create Contributions
   </h1>
-</div> 
+</div>
 
 <div class="row">
   <div class="span6">
@@ -23,8 +23,8 @@
     <%- contributions_count = @contributor.contributions_count('all_nodes') -%>
     <%- if(contributions_count[:items] > 0 ) -%>
     <p>
-    <%= link_to("<i class='icon-th'></i>Details".html_safe,contributions_contributor_path(@contributor),:class => 'btn btn-info') %>      
-    <%= link_to("<i class='icon-file'></i>Download (.csv)".html_safe,contributions_contributor_path(@contributor, :download => 'csv'),:class => 'btn btn-info') %>      
+    <%= link_to("<i class='icon-th'></i>Details".html_safe,contributions_contributor_path(@contributor),:class => 'btn btn-info') %>
+    <%= link_to("<i class='icon-file'></i>Download (.csv)".html_safe,contributions_contributor_path(@contributor, :download => 'csv'),:class => 'btn btn-info') %>
     </p>
      <dl>
       <dt><span class='regnumber'><%= contributions_count[:actions] %></span> actions on <span class='regnumber'><%= contributions_count[:items] %></span> nodes</dt>
@@ -41,8 +41,8 @@
     <%- metacontributions_count = @contributor.metacontributions_count('publishables') -%>
     <%- if(metacontributions_count[:items] > 0 ) -%>
     <p>
-    <%= link_to("<i class='icon-th'></i>Details".html_safe,metacontributions_contributor_path(@contributor),:class => 'btn btn-info') %>      
-    <%= link_to("<i class='icon-file'></i>Download (.csv)".html_safe,metacontributions_contributor_path(@contributor, :download => 'csv'),:class => 'btn btn-info') %>   
+    <%= link_to("<i class='icon-th'></i>Details".html_safe,metacontributions_contributor_path(@contributor),:class => 'btn btn-info') %>
+    <%= link_to("<i class='icon-file'></i>Download (.csv)".html_safe,metacontributions_contributor_path(@contributor, :download => 'csv'),:class => 'btn btn-info') %>
     </p>
      <dl>
       <dt><span class='regnumber'><%= metacontributions_count[:actions] %></span> actions on <span class='regnumber'><%= metacontributions_count[:items] %></span> nodes</dt>

@@ -10,5 +10,5 @@ class DarmokAccount < ActiveRecord::Base
   self.establish_connection :darmok
   self.set_table_name 'accounts'
   self.inheritance_column = "inheritance_type"
-  
+
 end

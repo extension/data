@@ -6,13 +6,13 @@
 <%- if !@hide_navbar%>
 <ul class="nav">
   <li class="divider-vertical"></li>
-  
+
 	<%= form_tag(search_pages_path, { :class => 'navbar-search pull-left' }) do -%>
     <%= text_field_tag :q, params[:q], {:class => 'search-query', :placeholder => 'Find page (title, page id, or node id)', :autocomplete => 'off'} -%>
 	<%- end -%>
   <li class="divider-vertical"></li>
-  
-  
+
+
 	<%= nav_item(pages_path,'Pages') %>
 	<%= nav_item(nodes_path,'Nodes') %>
 	<%= nav_item(groups_path,'Groups') %>
@@ -26,13 +26,13 @@
 	<li class="dropdown">
 		<a href="#" class="dropdown-toggle" data-toggle="dropdown"><%= @currentcontributor.fullname %><b class="caret"></b></a>
 		<ul class="dropdown-menu">
-			<%= nav_item(contributor_path(@currentcontributor),'Your Contributions') %>  
+			<%= nav_item(contributor_path(@currentcontributor),'Your Contributions') %>
 			<li class="divider"></li>
 			<%= nav_item(logout_path,'Sign out') %>
 		</ul>
 	</li>
 	<%- else -%>
-		<%= nav_item('/auth/extension','Sign in with eXtension') %>  
-	<%- end -%>	
+		<%= nav_item('/auth/extension','Sign in with eXtension') %>
+	<%- end -%>
 </ul>
 

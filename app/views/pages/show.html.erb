@@ -11,7 +11,7 @@
   </div>
   <div class="span8">
     <h3>Views over time</h3>
-    <%= render(:partial => 'page_traffic_plot', :locals => {:page => @page})%>     
+    <%= render(:partial => 'page_traffic_plot', :locals => {:page => @page})%>
   </div>
 </div>
 
@@ -24,7 +24,7 @@
   <div class="span12">
 	 <h3>Page Information</h3>
 	<table class="table table-bordered">
- 
+
 	  <tbody>
       <tr>
         <td>Title</td>
@@ -71,7 +71,7 @@
       <tr>
         <td>Source Published At</td>
         <td><%= @page.source_created_at %></td>
-      </tr>      
+      </tr>
       <tr>
         <td>Source Updated At</td>
         <td><%= @page.source_updated_at %></td>
@@ -81,7 +81,7 @@
         <td>Node Data</td>
         <td><%= link_to("Node ##{@page.node.id}",node_path(@page.node))%></td>
       </tr>
-      <tr> 
+      <tr>
         <td>Contributors</td>
         <td>
           <%- @page.node.contributions_by_contributor.each do |contributor| -%>
@@ -93,7 +93,7 @@
         </td>
       </tr>
       <%- meta_activity_counts = @page.node.metacontributions_count -%>
-      <tr> 
+      <tr>
         <td>Listed contributors</td>
         <%- if(meta_activity_counts[:contributors] > 0 ) -%>
         <td>

@@ -7,7 +7,7 @@
 require 'csv'
 
 class ContributorsController < ApplicationController
-  
+
   def show
     @contributor = Contributor.find(params[:id])
   end
@@ -17,7 +17,7 @@ class ContributorsController < ApplicationController
 
     if(!params[:download].nil? and params[:download] == 'csv')
     	@contributions = @contributor.contributions_by_node
-      send_data(contributions_csv(@contributions), 
+      send_data(contributions_csv(@contributions),
                 :type => 'text/csv; charset=iso-8859-1; header=present',
                 :disposition => "attachment; filename=contributions_for_#{@contributor.fullname.gsub(' ','_')}.csv")
     else
@@ -31,7 +31,7 @@ class ContributorsController < ApplicationController
 
     if(!params[:download].nil? and params[:download] == 'csv')
       @metacontributions = @contributor.meta_contributions_by_node
-      send_data(meta_contributions_csv(@metacontributions), 
+      send_data(meta_contributions_csv(@metacontributions),
                 :type => 'text/csv; charset=iso-8859-1; header=present',
                 :disposition => "attachment; filename=listed_contributions_for_#{@contributor.fullname.gsub(' ','_')}.csv")
     else
@@ -45,10 +45,10 @@ class ContributorsController < ApplicationController
   def contributions_csv(contributions)
     CSV.generate do |csv|
       headers = []
-      headers << 'Node Title'      
-      headers << 'Node ID'      
+      headers << 'Node Title'
+      headers << 'Node ID'
       headers << 'Source URL'
-      headers << 'Node Type'      
+      headers << 'Node Type'
       headers << 'Page ID'
       headers << 'Published URL'
       headers << 'Contributions'
@@ -77,10 +77,10 @@ class ContributorsController < ApplicationController
     def meta_contributions_csv(contributions)
     CSV.generate do |csv|
       headers = []
-      headers << 'Node Title'      
-      headers << 'Node ID'      
+      headers << 'Node Title'
+      headers << 'Node ID'
       headers << 'Source URL'
-      headers << 'Node Type'      
+      headers << 'Node Type'
       headers << 'Page ID'
       headers << 'Published URL'
       headers << 'Contributions'
@@ -103,6 +103,6 @@ class ContributorsController < ApplicationController
       end
     end
   end
-  
-  
+
+
 end

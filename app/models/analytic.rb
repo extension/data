@@ -11,13 +11,13 @@ class Analytic < ActiveRecord::Base
   extend YearWeek
   metrics :entrances, :pageviews, :unique_pageviews, :exits, :time_on_page, :visitors, :new_visits
   dimensions :page_path
-    
-  cattr_accessor :analytics_profile  
+
+  cattr_accessor :analytics_profile
   before_create :set_recordsignature
   before_save   :set_url_type
-  
+
   scope :by_year_week, lambda {|year,week| {:conditions => ["year = ? and week= ?",year,week] } }
-  
+
   URL_PAGE = 'page'
   URL_MIGRATED_FAQ = 'faq'
   URL_MIGRATED_EVENT = 'event'
@@ -27,7 +27,7 @@ class Analytic < ActiveRecord::Base
   URL_ASK = 'ask'
   URL_OTHER = 'other'
   URL_LANDING = 'landing'
-  
+
   def set_url_type
     if(analytics_url == '/')
       self.url_type = URL_ROOT
@@ -68,7 +68,7 @@ class Analytic < ActiveRecord::Base
         end
       else
         self.url_type = URL_OTHER
-      end    
+      end
     elsif(analytics_url =~ %r{^/ask/(\w+)})
       self.url_widget_id = $1
       self.url_type = URL_ASK
@@ -85,7 +85,7 @@ class Analytic < ActiveRecord::Base
     paths = checkstring.split('/').reject(&:empty?)
     if(paths.size == 1)
       begin
-        tagname = CGI.unescape(paths[0]).gsub('_',' ')    
+        tagname = CGI.unescape(paths[0]).gsub('_',' ')
         if(tag = Tag.find_by_name(tagname))
           self.tag_id = tag.id
           self.url_type = URL_LANDING
@@ -94,12 +94,12 @@ class Analytic < ActiveRecord::Base
         end
       rescue
         self.url_type = URL_OTHER
-      end    
+      end
     else
       self.url_type = URL_OTHER
     end
   end
-  
+
   def associate_with_page
     case self.url_type
     when URL_PAGE
@@ -113,7 +113,7 @@ class Analytic < ActiveRecord::Base
     else
       # nothing
     end
-    
+
     if(page)
       self.update_attribute(:page_id,page.id)
       return true
@@ -121,15 +121,15 @@ class Analytic < ActiveRecord::Base
       return false
     end
   end
-      
-  
+
+
   def set_recordsignature
     options = {:analytics_url => self.analytics_url, :year => self.year, :week => self.week}
     self.analytics_url_hash = self.class.recordsignature(options)
   end
-  
 
-  
+
+
   def self.recordsignature(options = {})
     keystring = []
     options.keys.map{|k|k.to_s}.sort.each do |key|
@@ -137,15 +137,15 @@ class Analytic < ActiveRecord::Base
     end
     Digest::SHA1.hexdigest(keystring.join(':'))
   end
-  
+
   def self.find_by_recordsignature(options = {})
     self.first(:conditions => {:analytics_url_hash => self.recordsignature(options)})
   end
-  
+
   def self.google_analytics_session
     @session_token ||= Garb::Session.login(Settings.googleapps_analytics,Settings.googleapps_analytics_secret)
   end
-  
+
   def self.request_google_analytics_data(options = {})
     return_results = []
     session = self.google_analytics_session
@@ -153,7 +153,7 @@ class Analytic < ActiveRecord::Base
       # harcoded to only the first profile, the account I'm using only has access to one
       self.analytics_profile = Garb::Management::Profile.all[0]
     end
-    
+
     # first resultset
     ga_options = options.merge({:limit => Settings.googleapps_analytics_limit})
     resultset = self.results(self.analytics_profile, ga_options)
@@ -168,16 +168,16 @@ class Analytic < ActiveRecord::Base
     end
     return_results
   end
-  
+
 
 
   def self.import_analytics_for_year_week(year,week)
     if(year.nil? or week.nil?)
       0
     end
-        
+
     (start_date,end_date) = self.date_pair_for_year_week(year,week)
-            
+
     # get the records
     request_options = {:start_date => start_date, :end_date => end_date}
     results = self.request_google_analytics_data(request_options)
@@ -190,11 +190,11 @@ class Analytic < ActiveRecord::Base
         record_options[:pageviews] = result.pageviews
         record_options[:unique_pageviews] = result.unique_pageviews
         record_options[:exits] = result.exits
-        record_options[:time_on_page] = result.time_on_page  
-        record_options[:visitors] = result.visitors  
-        record_options[:new_visits] = result.new_visits  
+        record_options[:time_on_page] = result.time_on_page
+        record_options[:visitors] = result.visitors
+        record_options[:new_visits] = result.new_visits
         record_options
-        
+
         begin
           self.create(record_options)
           record_count += 1
@@ -208,7 +208,7 @@ class Analytic < ActiveRecord::Base
     end
     record_count
   end
-  
+
   def self.associate_with_pages_for_year_week(year,week)
     pagecount = 0
     self.by_year_week(year,week).each do |analytic|
@@ -216,16 +216,16 @@ class Analytic < ActiveRecord::Base
     end
     pagecount
   end
-  
-  
+
+
   def self.latest_yearweek
     (year,week) = latest_year_week
     yearweek(year,week)
   end
-  
+
   def self.latest_year_week(cache_options = {})
     cachekey = self.get_cache_key(__method__)
-    Rails.cache.fetch(cachekey,cache_options) do 
+    Rails.cache.fetch(cachekey,cache_options) do
       if(yearweek = self._latest_year_week)
         latest_year = yearweek[0]
         latest_week = yearweek[1]
@@ -241,7 +241,7 @@ class Analytic < ActiveRecord::Base
     (blah,last_date) = self.date_pair_for_year_week(year,week)
     last_date
   end
-    
+
   def self._latest_year_week
     year = self.maximum(:year)
     if(year.nil?)
@@ -255,11 +255,11 @@ class Analytic < ActiveRecord::Base
       end
     end
   end
-  
-  
+
+
   def self.earliest_year_week(cache_options = {})
     cachekey = self.get_cache_key(__method__)
-    Rails.cache.fetch(cachekey,cache_options) do 
+    Rails.cache.fetch(cachekey,cache_options) do
       if(yearweek = self._earliest_year_week)
        earliest_year = yearweek[0]
        earliest_week = yearweek[1]
@@ -269,7 +269,7 @@ class Analytic < ActiveRecord::Base
       [earliest_year,earliest_week]
     end
   end
-  
+
   def self._earliest_year_week
     year = self.minimum(:year)
     if(year.nil?)
@@ -283,42 +283,42 @@ class Analytic < ActiveRecord::Base
       end
     end
   end
-    
+
   def self.has_analytics_for_year_week?(year,week)
     count = self.where(:year => year).where(:week => week).count
     (count > 0)
   end
-  
+
   def self.all_year_weeks
     (earliest_year,earliest_week) = self.earliest_year_week
     (latest_year,latest_week) = self.latest_year_week
-          
+
     start_date = self.date_pair_for_year_week(earliest_year,earliest_week)[0]
     end_date = self.date_pair_for_year_week(latest_year,latest_week)[1]
-    self.year_weeks_between_dates(start_date,end_date)  
+    self.year_weeks_between_dates(start_date,end_date)
   end
-  
+
   def self.year_weeks_from_date(start_date)
     (earliest_year,earliest_week) = self.earliest_year_week
     (latest_year,latest_week) = self.latest_year_week
     earliest_date = self.date_pair_for_year_week(earliest_year,earliest_week)[0]
-    from_date = (start_date < earliest_date) ? earliest_date : start_date    
+    from_date = (start_date < earliest_date) ? earliest_date : start_date
     end_date = self.date_pair_for_year_week(latest_year,latest_week)[1]
-    self.year_weeks_between_dates(from_date,end_date)  
+    self.year_weeks_between_dates(from_date,end_date)
   end
-  
+
   def self.year_weeks(start_date,end_date)
     (earliest_year,earliest_week) = self.earliest_year_week
     (latest_year,latest_week) = self.latest_year_week
-      
+
     earliest_date = self.date_pair_for_year_week(earliest_year,earliest_week)[0]
     from_date = (start_date < earliest_date) ? earliest_date : start_date
-        
+
     latest_date = self.date_pair_for_year_week(latest_year,latest_week)[1]
     to_date = (end_date > latest_date) ? latest_date : end_date
 
-    self.year_weeks_between_dates(from_date,to_date)  
+    self.year_weeks_between_dates(from_date,to_date)
   end
-  
-  
+
+
 end

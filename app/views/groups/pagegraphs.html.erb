@@ -1,4 +1,4 @@
-<%- if @group.nil? 
+<%- if @group.nil?
       @page_title = "#{@datatype.pluralize} Graphs "
       @page_title_display = "#{@datatype.pluralize} Graphs "
     else
@@ -12,7 +12,7 @@
   <%= render(:partial => 'date_changing_lead')%>
 </header>
 
-<%= render(:partial => 'graphs', :locals => {:percentiles_data => @percentiles_data, :percentiles_labels => @percentiles_labels, :graph_data => @graph_data})%>     
+<%= render(:partial => 'graphs', :locals => {:percentiles_data => @percentiles_data, :percentiles_labels => @percentiles_labels, :graph_data => @graph_data})%>
 
 
 
