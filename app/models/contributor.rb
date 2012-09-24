@@ -55,17 +55,17 @@ class Contributor < ActiveRecord::Base
 
   def contributions_count(node_type)
     counts = {}
-    counts[:items] = self.node_activities.send(node_type).count('node_id',:distinct => true)
-    counts[:actions] = self.node_activities.send(node_type).count    
-    counts[:byaction] = self.node_activities.send(node_type).group('event').count
+    counts[:items] = self.contributed_nodes.send(node_type).count('node_id',:distinct => true)
+    counts[:actions] = self.contributed_nodes.send(node_type).count    
+    counts[:byaction] = self.contributed_nodes.send(node_type).group('event').count
     counts
   end
 
   def metacontributions_count(node_type)
     counts = {}
-    counts[:items] = self.node_metacontributions.send(node_type).count('node_id',:distinct => true)
-    counts[:actions] = self.node_metacontributions.send(node_type).count    
-    counts[:byaction] = self.node_metacontributions.send(node_type).group('role').count
+    counts[:items] = self.meta_contributed_nodes.send(node_type).count('node_id',:distinct => true)
+    counts[:actions] = self.meta_contributed_nodes.send(node_type).count    
+    counts[:byaction] = self.meta_contributed_nodes.send(node_type).group('role').count
     counts
   end 
 
