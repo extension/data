@@ -155,37 +155,50 @@ class Node < ActiveRecord::Base
   end
 
   def self.stats_by_yearweek(activity,cache_options = {})
-    stats = YearWeekStats.new
-    cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
-    Rails.cache.fetch(cache_key,cache_options) do
-      with_scope do
-        yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
-        contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
-        contributions_count =  "COUNT(node_activities.id) as contributions"
-        items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
-
-        scope = self.joins(:node_activities).group(yearweek_condition)
-        if(activity != NodeActivity::ALL_ACTIVITY)
-          scope = scope.where('node_activities.activity = ?',activity)
-        end
-        week_stats_query = scope.select("#{yearweek_condition} as yearweek, #{contributions_count}, #{contributors_count}, #{items_count}")
-
-        weekstats_by_yearweek = {}
-        week_stats_query.each do |ws|
-          weekstats_by_yearweek[ws.yearweek] = {contributions: ws.contributions, contributors: ws.contributors, items: ws.items}
-        end
-
-        self.eligible_year_weeks.each do |year,week|
-          yearweek = self.yearweek(year,week)
-          if(weekstats_by_yearweek[yearweek])
-            stats[yearweek] = weekstats_by_yearweek[yearweek]
-          else
-            stats[yearweek] = {contributions: 0, contributors: 0, items: 0}
-          end
+    if(!cache_options[:nocache])
+      cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
+      Rails.cache.fetch(cache_key,cache_options) do
+        with_scope do
+          _stats_by_yearweek(activity,cache_options)
         end
       end
-      stats
+    else
+      with_scope do
+        _stats_by_yearweek(activity,cache_options)
+      end
     end
+  end
+
+  def self._stats_by_yearweek(activity,cache_options = {})
+    stats = YearWeekStats.new
+    cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
+    with_scope do
+      yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
+      contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+      contributions_count =  "COUNT(node_activities.id) as contributions"
+      items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
+
+      scope = self.joins(:node_activities).group(yearweek_condition)
+      if(activity != NodeActivity::ALL_ACTIVITY)
+        scope = scope.where('node_activities.activity = ?',activity)
+      end
+      week_stats_query = scope.select("#{yearweek_condition} as yearweek, #{contributions_count}, #{contributors_count}, #{items_count}")
+
+      weekstats_by_yearweek = {}
+      week_stats_query.each do |ws|
+        weekstats_by_yearweek[ws.yearweek] = {contributions: ws.contributions, contributors: ws.contributors, items: ws.items}
+      end
+
+      self.eligible_year_weeks.each do |year,week|
+        yearweek = self.yearweek(year,week)
+        if(weekstats_by_yearweek[yearweek])
+          stats[yearweek] = weekstats_by_yearweek[yearweek]
+        else
+          stats[yearweek] = {contributions: 0, contributors: 0, items: 0}
+        end
+      end
+    end
+    stats
   end
 
   def self.published_workflow_stats_since_migration

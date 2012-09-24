@@ -180,115 +180,139 @@ class Page < ActiveRecord::Base
     stats[yearweek].merge({'average' => average, 'weeks' => weeks.round})
   end
 
-
   def self.stats_by_yearweek(metric,cache_options = {})
-    stats = YearWeekStats.new
-    cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope.to_sql})
-    Rails.cache.fetch(cache_key,cache_options) do
-      with_scope do
-        eca = self.earliest_created_at
-        if(eca.blank?)
-          return stats
-        end
-
-        metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
-        metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
-        year_weeks = Analytic.year_weeks_from_date(eca.to_date)
-        pagetotals = self.page_totals_by_yearweek
-
-        year_weeks.each do |year,week|
-          yearweek = self.yearweek(year,week)
-          stats[yearweek] = {}
-          pages = pagetotals[yearweek] || 0
-          total = metric_by_yearweek[yearweek] || 0
-          seen = metric_counts_by_yearweek[yearweek] || 0
-
-          stats[yearweek]['pages'] = pages
-          stats[yearweek]['seen'] = seen
-          stats[yearweek]['total'] = total
-
-          per_page = ((pages > 0) ? total / pages : 0)
-          stats[yearweek]['per_page'] = per_page
-
-          previous_year_key = self.yearweek(year-1,week)
-          (previous_year,previous_week) = self.previous_year_week(year,week)
-          previous_week_key = self.yearweek(previous_year,previous_week)
-
-          previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
-          stats[yearweek]['previous_week_total'] = previous_week_total
-          previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
-          stats[yearweek]['previous_year_total'] = previous_year_total
-
-          previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
-          stats[yearweek]['previous_week'] = previous_week
-          previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? previous_year_total / pagetotals[previous_year_key] : 0)
-          stats[yearweek]['previous_year'] = previous_year
-
-
-          # pct_change
-          if(previous_week == 0)
-            stats[yearweek]['pct_change_week'] = nil
-          else
-            stats[yearweek]['pct_change_week'] = (per_page - previous_week) / previous_week
-          end
-
-          if(previous_year == 0)
-            stats[yearweek]['pct_change_year'] = nil
-          else
-            stats[yearweek]['pct_change_year'] = (per_page - previous_year) / previous_year
-          end
+    if(!cache_options[:nocache])
+      cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : ''})
+      Rails.cache.fetch(cache_key,cache_options) do
+        with_scope do
+          _stats_by_yearweek(metric,cache_options)
         end
       end
-      stats
+    else
+      with_scope do
+        _stats_by_yearweek(metric,cache_options)
+      end
     end
   end
 
+  def self._stats_by_yearweek(metric,cache_options = {})
+    stats = YearWeekStats.new
+    with_scope do
+      eca = self.earliest_created_at
+      if(eca.blank?)
+        return stats
+      end
+
+      metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
+      metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
+      year_weeks = Analytic.year_weeks_from_date(eca.to_date)
+      pagetotals = self.page_totals_by_yearweek
+
+      year_weeks.each do |year,week|
+        yearweek = self.yearweek(year,week)
+        stats[yearweek] = {}
+        pages = pagetotals[yearweek] || 0
+        total = metric_by_yearweek[yearweek] || 0
+        seen = metric_counts_by_yearweek[yearweek] || 0
+
+        stats[yearweek]['pages'] = pages
+        stats[yearweek]['seen'] = seen
+        stats[yearweek]['total'] = total
+
+        per_page = ((pages > 0) ? total / pages : 0)
+        stats[yearweek]['per_page'] = per_page
+
+        previous_year_key = self.yearweek(year-1,week)
+        (previous_year,previous_week) = self.previous_year_week(year,week)
+        previous_week_key = self.yearweek(previous_year,previous_week)
+
+        previous_week_total = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
+        stats[yearweek]['previous_week_total'] = previous_week_total
+        previous_year_total = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+        stats[yearweek]['previous_year_total'] = previous_year_total
+
+        previous_week = ((pagetotals[previous_week_key] and pagetotals[previous_week_key] > 0) ? previous_week_total / pagetotals[previous_week_key] : 0)
+        stats[yearweek]['previous_week'] = previous_week
+        previous_year = ((pagetotals[previous_year_key] and  pagetotals[previous_year_key] > 0) ? previous_year_total / pagetotals[previous_year_key] : 0)
+        stats[yearweek]['previous_year'] = previous_year
+
+
+        # pct_change
+        if(previous_week == 0)
+          stats[yearweek]['pct_change_week'] = nil
+        else
+          stats[yearweek]['pct_change_week'] = (per_page - previous_week) / previous_week
+        end
+
+        if(previous_year == 0)
+          stats[yearweek]['pct_change_year'] = nil
+        else
+          stats[yearweek]['pct_change_year'] = (per_page - previous_year) / previous_year
+        end
+      end
+    end
+    stats
+  end
+
   def self.percentiles_by_yearweek(metric,options = {},cache_options = {})
+    if(!cache_options[:nocache])
+      cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : '', options: options.to_yaml})
+      Rails.cache.fetch(cache_key,cache_options) do
+        with_scope do
+          _percentiles_by_yearweek(metric,options,cache_options)
+        end
+      end
+    else
+      with_scope do
+        _percentiles_by_yearweek(metric,options,cache_options)
+      end
+    end
+  end
+
+
+  def self._percentiles_by_yearweek(metric,options = {},cache_options = {})
     percentiles = options[:percentiles] || PERCENTILES
     seenonly = options[:seenonly].nil? ? false : options[:seenonly]
-    cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope.to_sql, percentiles: percentiles, seenonly: seenonly})
-    Rails.cache.fetch(cache_key,cache_options) do
-      returnpercentiles = YearWeekStats.new
-      returnpercentiles[:flags] = {percentiles: true}
-      set_group_concat_size_query = "SET SESSION group_concat_max_len = #{Settings.group_concat_max_len};"
-      self.connection.execute(set_group_concat_size_query)
-      with_scope do
-        eca = self.earliest_created_at
-        if(eca.blank?)
-          return returnpercentiles
+    returnpercentiles = YearWeekStats.new
+    returnpercentiles[:flags] = {percentiles: true}
+    set_group_concat_size_query = "SET SESSION group_concat_max_len = #{Settings.group_concat_max_len};"
+    self.connection.execute(set_group_concat_size_query)
+    with_scope do
+      eca = self.earliest_created_at
+      if(eca.blank?)
+        return returnpercentiles
+      end
+
+      week_stats_query = self.joins(:page_stats).group('page_stats.yearweek').select("page_stats.yearweek as yearweek, GROUP_CONCAT(page_stats.#{metric}) as distribution")
+      year_weeks = Analytic.year_weeks_from_date(eca.to_date)
+      pagetotals = self.page_totals_by_yearweek(cache_options)
+
+      weekstats_by_yearweek = {}
+      week_stats_query.each do |ws|
+        weekstats_by_yearweek[ws.yearweek] = ws.distribution.split(',').map{|i| i.to_f}
+      end
+
+      year_weeks.each do |year,week|
+        yearweek = self.yearweek(year,week)
+        returnpercentiles[yearweek] = {}
+        pagecount = pagetotals[yearweek] || 0
+        distribution = weekstats_by_yearweek[yearweek] || []
+        seen = distribution.length
+        if((pagecount > seen) and !seenonly)
+          emptyset = Array.new((pagecount - seen),0)
+          distribution += emptyset
         end
-
-        week_stats_query = self.joins(:page_stats).group('page_stats.yearweek').select("page_stats.yearweek as yearweek, GROUP_CONCAT(page_stats.#{metric}) as distribution")
-        year_weeks = Analytic.year_weeks_from_date(eca.to_date)
-        pagetotals = self.page_totals_by_yearweek(cache_options)
-
-        weekstats_by_yearweek = {}
-        week_stats_query.each do |ws|
-          weekstats_by_yearweek[ws.yearweek] = ws.distribution.split(',').map{|i| i.to_f}
+        distribution.sort!
+        returnpercentiles[yearweek][:total] = pagecount
+        returnpercentiles[yearweek][:seen] = seen
+        distributionsum = distribution.sum
+        returnpercentiles[yearweek][:mean] = (pagecount > 0 ? distributionsum / pagecount : 0 )
+        percentiles.each do |percentile|
+          returnpercentiles[yearweek][percentile] = distribution.nist_percentile(percentile)
         end
-
-        year_weeks.each do |year,week|
-          yearweek = self.yearweek(year,week)
-          returnpercentiles[yearweek] = {}
-          pagecount = pagetotals[yearweek] || 0
-          distribution = weekstats_by_yearweek[yearweek] || []
-          seen = distribution.length
-          if((pagecount > seen) and !seenonly)
-            emptyset = Array.new((pagecount - seen),0)
-            distribution += emptyset
-          end
-          distribution.sort!
-          returnpercentiles[yearweek][:total] = pagecount
-          returnpercentiles[yearweek][:seen] = seen
-          distributionsum = distribution.sum
-          returnpercentiles[yearweek][:mean] = (pagecount > 0 ? distributionsum / pagecount : 0 )
-          percentiles.each do |percentile|
-            returnpercentiles[yearweek][percentile] = distribution.nist_percentile(percentile)
-          end
-        end # year_week loop
-      end # scoped
-      returnpercentiles
-    end # cache
+      end # year_week loop
+    end # scoped
+    returnpercentiles
   end
 
   def self.filtered_pagelist(params)
