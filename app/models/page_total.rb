@@ -25,7 +25,7 @@ class PageTotal < ActiveRecord::Base
         insert_list << ActiveRecord::Base.quote_value(metric)
         eligible_weeks = page.eligible_weeks(true)
         insert_list << eligible_weeks
-        stats_by_yearweek = page.stats_by_yearweek(metric,{force: true})
+        stats_by_yearweek = page.stats_by_yearweek(metric,{nocache: true})
         if !stats_by_yearweek.blank?
           total = stats_by_yearweek.sum_for_hashvalue('total')
           seen_weeks =  stats_by_yearweek.count_for_hashvalue('seen',1)
