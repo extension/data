@@ -165,7 +165,7 @@ class Page < ActiveRecord::Base
   end
 
   def stats_by_yearweek(metric,cache_options = {})
-    self.class.where(id: self.id).stats_by_yearweek(metric,cache_options = {})
+    self.class.where(id: self.id).stats_by_yearweek(metric,cache_options)
   end
 
   def stats_for_week(metric,cache_options = {})
