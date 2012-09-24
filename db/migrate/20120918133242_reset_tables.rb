@@ -189,6 +189,25 @@ class ResetTables < ActiveRecord::Migration
 
     add_index "page_taggings", ["page_id", "tag_id"], :name => "pt_ndx"
 
+    create_table "page_totals", :force => true do |t|
+      t.integer  "page_id"
+      t.string   "metric", limit: 25, null: false
+      t.float    "total_weeks"
+      t.float    "total"
+      t.float    "seen_weeks"
+      t.float    "mean"
+      t.integer  "yearweek"
+      t.float    "this_week"
+      t.float    "previous_week"
+      t.float    "previous_year"
+      t.float    "pct_change_week"
+      t.float    "pct_change_year"
+      t.datetime "created_at",       :null => false
+    end
+
+    add_index "page_totals", ["page_id","metric"], :name => "page_ndx", :unique => true
+
+
     create_table "pages", :force => true do |t|
       t.integer  "migrated_id"
       t.string   "datatype"

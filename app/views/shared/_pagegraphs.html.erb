@@ -25,6 +25,6 @@
   <div class="span12">
   <h3>Percentiles</h3>
     <p><em>click the legend labels to toggle display of the given item</em></p>
-    <%= render(:partial => 'shared/percentiles_plot', :locals => {:data => percentiles.to_percentile_graph_data, :labels => percentiles.to_percentile_graph_labels})%>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => percentiles.to_percentile_graph_data, :labels => percentiles.to_percentile_graph_labels, datalabel: 'percentiles'})%>
   </div>
 </div>

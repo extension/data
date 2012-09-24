@@ -198,5 +198,4 @@ class NodeActivity < ActiveRecord::Base
 
 
 
-
 end

@@ -2,7 +2,10 @@
   <thead>
     <tr>
         <th>Page</th>
-        <th>Views</th>
+        <th>Weeks Published</th>
+        <th>Total Views</th>
+        <th>Average Views</th>
+        <th>This Week</th>
         <th>% Change Week</th>
         <th>% Change Year</th>
     </tr>
@@ -10,7 +13,6 @@
   
   <tbody>
     <%- for page in pagelist -%>
-    <%- stats_for_week = page.stats_for_week('unique_pageviews') -%>
   	<tr>
       <%- if page.title.blank? 
           title = '(blank)' 
@@ -18,9 +20,12 @@
           title = page.title.truncate(80, :separator => ' ')
         end -%>
       <td><%= link_to(title,page_path(page)) %></td>
-      <td><%= stats_for_week['total'] %></td>
-      <td><%= pct_change(stats_for_week['pct_change_week'])%></td>
-      <td><%= pct_change(stats_for_week['pct_change_year'])%></td>
+      <td><%= page.eligible_weeks %></td>
+      <td><%= page.try(:total) %></td>
+      <td><%= page.try(:mean) %></td>
+      <td><%= page.try(:this_week) %></td>
+      <td><%= pct_change(page.pct_change_week)%></td>
+      <td><%= pct_change(page.pct_change_year)%></td>
     </tr>
   <%- end -%>
   </tbody>

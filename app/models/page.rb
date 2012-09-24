@@ -14,7 +14,7 @@ class Page < ActiveRecord::Base
   has_many :groups, :through => :tags
   belongs_to :node
   has_many :page_stats
-  has_one :page_total
+  has_many :page_totals
   has_many :meta_contributors, :through => :node, :source => :meta_contributors
 
   # index settings
@@ -36,6 +36,12 @@ class Page < ActiveRecord::Base
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
   scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
+
+  scope :with_totals_for_metric, lambda{|metric|
+    pt_columns = PageTotal.column_names.reject{|n| ['id','page_id','metric','created_at'].include?(n)}
+    select_columns = pt_columns.map{|col| "page_totals.#{col} as #{col}"}
+    joins(:page_totals).where('page_totals.metric = ?',metric).select("pages.*, #{select_columns.join(',')}")
+  }
 
   def display_title(options = {})
     truncate_it = options[:truncate].nil? ? true : options[:truncate]
@@ -290,12 +296,11 @@ class Page < ActiveRecord::Base
     with_scope do
       case(params[:filter])
       when 'viewed'
-        joins(:page_stats).where("page_stats.yearweek = ?",yearweek).where('page_stats.unique_pageviews > 0').order("page_stats.unique_pageviews DESC")
+        with_totals_for_metric('unique_pageviews').where('mean >= 1')
       when 'unviewed'
-        subquery = self.joins(:page_stats).where("page_stats.yearweek = ?",yearweek).where('page_stats.unique_pageviews > 0').select('pages.id')
-        self.where("id NOT IN (#{subquery.to_sql})").order('pages.created_at ASC')
+        with_totals_for_metric('unique_pageviews').where('mean < 1')
       else
-        includes(:page_stats).order("page_stats.unique_pageviews DESC")
+        with_totals_for_metric('unique_pageviews')
       end
     end
   end

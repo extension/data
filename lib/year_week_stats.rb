@@ -107,4 +107,18 @@ class YearWeekStats < Hash
     ['Average Views'] + Settings.display_percentiles_labels
   end
 
+  def count_for_hashvalue(hashvalue,minval = nil)
+    distribution = []
+    self.yearweeks.each do |yearweek|
+      if(!self[yearweek][hashvalue].nil?)
+        if(!minval.nil?)
+          distribution << self[yearweek][hashvalue] if self[yearweek][hashvalue] >= minval
+        else
+          distribution << self[yearweek][hashvalue]
+        end
+      end
+    end
+    returncount = distribution.size
+    returncount
+  end
 end

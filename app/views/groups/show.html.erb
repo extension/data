@@ -42,7 +42,7 @@
 
     <%- if datatype_stats[@latest_yearweek]['pages'] and datatype_stats[@latest_yearweek]['pages'] > 0 -%>
       <div class="span8">
-        <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype))%></small></h3>
+        <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype,:group => @group.id))%></small></h3>
         <%= render(:partial => 'shared/line_plot', :locals => {:data => datatype_stats.to_graph_data('per_page'), :datalabel => "views_#{datatype}"})%>
       </div>
     <%- end -%>
