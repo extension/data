@@ -125,4 +125,10 @@ class PagesController < ApplicationController
     end
   end
 
+  def comparison_test
+    @stats = YearWeekStatsComparator.new
+    @stats['News'] = Page.news.stats_by_yearweek('unique_pageviews')
+    @stats['Indexed News'] = Page.news.indexed.stats_by_yearweek('unique_pageviews')
+  end
+
 end

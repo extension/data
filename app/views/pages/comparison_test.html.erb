@@ -1,0 +1,27 @@
+<%- @page_title = "Comparing News To Indexed News "-%>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <%= render(:partial => 'date_changing_lead')%>
+</header>
+
+<div class="row">
+  <div class="span12">
+    <h3><%= @datatype %> growth</h3>
+    <%= render(partial: 'shared/comparison_plot', locals: {:data => @stats.to_graph_data('pages',{showrolling: false}), :datalabel => 'pagegrowth', :labels => @stats.to_graph_labels})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>% Viewed</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @stats.to_graph_data('seen',{relative_to: 'pages', relative_percentage: true, showrolling: false}), :labels => @stats.to_graph_labels, :datalabel => 'seen_pct', :ymax => 100})%>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+  <h3>Views</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @stats.to_graph_data('per_page'), :datalabel => 'views', :labels => @stats.to_graph_labels})%>
+  </div>
+</div>

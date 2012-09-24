@@ -10,6 +10,7 @@ Positronic::Application.routes.draw do
       get :list
       post :setdate
       post :search
+      get :comparison_test
     end
   end
 
