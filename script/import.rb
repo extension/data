@@ -196,14 +196,13 @@ class GAImporter < Thor
   desc "model", "Rebuild a specific model"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
-  method_option :name, :aliases => "-n", :desc => "Model name"
+  method_option :name, :aliases => "-n", :desc => "Model name", required: true
+  method_option :method, :aliases => "-m", default: 'rebuild', :desc => "Model method"
+
   def model
     load_rails(options[:environment])
-    item_rebuild(options[:name])
+    item_rebuild(options[:name],options[:method])
   end
-
-
-
 
 end
 

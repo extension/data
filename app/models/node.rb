@@ -249,5 +249,27 @@ class Node < ActiveRecord::Base
     end
   end
 
+  def self.rebuild_activity_cache(do_groups = true)
+
+    NODE_SCOPES.each do |node_scope|
+      NodeActivity::ACTIVITIES.each do |activity|
+        self.send(node_scope).overall_stats(activity,{force: true})
+        self.send(node_scope).stats_by_yearweek(activity,{force: true})
+      end
+    end
+
+    if(do_groups)
+      Group.launched.each do |group|
+        NODE_SCOPES.each do |node_scope|
+          NodeActivity::ACTIVITIES.each do |activity|
+            self.send(node_scope).overall_stats(activity,{force: true})
+            self.send(node_scope).stats_by_yearweek(activity,{force: true})
+          end
+        end
+      end
+    end
+
+  end
+
 
 end
