@@ -262,8 +262,8 @@ class Node < ActiveRecord::Base
       Group.launched.each do |group|
         NODE_SCOPES.each do |node_scope|
           NodeActivity::ACTIVITIES.each do |activity|
-            self.send(node_scope).overall_stats(activity,{force: true})
-            self.send(node_scope).stats_by_yearweek(activity,{force: true})
+            group.nodes.send(node_scope).overall_stats(activity,{force: true})
+            group.nodes.send(node_scope).stats_by_yearweek(activity,{force: true})
           end
         end
       end
