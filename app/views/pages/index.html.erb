@@ -6,19 +6,20 @@
   <%= render(:partial => 'date_changing_lead')%>
 </header>
 
+  <%- index_stats = LandingStat.overall.stats_by_yearweek('unique_pageviews') -%>
   <div class="page-header">
     <h2>Home Page</h2>
   </div>
   <div class="row">
     <div class="span4">
-      <p><span class='bignumber'><%=number_with_precision(@index_stats[@latest_yearweek]['total'], :precision => 0)%></span> views for week</p>
-      <p><%= pct_change(@index_stats[@latest_yearweek]['pct_change_week'],'mednumber') %> from previous week</p>
-      <p><%= pct_change(@index_stats[@latest_yearweek]['pct_change_year'],'mednumber') %> from previous year</p>
+      <p><span class='bignumber'><%=number_with_precision(index_stats[@latest_yearweek]['total'], :precision => 0)%></span> views for week</p>
+      <p><%= pct_change(index_stats[@latest_yearweek]['pct_change_week'],'mednumber') %> from previous week</p>
+      <p><%= pct_change(index_stats[@latest_yearweek]['pct_change_year'],'mednumber') %> from previous year</p>
     </div>
 
     <div class="span8">
       <h3>Views per week over time</h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => @index_stats.to_graph_data('total'), :datalabel => 'index'})%>
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => index_stats.to_graph_data('total'), :datalabel => 'index'})%>
     </div>
   </div>
 
