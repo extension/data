@@ -3,7 +3,7 @@ require 'rubygems'
 require 'thor'
 require 'benchmark'
 
-class GAImporter < Thor
+class DataImporter < Thor
   include Thor::Actions
 
   def self.year_week_for_date(date)
@@ -27,105 +27,33 @@ class GAImporter < Thor
       require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
     end
 
-    def associate_analytics_for_year_week(year,week)
-      puts "Associating GA data to pages for #{year.to_s}-#{week.to_s}..." if options[:verbose]
-      records = 0
-      benchmark = Benchmark.measure do
-        records = Analytic.associate_with_pages_for_year_week(year,week)
+
+    def run_and_log(rebuilder,model,action)
+      puts "Starting #{model}##{action}..." if options[:verbose]
+      run_time = rebuilder.run_and_log(model,action)
+      puts "\t Finished #{model}##{action} (#{run_time.round(2)}s)" if options[:verbose]
+    end
+
+    def rebuild_group(group)
+      rebuilder = Rebuild.start(group)
+      rebuilder.list_of_rebuilds.each do |(model,action)|
+        run_and_log(rebuilder,model,action)
       end
-      UpdateTime.log("Analytic","associate_with_page_for_year_week",benchmark.real,{:year => year, :week => week, :records => records})
-      puts "\t associated: #{records}" if options[:verbose]
-    end
-
-    def get_analytics_for_year_week(year,week)
-      puts "Getting GA data for #{year.to_s}-#{week.to_s}..." if options[:verbose]
-      records = 0
-      benchmark = Benchmark.measure do
-        records = Analytic.import_analytics_for_year_week(year,week)
-      end
-      UpdateTime.log("Analytic","import_analytics_for_year_week",benchmark.real,{:year => year, :week => week, :records => records})
-      puts "\t saved: #{records}" if options[:verbose]
-    end
-
-    def run_and_log(object,method,output)
-      puts "Starting #{output}..." if options[:verbose]
-
-      benchmark = Benchmark.measure do
-        object.send(method)
-      end
-      UpdateTime.log(object.name,method,benchmark.real)
-
-      puts "\t Finished #{output}" if options[:verbose]
-    end
-
-
-    def darmok_rebuilds
-      run_and_log(Page,'rebuild','darmok page import')
-      run_and_log(Group,'rebuild','darmok group import')
-      run_and_log(Tag,'rebuild','darmok tag import')
-      run_and_log(PageTagging,'rebuild','darmok page tagging import')
-      run_and_log(Contributor,'rebuild','darmok contributor import')
-      run_and_log(ContributorGroup,'rebuild','darmok contributor group import')
-    end
-
-    def create_rebuilds
-      run_and_log(Node,'rebuild','create node import')
-      run_and_log(NodeGroup,'rebuild','create group node import')
-      run_and_log(Revision,'rebuild','create revision import')
-      run_and_log(AaeNode,'rebuild','create aae node import')
-      run_and_log(NodeActivity,'rebuild','create node events import')
-      run_and_log(NodeMetacontribution,'rebuild','create node contributors import')
+      rebuilder.finish
     end
 
     def internal_rebuilds
       Rails.cache.clear
-      run_and_log(PageStat,'rebuild','page stats rebuild')
-      run_and_log(LandingStat,'rebuild','landing stats rebuild')
-      run_and_log(PageTotal,'rebuild','page totals rebuild')
-      run_and_log(CollectedPageStat,'rebuild','page stats for collections rebuild')
     end
 
 
-    def item_rebuild(model,method='rebuild')
-      object = Object.const_get(model)
-      run_and_log(object,method,"#{model} #{method}")
-    end
-
-    def import_analytics
-      # analytics
-      latest_year_week = Analytic._latest_year_week
-      if(latest_year_week.nil?)
-        yearweeks = Analytic.all_year_weeks
-      else
-        next_year_week = Analytic.next_year_week(latest_year_week[0],latest_year_week[1])
-        start_date = Analytic.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
-        end_date = (Date.today - 1)
-        yearweeks = Analytic.year_weeks_between_dates(start_date,end_date)
-      end
-
-      yearweeks.each do |year,week|
-        get_analytics_for_year_week(year,week)
-        associate_analytics_for_year_week(year,week)
-      end
-    end
-
-  end
-
-  desc "analytics_for_year_week", "Import Google Analytics data for a specified date"
-  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
-  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
-  method_option :year,:default => last_year_week[0], :desc => "Year to retrieve"
-  method_option :week,:default => last_year_week[1], :desc => "Week to retrieve"
-  method_option :associate,:default => true, :aliases => "-a", :desc => "Associate analytic with page (run Page.rebuild prior!)"
-  def analytics_for_year_week
-    load_rails(options[:environment])
-    year = options[:year].to_i
-    week = options[:week].to_i
-    get_analytics_for_year_week(year,week)
-    if(options[:associate])
-      associate_analytics_for_year_week(year,week)
+    def rebuild_single(model,method='rebuild')
+      rebuilder = Rebuild.start(group)
+      run_and_log(rebuilder,model,action)
+      rebuilder.finish
     end
   end
+
 
   desc "analytics", "Import Google Analytics data for all year-weeks since last pulled"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
@@ -133,17 +61,7 @@ class GAImporter < Thor
   method_option :associate,:default => true, :aliases => "-a", :desc => "Associate analytic with page (run Page.rebuild prior!)"
   def analytics
     load_rails(options[:environment])
-    import_analytics
-  end
-
-  desc "pages", "Rebuild/reimport pages from Darmok"
-  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
-  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
-  def pages
-    load_rails(options[:environment])
-    puts "Starting darmok page import (no progress will be shown)..." if options[:verbose]
-    Page.rebuild
-    puts "\t Finished darmok page import" if options[:verbose]
+    rebuild_group('analytics')
   end
 
   desc "all_the_things", "Import data items from Darmok, Create, and GA"
@@ -151,10 +69,8 @@ class GAImporter < Thor
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
   def all_the_things
     load_rails(options[:environment])
-    darmok_rebuilds
-    create_rebuilds
-    import_analytics
-    internal_rebuilds
+    Rails.cache.clear
+    rebuild_group('all')
   end
 
   desc "weekly", "Weekly import of data from Darmok, Create, GA, and Internal Stat Rebuilds"
@@ -163,10 +79,8 @@ class GAImporter < Thor
   def weekly
     # currently equivalent to "all_the_things"
     load_rails(options[:environment])
-    darmok_rebuilds
-    create_rebuilds
-    import_analytics
-    internal_rebuilds
+    Rails.cache.clear
+    rebuild_group('all')
   end
 
   desc "darmok", "All Darmok Rebuilds"
@@ -174,7 +88,7 @@ class GAImporter < Thor
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
   def darmok
     load_rails(options[:environment])
-    darmok_rebuilds
+    rebuild_group('darmok')
   end
 
   desc "create", "All Create Rebuilds"
@@ -182,7 +96,7 @@ class GAImporter < Thor
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
   def create
     load_rails(options[:environment])
-    create_rebuilds
+    rebuild_group('create')
   end
 
   desc "internal", "All Internal Rebuilds"
@@ -190,7 +104,8 @@ class GAImporter < Thor
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
   def internal
     load_rails(options[:environment])
-    internal_rebuilds
+    Rails.cache.clear
+    rebuild_group('internal')
   end
 
   desc "model", "Rebuild a specific model"
@@ -198,12 +113,11 @@ class GAImporter < Thor
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
   method_option :name, :aliases => "-n", :desc => "Model name", required: true
   method_option :method, :aliases => "-m", default: 'rebuild', :desc => "Model method"
-
   def model
     load_rails(options[:environment])
-    item_rebuild(options[:name],options[:method])
+    rebuild_single(options[:name],options[:method])
   end
 
 end
 
-GAImporter.start
+DataImporter.start
