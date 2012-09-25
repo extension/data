@@ -41,8 +41,9 @@ class PageTotal < ActiveRecord::Base
               insert_list << stats_by_yearweek[latest_yearweek][value]
             end
           end
-          insert_list << stats_by_yearweek.max_for_hashvalue('total')
-          insert_list << stats_by_yearweek.max_yearweek_for_hashvalue('total')
+          (max_yearweek,max) = stats_by_yearweek.max_yearweek_for_hashvalue('total')
+          insert_list << (max.nil? ? 'NULL' : max)
+          insert_list << (max_yearweek.nil? ? 'NULL' : max_yearweek)
         else
           1.upto 11 do
             insert_list << 'NULL'
