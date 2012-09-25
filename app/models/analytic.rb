@@ -320,5 +320,25 @@ class Analytic < ActiveRecord::Base
     self.year_weeks_between_dates(from_date,to_date)
   end
 
+  def self.import_analytics
+    results = {}
+    latest_year_week = self._latest_year_week
+    if(latest_year_week.nil?)
+      year_weeks = self.all_year_weeks
+    else
+      next_year_week = self.next_year_week(latest_year_week[0],latest_year_week[1])
+      start_date = self.date_pair_for_year_week(next_year_week[0],next_year_week[1])[0]
+      end_date = (Date.today - 1)
+      year_weeks = self.year_weeks_between_dates(start_date,end_date)
+    end
+
+    year_weeks.each do |year,week|
+      yearweek = self.yearweek(year,week) 
+      imported = self.import_analytics_for_year_week(year,week)
+      associated = self.associate_with_pages_for_year_week(year,week)
+      results[yearweek] = {imported: imported, associated: associated}
+    end
+    results
+  end
 
 end
