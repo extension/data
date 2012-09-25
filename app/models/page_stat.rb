@@ -84,7 +84,7 @@ class PageStat < ActiveRecord::Base
     # go back and clear out stats earlier than first page created_at
     delete_statement = "DELETE #{self.table_name}.* FROM #{self.table_name},#{Page.table_name} WHERE #{self.table_name}.page_id = #{Page.table_name}.id and #{self.table_name}.yearweek < YEARWEEK(#{Page.table_name}.created_at,3)"
     self.connection.execute(delete_statement)
-
+    true
   end
 
 

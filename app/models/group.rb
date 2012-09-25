@@ -38,6 +38,7 @@ class Group < ActiveRecord::Base
     end
     insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
+    true
   end
 
   def self.top_or_bottom_by_views(top_or_bottom,options = {})

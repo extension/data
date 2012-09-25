@@ -41,4 +41,5 @@ class Tag < ActiveRecord::Base
       self.connection.execute(update_sql)
     end
   end
+  true
 end

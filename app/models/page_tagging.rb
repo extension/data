@@ -25,6 +25,7 @@ class PageTagging < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} (page_id,tag_id,created_at,updated_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
+    true
   end
 
 end

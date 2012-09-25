@@ -24,6 +24,7 @@ class NodeGroup < ActiveRecord::Base
     end
     insert_sql = "INSERT INTO #{self.table_name} (node_id,group_id,created_at) VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
+    true
   end
 
 end

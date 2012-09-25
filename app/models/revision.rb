@@ -24,6 +24,7 @@ class Revision < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} (id,node_id,contributor_id,log,created_at) VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
+    true
   end
 
 end

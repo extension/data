@@ -119,6 +119,7 @@ class Page < ActiveRecord::Base
       insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"
       self.connection.execute(insert_sql)
     end
+    true
   end
 
   def self.earliest_created_at

@@ -56,6 +56,7 @@ class NodeMetacontribution < ActiveRecord::Base
 
     # associate
     self.associate_all_with_contributors
+    true
   end
 
   def self.associate_all_with_contributors

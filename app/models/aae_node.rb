@@ -19,6 +19,7 @@ class AaeNode < ActiveRecord::Base
     end
     insert_sql = "INSERT INTO #{self.table_name} (node_id,aae_id) VALUES #{insert_values.join(',')};"
     self.connection.execute(insert_sql)
+    true
   end
 
 end
