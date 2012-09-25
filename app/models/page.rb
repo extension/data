@@ -166,8 +166,56 @@ class Page < ActiveRecord::Base
   end
 
   def stats_by_yearweek(metric,cache_options = {})
-    self.class.where(id: self.id).stats_by_yearweek(metric,cache_options)
+    if(!cache_options[:nocache])
+      cache_key = self.class.get_instance_cache_key("#{self.class.name}##{self.id}",__method__,{metric: metric})
+      Rails.cache.fetch(cache_key,cache_options) do
+        _stats_by_yearweek(metric)
+      end
+    else
+      _stats_by_yearweek(metric)
+    end
   end
+
+  def _stats_by_yearweek(metric)
+    stats = YearWeekStats.new
+    metric_by_yearweek = self.page_stats.group('page_stats.yearweek').sum("page_stats.#{metric}")
+    year_weeks = Analytic.year_weeks_from_date(self.created_at.to_date)
+    year_weeks.each do |year,week|
+      yearweek = self.class.yearweek(year,week)
+      stats[yearweek] = {}
+      total = metric_by_yearweek[yearweek] || 0
+      seen = (metric_by_yearweek[yearweek] ? 1 : 0)
+
+      stats[yearweek]['seen'] = seen
+      stats[yearweek]['total'] = total
+
+      previous_year_key = self.class.yearweek(year-1,week)
+      (previous_year,previous_week) = self.class.previous_year_week(year,week)
+      previous_week_key = self.class.yearweek(previous_year,previous_week)
+
+      previous_week = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
+      previous_year = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+      stats[yearweek]['previous_week'] = previous_week
+      stats[yearweek]['previous_year'] = previous_year
+
+
+      # pct_change
+      if(previous_week == 0)
+        stats[yearweek]['pct_change_week'] = nil
+      else
+        stats[yearweek]['pct_change_week'] = (total - previous_week) / previous_week
+      end
+
+      if(previous_year == 0)
+        stats[yearweek]['pct_change_year'] = nil
+      else
+        stats[yearweek]['pct_change_year'] = (total - previous_year) / previous_year
+      end
+    end
+    stats
+  end
+
+
 
   def stats_for_week(metric,cache_options = {})
     stats = stats_by_yearweek(metric,cache_options)
@@ -186,12 +234,12 @@ class Page < ActiveRecord::Base
       cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : ''})
       Rails.cache.fetch(cache_key,cache_options) do
         with_scope do
-          _stats_by_yearweek(metric,cache_options)
+          _stats_by_yearweek(metric)
         end
       end
     else
       with_scope do
-        _stats_by_yearweek(metric,cache_options)
+        _stats_by_yearweek(metric)
       end
     end
   end
@@ -207,7 +255,7 @@ class Page < ActiveRecord::Base
       metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
       metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
       year_weeks = Analytic.year_weeks_from_date(eca.to_date)
-      pagetotals = self.page_totals_by_yearweek
+      pagetotals = self.page_totals_by_yearweek(cache_options)
 
       year_weeks.each do |year,week|
         yearweek = self.yearweek(year,week)
@@ -260,12 +308,12 @@ class Page < ActiveRecord::Base
       cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : '', options: options.to_yaml})
       Rails.cache.fetch(cache_key,cache_options) do
         with_scope do
-          _percentiles_by_yearweek(metric,options,cache_options)
+          _percentiles_by_yearweek(metric,options)
         end
       end
     else
       with_scope do
-        _percentiles_by_yearweek(metric,options,cache_options)
+        _percentiles_by_yearweek(metric,options)
       end
     end
   end
