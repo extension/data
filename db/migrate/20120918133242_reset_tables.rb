@@ -202,6 +202,8 @@ class ResetTables < ActiveRecord::Migration
       t.float    "previous_year"
       t.float    "pct_change_week"
       t.float    "pct_change_year"
+      t.float    "max"
+      t.integer  "max_yearweek"
       t.datetime "created_at",       :null => false
     end
 
@@ -257,6 +259,7 @@ class ResetTables < ActiveRecord::Migration
 
 
     create_table "update_times", :force => true do |t|
+      t.integer  "rebuild_id"
       t.string   "item"
       t.string   "operation"
       t.float    "run_time"
@@ -266,6 +269,21 @@ class ResetTables < ActiveRecord::Migration
 
     add_index "update_times", ["item"], :name => "item_ndx"
 
+    create_table "rebuilds", :force => true do |t|
+      t.string   "group"
+      t.string   "single_model"
+      t.string   "single_action"
+      t.boolean  "in_progress"
+      t.datetime "started"
+      t.datetime "finished"
+      t.float    "run_time"
+      t.string   "current_model"
+      t.string   "current_action"
+      t.datetime  "current_start"
+      t.datetime "created_at"
+      t.datetime "updated_at"
+    end
 
+    add_index "rebuilds", ["created_at"], :name => "created_ndx"
   end
 end

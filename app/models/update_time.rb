@@ -7,10 +7,10 @@
 
 class UpdateTime < ActiveRecord::Base
   serialize :additionaldata
-  attr_accessible :item,:run_time,:additionaldata,:operation
+  attr_accessible :rebuild_id, :item,:run_time,:additionaldata,:operation
 
-  def self.log(item,operation,run_time,additionaldata=nil)
-    self.create(:item => item, :operation => operation, :run_time => run_time, :additionaldata => additionaldata)
+  def self.log(rebuild,item,operation,run_time,additionaldata=nil)
+    self.create(rebuild_id: rebuild.id, item: item, operation: operation, run_time: run_time, additionaldata: additionaldata)
   end
 
 end

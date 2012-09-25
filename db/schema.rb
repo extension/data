@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20120918133242) do
+ActiveRecord::Schema.define(:version => 20120925144023) do
 
   create_table "aae_nodes", :force => true do |t|
     t.integer "node_id"
@@ -240,6 +240,8 @@ ActiveRecord::Schema.define(:version => 20120918133242) do
     t.float    "previous_year"
     t.float    "pct_change_week"
     t.float    "pct_change_year"
+    t.float    "max"
+    t.integer  "max_yearweek"
     t.datetime "created_at",                    :null => false
   end
 
@@ -273,6 +275,23 @@ ActiveRecord::Schema.define(:version => 20120918133242) do
   add_index "pages", ["node_id"], :name => "node_ndx"
   add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
 
+  create_table "rebuilds", :force => true do |t|
+    t.string   "group"
+    t.string   "single_model"
+    t.string   "single_action"
+    t.boolean  "in_progress"
+    t.datetime "started"
+    t.datetime "finished"
+    t.float    "run_time"
+    t.string   "current_model"
+    t.string   "current_action"
+    t.datetime "current_start"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "rebuilds", ["created_at"], :name => "created_ndx"
+
   create_table "revisions", :force => true do |t|
     t.integer  "node_id"
     t.integer  "contributor_id"
@@ -293,6 +312,7 @@ ActiveRecord::Schema.define(:version => 20120918133242) do
   add_index "tags", ["name"], :name => "name_idx", :unique => true
 
   create_table "update_times", :force => true do |t|
+    t.integer  "rebuild_id"
     t.string   "item"
     t.string   "operation"
     t.float    "run_time"

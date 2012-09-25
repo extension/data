@@ -60,6 +60,16 @@ class YearWeekStats < Hash
     returnmax
   end
 
+  def max_yearweek_for_hashvalue(hashvalue,nearest = nil)
+    yearweeks_with_hashvalue = {}
+    self.yearweeks.each do |yearweek|
+      if(!self[yearweek][hashvalue].nil?)
+        yearweeks_with_hashvalue[yearweek] = self[yearweek][hashvalue]
+      end
+    end
+    yearweeks_with_hashvalue.max_by{|k,v| v}
+  end
+
   def sum_for_hashvalue(hashvalue)
     distribution = []
     self.yearweeks.each do |yearweek|
