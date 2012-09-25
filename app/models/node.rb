@@ -125,53 +125,109 @@ class Node < ActiveRecord::Base
     end
   end
 
+  def overall_stats(activity)
+    stats = {}
+    contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+    contributions_count =  "COUNT(node_activities.id) as contributions"
+
+    scope = self.node_activities
+    if(activity != NodeActivity::ALL_ACTIVITY)
+      scope = scope.where('node_activities.activity = ?',activity)
+    end
+    result = scope.select("#{contributions_count}, #{contributors_count}").first
+    stats = {contributions: result.contributions, contributors: result.contributors}
+    stats
+  end
+
   def self.overall_stats(activity,cache_options = {})
-    cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
-    Rails.cache.fetch(cache_key,cache_options) do
-      stats = {}
-      with_scope do
-        eca = self.earliest_created_at
-        if(eca.blank?)
-          return stats
+    if(!cache_options[:nocache])
+      cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
+      Rails.cache.fetch(cache_key,cache_options) do
+        with_scope do
+          _overall_stats(activity)
         end
-
-        contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
-        contributions_count =  "COUNT(node_activities.id) as contributions"
-        items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
-
-        scope = self.joins(:node_activities)
-        if(activity != NodeActivity::ALL_ACTIVITY)
-          scope = scope.where('node_activities.activity = ?',activity)
-        end
-        result = scope.select("#{contributions_count}, #{contributors_count}, #{items_count}").first
-        stats = {contributions: result.contributions, contributors: result.contributors, items: result.items}
       end
-      stats
+    else
+      with_scope do
+        _overall_stats(activity)
+      end
     end
   end
 
-  def stats_by_yearweek(activity,cache_options = {})
-    self.class.where(id: self.id).stats_by_yearweek(activity,cache_options = {})
+  def self._overall_stats(activity)
+    stats = {}
+    with_scope do
+      contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+      contributions_count =  "COUNT(node_activities.id) as contributions"
+      items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
+
+      scope = self.joins(:node_activities)
+      if(activity != NodeActivity::ALL_ACTIVITY)
+        scope = scope.where('node_activities.activity = ?',activity)
+      end
+      result = scope.select("#{contributions_count}, #{contributors_count}, #{items_count}").first
+      stats = {contributions: result.contributions, contributors: result.contributors, items: result.items}
+    end
+    stats
   end
+
+  def stats_by_yearweek(activity,cache_options = {})
+    if(!cache_options[:nocache])
+      cache_key = self.class.get_instance_cache_key("#{self.class.name}##{self.id}",__method__,{activity: activity})
+      Rails.cache.fetch(cache_key,cache_options) do
+        _stats_by_yearweek(activity)
+      end
+    else
+      _stats_by_yearweek(activity)
+    end
+  end
+
+  def _stats_by_yearweek(activity)
+    stats = YearWeekStats.new
+    yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
+    contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
+    contributions_count =  "COUNT(node_activities.id) as contributions"
+
+    scope = self.node_activities.group(yearweek_condition)
+    if(activity != NodeActivity::ALL_ACTIVITY)
+      scope = scope.where('node_activities.activity = ?',activity)
+    end
+    week_stats_query = scope.select("#{yearweek_condition} as yearweek, #{contributions_count}, #{contributors_count}")
+
+    weekstats_by_yearweek = {}
+    week_stats_query.each do |ws|
+      weekstats_by_yearweek[ws.yearweek] = {contributions: ws.contributions, contributors: ws.contributors}
+    end
+
+    eligible_year_weeks.each do |year,week|
+      yearweek = self.class.yearweek(year,week)
+      if(weekstats_by_yearweek[yearweek])
+        stats[yearweek] = weekstats_by_yearweek[yearweek]
+      else
+        stats[yearweek] = {contributions: 0, contributors: 0}
+      end
+    end
+    stats
+  end
+
 
   def self.stats_by_yearweek(activity,cache_options = {})
     if(!cache_options[:nocache])
       cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
       Rails.cache.fetch(cache_key,cache_options) do
         with_scope do
-          _stats_by_yearweek(activity,cache_options)
+          _stats_by_yearweek(activity)
         end
       end
     else
       with_scope do
-        _stats_by_yearweek(activity,cache_options)
+        _stats_by_yearweek(activity)
       end
     end
   end
 
-  def self._stats_by_yearweek(activity,cache_options = {})
+  def self._stats_by_yearweek(activity)
     stats = YearWeekStats.new
-    cache_key = self.get_cache_key(__method__,{activity: activity, scope_sql: current_scope ? current_scope.to_sql : ''})
     with_scope do
       yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
       contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
@@ -246,6 +302,12 @@ class Node < ActiveRecord::Base
       @yearweek = [earliest_date.cwyear,earliest_date.cweek]
     end
     @yearweek
+  end
+
+  def eligible_year_weeks
+    latest_date = Analytic.latest_date
+    start_date = self.created_at.to_date
+    self.class.year_weeks_between_dates(start_date,latest_date)
   end
 
   def self.eligible_year_weeks
