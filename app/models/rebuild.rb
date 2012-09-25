@@ -9,7 +9,7 @@ class Rebuild < ActiveRecord::Base
 
   CREATE_REBUILDS = ['Node','NodeGroup','Revision','AaeNode','NodeActivity','NodeMetacontribution']
   DARMOK_REBUILDS = ['Page','Group','Tag','PageTagging','Contributor','ContributorGroup']
-  INTERNAL_REBUILDS = ['PageStat','LandingStat','PageTotal',{'CollectedPageStat' => 'rebuild'}]
+  INTERNAL_REBUILDS = ['PageStat','LandingStat','PageTotal','CollectedPageStat']
 
 
   def run_and_log(model,action)
