@@ -18,6 +18,9 @@
             },
             yaxis: {
               min: 0,
+              <%- if local_assigns.has_key?(:ymax) -%>
+              max: <%= ymax %>,
+              <%- end -%>
             }
           },
           seriesDefaults: {

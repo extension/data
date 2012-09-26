@@ -6,9 +6,22 @@
 #  see LICENSE file
 
 class PagesController < ApplicationController
-  before_filter :check_for_group
+  before_filter :check_for_group, :check_for_metric
 
   def index
+    if(@group)
+      page_stats_scope = @group.pages
+      landing_stats_scope = @group.landing_stats
+    else
+      page_stats_scope = Page
+      landing_stats_scope = LandingStat.overall
+    end
+
+    @landing_stats = landing_stats_scope.stats_by_yearweek(@metric)
+    @datatype_stats = YearWeekStatsComparator.new
+    Page::DATATYPES.each do |datatype|
+      @datatype_stats[datatype] = page_stats_scope.by_datatype(datatype).stats_by_yearweek(@metric)
+    end
   end
 
   def show
@@ -59,10 +72,7 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    @metric = params[:metric]
-    if(!PageStat.column_names.include?(@metric))
-      @metric = 'unique_pageviews'
-    end
+
 
     # todo: contributor, tags
     if(@group)
@@ -114,6 +124,17 @@ class PagesController < ApplicationController
     if(params[:group_id])
       @group = Group.find(params[:group_id])
     end
+    true
   end
+
+  def check_for_metric
+    @metric = params[:metric]
+    if(!PageStat.column_names.include?(@metric))
+      @metric = 'unique_pageviews'
+    end
+    true
+  end
+
+
 
 end

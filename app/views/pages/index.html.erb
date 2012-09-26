@@ -6,40 +6,57 @@
   <%= render(:partial => 'date_changing_lead')%>
 </header>
 
-  <%- index_stats = LandingStat.overall.stats_by_yearweek('unique_pageviews') -%>
-  <div class="page-header">
-    <h2>Home Page</h2>
-  </div>
-  <div class="row">
-    <div class="span4">
-      <p><span class='bignumber'><%=number_with_precision(index_stats[@latest_yearweek]['total'], :precision => 0)%></span> views for week</p>
-      <p><%= pct_change(index_stats[@latest_yearweek]['pct_change_week'],'mednumber') %> from previous week</p>
-      <p><%= pct_change(index_stats[@latest_yearweek]['pct_change_year'],'mednumber') %> from previous year</p>
-    </div>
+<div class="page-header">
+  <h2>Overall</h2>
+</div>
 
-    <div class="span8">
-      <h3>Views per week over time</h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => index_stats.to_graph_data('total'), :datalabel => 'index'})%>
-    </div>
+<div class="row">
+  <div class="span8">
+    <h3><%= @group.nil? ? 'Home': 'Landing' %> Page Views</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @landing_stats.to_graph_data('total'), :datalabel => 'index'})%>
   </div>
 
-
-<%- Page::DATATYPES.each do |datatype| -%>  <div class="page-header">
-  <%- datatype_stats = Page.by_datatype(datatype).stats_by_yearweek('unique_pageviews') -%>
-
-    <h2><%= datatype.pluralize %></h2>
+  <div class="span4">
+    <h3><%= @group.nil? ? 'Home': 'Landing' %>  Page Stats</h3>
+    <p><span class='bignumber'><%=number_with_precision(@landing_stats[@latest_yearweek]['total'], :precision => 0)%></span> views for week</p>
+    <p><%= pct_change(@landing_stats[@latest_yearweek]['pct_change_week'],'mednumber') %> from previous week</p>
+    <p><%= pct_change(@landing_stats[@latest_yearweek]['pct_change_year'],'mednumber') %> from previous year</p>
   </div>
-  <div class="row">
-    <div class="span4">
-      <%= render(:partial => 'shared/overall_views_information', :locals => {:datatype => datatype, :stats_for_week => datatype_stats[@latest_yearweek]}) %>
-      <p><%= link_to("<i class='icon-th'></i> #{datatype.pluralize} list".html_safe,list_pages_path(:datatype => datatype),:class => 'btn btn-info') %></p>
-    </div>
+</div>
 
-    <div class="span8">
-      <h3>Views per week over time <small><%= link_to('more graphs...',graphs_pages_path(:datatype => datatype))%></small></h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => datatype_stats.to_graph_data('per_page'), :datalabel => "views_#{datatype}"})%>
+<div class="page-header">
+  <h2>Page Types</h2>
+</div>
+<div class="row">
+  <%- Page::DATATYPES.each do |datatype| -%>
+    <div class="span3">
+      <h3><%= datatype.pluralize %> <span><%= link_to("details",
+                     list_pages_path(:datatype => datatype),:class => 'btn btn-small btn-info') %></span></h3>
+      <%= render(:partial => 'shared/overall_views_information',
+                 :locals => {:datatype => datatype, :stats_for_week => @datatype_stats[datatype][@latest_yearweek]}) %>
+
     </div>
+  <%- end -%>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>Views</h3>
+    <%= render(:partial => 'shared/comparison_plot',
+               :locals => {data: @datatype_stats.to_graph_data('per_page'),
+                           labels: @datatype_stats.to_graph_labels,
+                           datalabel: "per_page" }) -%>
   </div>
+</div>
 
-<%- end -%>
+<div class="row">
+  <div class="span12">
+    <h3>% Viewed</h3>
+    <%= render(:partial => 'shared/comparison_plot',
+               :locals => {data: @datatype_stats.to_graph_data('seen',{relative_to: 'pages', relative_percentage: true}),
+                           labels: @datatype_stats.to_graph_labels,
+                           datalabel: "seen_pct",
+                           ymax: 100 }) -%>
+  </div>
+</div>
 
