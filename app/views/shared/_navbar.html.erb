@@ -17,10 +17,9 @@
 	<%= nav_item(nodes_path,'Nodes') %>
 	<%= nav_item(groups_path,'Groups') %>
 </ul>
-<%- end -%>
 
 
-
+<!-- right pulldown -->
 <ul class="nav pull-right">
 	<%- if @currentcontributor -%>
 	<li class="dropdown">
@@ -32,7 +31,8 @@
 		</ul>
 	</li>
 	<%- else -%>
-		<%= nav_item('/auth/extension','Sign in with eXtension') %>
+		<%= nav_item('/auth/extension','Sign in (eXtensionID)') %>
 	<%- end -%>
 </ul>
+<%- end -%>
 
