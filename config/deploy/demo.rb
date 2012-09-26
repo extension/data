@@ -1,4 +1,4 @@
-set :rails_env 'production'
+set :rails_env, 'production'
 set :branch, "development"
 set :deploy_to, '/services/data/'
 server 'demo.data.extension.org', :app, :web, :db, :primary => true
