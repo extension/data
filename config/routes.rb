@@ -8,7 +8,6 @@ Positronic::Application.routes.draw do
       get :panda_impact_summary
       get :list
       post :setdate
-      post :search
       get :comparison_test
       get :graphs
     end
@@ -53,6 +52,9 @@ Positronic::Application.routes.draw do
   match '/logout', to:'auth#end', :as => 'logout'
   match '/auth/:provider/callback', to: 'auth#success'
 
+  # home routes
+  match '/search', to:'home#search', :as => 'search'
+  
   # catch all
   match '/:controller(/:action(/:id))'
 

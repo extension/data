@@ -102,25 +102,6 @@ class PagesController < ApplicationController
     end
   end
 
-
-  def search
-    if(params[:q])
-      if(params[:q].to_i > 0)
-        @id_number = params[:q].to_i
-        @page = Page.find_by_id(@id_number)
-        @node = Node.find_by_id(@id_number)
-        if(@page and !@node)
-          return redirect_to(page_path(@page))
-        elsif(@node and !@page and !@node.page.nil?)
-          return redirect_to(page_path(@node.page))
-        end
-      else
-        like= "%".concat(params[:q].concat("%"))
-        @pagelist = Page.where("title like ?", like)
-      end
-    end
-  end
-
   def comparison_test
     @stats = YearWeekStatsComparator.new
     @stats['News'] = Page.news.stats_by_yearweek('unique_pageviews')
