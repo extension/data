@@ -8,7 +8,7 @@
 class ApplicationController < ActionController::Base
   protect_from_forgery
   include AuthLib
-  before_filter :check_for_rebuild, :signin_optional, :set_latest_yearweek
+  before_filter :check_for_rebuild, :signin_optional, :set_latest_yearweek, :check_for_metric
 
   def set_latest_yearweek
     @latest_yearweek = Analytic.latest_yearweek
@@ -20,6 +20,14 @@ class ApplicationController < ActionController::Base
         # probably should return 307 instead of 302
         return redirect_to(root_path)
       end
+    end
+    true
+  end
+
+  def check_for_metric
+    @metric = params[:metric]
+    if(!PageStat.column_names.include?(@metric))
+      @metric = 'unique_pageviews'
     end
     true
   end

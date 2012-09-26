@@ -1,0 +1,7 @@
+<% @page_title = "Page Information - #{@datatype}" %>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @datatype.pluralize}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>

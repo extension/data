@@ -13,8 +13,15 @@ class GroupsController < ApplicationController
 
 	def show
     @group = Group.find(params[:id])
-    @index_stats = @group.landing_stats.stats_by_yearweek('unique_pageviews')
-    @latest_yearweek = Analytic.latest_yearweek
+  end
+
+  def pages
+    @group = Group.find(params[:id])
+    @landing_stats = @group.landing_stats.stats_by_yearweek(@metric)
+    @datatype_stats = YearWeekStatsComparator.new
+    Page::DATATYPES.each do |datatype|
+      @datatype_stats[datatype] = @group.pages.by_datatype(datatype).stats_by_yearweek(@metric)
+    end
   end
 
 

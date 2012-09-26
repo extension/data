@@ -10,6 +10,7 @@ Positronic::Application.routes.draw do
       post :setdate
       get :comparison_test
       get :graphs
+      get :details
     end
   end
 
@@ -39,12 +40,7 @@ Positronic::Application.routes.draw do
   resources :groups, :only => [:index, :show] do
     member do
       get :pagelist
-    end
-
-    resources :pages, :only => [:index] do
-      collection do
-        get :graphs
-      end
+      get :pages
     end
   end
 
@@ -54,7 +50,7 @@ Positronic::Application.routes.draw do
 
   # home routes
   match '/search', to:'home#search', :as => 'search'
-  
+
   # catch all
   match '/:controller(/:action(/:id))'
 

@@ -1,9 +1,11 @@
-<% @page_title = "Page Information" %>
-<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => 'Pages'}) %>
-
+<% @page_title = "Page Information - Group ##{@group.id}" %>
+<%= render(:partial => 'group_breadcrumbs', :locals => {group: @group, endpoint: 'Pages'}) %>
 <header class="jumbotron subhead" id="overview">
-  <h1><%= @page_title %></h1>
-  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+  <h1>Page Information for <%= @group.name %></h1>
+  <p class="lead">
+    Data for <%= year_week_for_last_week%>
+    (<%= date_range_for_last_week%>)
+  </p>
 </header>
 
 <div class="page-header">
@@ -12,26 +14,22 @@
 
 <div class="row">
   <div class="span8">
-    <h3>Home Page Views</h3>
+    <h3>Landing Page Views</h3>
     <%= render(:partial => 'shared/line_plot', :locals => {:data => @landing_stats.to_graph_data('total'), :datalabel => 'index'})%>
   </div>
 
   <div class="span4">
-    <h3>Home Page Stats</h3>
+    <h3>Landing Page Stats</h3>
     <p><span class='bignumber'><%=number_with_precision(@landing_stats[@latest_yearweek]['total'], :precision => 0)%></span> views for week</p>
     <p><%= pct_change(@landing_stats[@latest_yearweek]['pct_change_week'],'mednumber') %> from previous week</p>
     <p><%= pct_change(@landing_stats[@latest_yearweek]['pct_change_year'],'mednumber') %> from previous year</p>
   </div>
 </div>
 
-<div class="page-header">
-  <h2>Page Types</h2>
-</div>
 <div class="row">
   <%- Page::DATATYPES.each do |datatype| -%>
     <div class="span3">
-      <h3><%= datatype.pluralize %> <span><%= link_to("details",
-                     details_pages_path(datatype: datatype),:class => 'btn btn-small btn-info') %></span></h3>
+      <h3><%= datatype.pluralize %> <span><%= link_to("details",'#',:class => 'btn btn-small btn-info') %></span></h3>
       <%= render(:partial => 'shared/overall_views_information',
                  :locals => {:datatype => datatype, :stats_for_week => @datatype_stats[datatype][@latest_yearweek]}) %>
 
@@ -59,4 +57,3 @@
                            ymax: 100 }) -%>
   </div>
 </div>
-

@@ -1,52 +1,38 @@
-<% @page_title = "Page Information - Group ##{@group.id}" %>
+<% @page_title = "Data for #{@group.name}" %>
 <%= render(:partial => 'group_breadcrumbs', :locals => {:group => @group}) %>
 <header class="jumbotron subhead" id="overview">
-  <h1>Page Information for <%= @group.name %></h1>
+  <h1><%= @group.name %></h1>
   <p class="lead">
     Data for <%= year_week_for_last_week%>
     (<%= date_range_for_last_week%>)
   </p>
 </header>
 
-  <div class="page-header">
-    <h2>Landing Page</h2>
-  </div>
-  <div class="row">
-    <div class="span4">
-      <p><span class='bignumber'><%=number_with_precision(@index_stats[@latest_yearweek]['total'], :precision => 0)%></span> views for week</p>
-      <p><%= pct_change(@index_stats[@latest_yearweek]['pct_change_week'],'mednumber') %> from previous week</p>
-      <p><%= pct_change(@index_stats[@latest_yearweek]['pct_change_year'],'mednumber') %> from previous year</p>
-    </div>
 
-    <div class="span8">
-      <h3>Views per week over time</h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => @index_stats.to_graph_data('total'), :datalabel => 'index'})%>
-    </div>
+
+
+<div class="row">
+
+  <div class="span4">
+    <h2>Pages <span><%= link_to("details",group_pages_path(@group),:class => 'btn btn-small btn-info') %></span></h2>
+    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+    <p><a class="btn" href="#">View details &raquo;</a></p>
   </div>
 
 
-<%- Page::DATATYPES.each do |datatype| -%>  <div class="page-header">
-  <%- datatype_stats = @group.pages.by_datatype(datatype).stats_by_yearweek('unique_pageviews') -%>
-
-    <h2><%= datatype.pluralize %></h2>
-  </div>
-  <div class="row">
-    <div class="span4">
-      <%- if datatype_stats[@latest_yearweek]['pages'] and datatype_stats[@latest_yearweek]['pages'] > 0 -%>
-        <%= render(:partial => 'shared/overall_views_information', :locals => {:datatype => datatype, :stats_for_week => datatype_stats[@latest_yearweek]}) %>
-        <p><%= link_to("<i class='icon-th'></i> #{datatype.pluralize} list".html_safe,pagelist_group_path(:datatype => datatype, :group => @group.id),:class => 'btn btn-info') %></p>
-      <%- else -%>
-        No data.
-      <%- end -%>
-    </div>
-
-    <%- if datatype_stats[@latest_yearweek]['pages'] and datatype_stats[@latest_yearweek]['pages'] > 0 -%>
-      <div class="span8">
-        <h3>Views per week over time <small><%= link_to('more graphs...',graphs_group_pages_path(:datatype => datatype,:group_id => @group.id))%></small></h3>
-        <%= render(:partial => 'shared/line_plot', :locals => {:data => datatype_stats.to_graph_data('per_page'), :datalabel => "views_#{datatype}"})%>
-      </div>
-    <%- end -%>
+  <div class="span4">
+    <h2>Heading</h2>
+    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+    <p><a class="btn" href="#">View details &raquo;</a></p>
   </div>
 
-<%- end -%>
+
+  <div class="span4">
+    <h2>Heading</h2>
+    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
+    <p><a class="btn" href="#">View details &raquo;</a></p>
+  </div>
+
+</div
+
 
