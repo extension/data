@@ -9,7 +9,10 @@ class CollectedPageStat < ActiveRecord::Base
   extend YearWeek
   belongs_to :statable, polymorphic: true
 
-  scope :overall, where(:group_id => 0)
+  scope :overall, where(statable_id: 0).where(statable_type: 'Page')
+  scope :latest_week, lambda{
+    where('yearweek = ?',Analytic.latest_yearweek)
+  }
 
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")

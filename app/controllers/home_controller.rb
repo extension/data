@@ -13,8 +13,15 @@ class HomeController < ApplicationController
     if(@rebuild.in_progress?)
       @hide_navbar = true
       return render :template => 'home/rebuild_in_progress'
+    else
+      @seen = CollectedPageStat.overall.latest_week.where(metric: @metric).pluck(:seen).sum
+      @seen_page_views = CollectedPageStat.overall.latest_week.where(metric: @metric).pluck(:total).sum
+      @home_views = LandingStat.overall.latest_week.first.send(@metric)
+      @group_views = LandingStat.where('group_id > 0').latest_week.sum("#{@metric}") 
+      @groups_viewed = LandingStat.where('group_id > 0').where("#{@metric} > 0").latest_week.count
+      @total_views = (@seen_page_views + @home_views + @group_views).to_i
     end
-  end
+   end
 
   def search
     if(params[:q])

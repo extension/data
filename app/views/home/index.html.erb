@@ -7,22 +7,34 @@
 
   <div class="span4">
     <h2>Pages</h2>
-    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-    <p><%= link_to("View details &raquo;".html_safe,pages_path,:class => 'btn') %></p>
+    <p>Extension faculty and staff have published <span class='mednumber'><%= number_with_delimiter(Page.count)%></span> pages: 
+    <span class='mednumber'><%= number_with_delimiter(Page.articles.count)%></span> articles, 
+    <span class='mednumber'><%= number_with_delimiter(Page.faqs.count)%></span> faqs,
+    <span class='mednumber'><%= number_with_delimiter(Page.events.count)%></span> events, and
+    <span class='mednumber'><%= number_with_delimiter(Page.news.count)%></span> news items from
+    <span class='mednumber'><%= number_with_delimiter(Page.group(:source).count.size)%></span> sources
+    to <a href='http://www.extension.org'>www.extension.org</a>.</p>
+    <p>Last week <span class='mednumber'><%= number_with_delimiter(@seen)%></span> of those pages, the home page, and the landing pages
+      for <span class='mednumber'><%= number_with_delimiter(@groups_viewed)%></span> communities had
+      <span class='mednumber'><%= number_with_delimiter(@total_views)%></span> views.</p>
+    <p><%= link_to("Explore more &raquo;".html_safe,pages_path,:class => 'btn') %></p>
   </div>
 
 
   <div class="span4">
     <h2>Nodes</h2>
-    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-    <p><%= link_to("View details &raquo;".html_safe,nodes_path,:class => 'btn') %></p>
+    <%- stats = Node.overall_stats(NodeActivity::ALL_ACTIVITY) -%>
+    <p><span class='mednumber'><%= number_with_delimiter(stats[:items])%></span> content items</p>
+    <p><span class='mednumber'><%= number_with_delimiter(stats[:contributions])%></span> contributions</p>
+    <p><span class='mednumber'><%= number_with_delimiter(stats[:contributors])%></span> contributors</p>
+    <p><%= link_to("More details &raquo;".html_safe,nodes_path,:class => 'btn') %></p>
   </div>
 
 
   <div class="span4">
     <h2>Groups</h2>
     <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-    <p><%= link_to("View details &raquo;".html_safe,groups_path,:class => 'btn') %></p>
+    <p><%= link_to("More details &raquo;".html_safe,groups_path,:class => 'btn') %></p>
   </div>
 
 </div
