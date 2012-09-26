@@ -378,4 +378,13 @@ class Page < ActiveRecord::Base
     end
   end
 
+  def self.top_pages(options = {})
+    metric = options[:metric] || 'unique_pageviews'
+    limit = options[:limit] || 3
+    order_by = options[:by] || 'mean'
+    with_scope do
+      with_totals_for_metric(metric).order("#{order_by} DESC").limit(limit)
+    end
+  end
+
 end
