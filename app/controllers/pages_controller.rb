@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class PagesController < ApplicationController
+  before_filter :check_for_group
 
   def index
   end
@@ -52,10 +53,6 @@ class PagesController < ApplicationController
   end
 
   def graphs
-    if(params[:group])
-      @group = Group.find(params[:group])
-    end
-
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
       # for now, error later
@@ -128,6 +125,14 @@ class PagesController < ApplicationController
     @stats = YearWeekStatsComparator.new
     @stats['News'] = Page.news.stats_by_yearweek('unique_pageviews')
     @stats['Indexed News'] = Page.news.indexed.stats_by_yearweek('unique_pageviews')
+  end
+
+  protected
+
+  def check_for_group
+    if(params[:group_id])
+      @group = Group.find(params[:group_id])
+    end
   end
 
 end

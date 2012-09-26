@@ -6,18 +6,13 @@ Positronic::Application.routes.draw do
     end
     collection do
       get :panda_impact_summary
-      get :groups
       get :list
       post :setdate
       post :search
       get :comparison_test
+      get :graphs
     end
   end
-
-  # pretty url matchers
-  match '/pages/graphs/:datatype/:group', to: 'pages#graphs', :as => 'graphs_pages', :via => :get
-  match '/pages/graphs/:datatype', to: 'pages#graphs', :as => 'graphs_pages', :via => :get
-  match '/pages/datatype/:datatype', to:'pages#datatype', :as => 'datatype_pages', :via => :get
 
   resources :groups, :only => [:index, :show]
 
@@ -45,6 +40,12 @@ Positronic::Application.routes.draw do
   resources :groups, :only => [:index, :show] do
     member do
       get :pagelist
+    end
+
+    resources :pages, :only => [:index] do
+      collection do
+        get :graphs
+      end
     end
   end
 
