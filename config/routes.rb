@@ -34,6 +34,8 @@ Positronic::Application.routes.draw do
   resources :nodes, :only => [:index, :show] do
     collection do
       get :graphs
+      get :details
+      get :list
     end
   end
 

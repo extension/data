@@ -1,0 +1,46 @@
+<%- if @group -%>
+  <%= render(:partial => 'group_node_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- else -%>
+  <%= render(:partial => 'node_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- end -%>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display.html_safe %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="page-header">
+  <h2>Summary</h2>
+  <%- link_params = params.delete_if{|k,v| ['action'].include?(k)} -%>
+  <%= link_to("Node List &raquo;".html_safe,list_nodes_path(link_params),:class => 'btn') %></p>
+</div>
+
+
+<div class="row">
+<div class="span12">
+  <h3>Contributors</h3>
+  <%= render(:partial => 'shared/comparison_plot',
+             :locals => {data: @activity_stats.to_graph_data(:contributors),
+                         labels: @activity_stats.to_graph_labels,
+                         datalabel: "contributors" }) -%>
+</div>
+</div>
+
+<div class="row">
+<div class="span12">
+  <h3>Contributions</h3>
+  <%= render(:partial => 'shared/comparison_plot',
+             :locals => {data: @activity_stats.to_graph_data(:contributions),
+                         labels: @activity_stats.to_graph_labels,
+                         datalabel: "contributions" }) -%>
+</div>
+</div>
+
+<div class="row">
+<div class="span12">
+  <h3>Items</h3>
+  <%= render(:partial => 'shared/comparison_plot',
+             :locals => {data: @activity_stats.to_graph_data(:items),
+                         labels: @activity_stats.to_graph_labels,
+                         datalabel: "items" }) -%>
+</div>
+</div>

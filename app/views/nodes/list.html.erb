@@ -1,0 +1,45 @@
+<%- if @group -%>
+  <%= render(:partial => 'group_node_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- else -%>
+  <%= render(:partial => 'node_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- end -%>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display.html_safe %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="row">
+  <div class="span12">
+    <%= paginate(@nodelist) %>
+
+    <table class="table table-bordered table-striped sortable">
+      <thead>
+        <tr>
+            <%= sortable_th(column: 'id', title: '#', direction: 'asc') %>
+            <%= sortable_th(column: 'title', title: 'Title', direction: 'asc') %>
+            <%= sortable_th(column: 'published', title: 'Published?', direction: 'desc') %>
+            <%= sortable_th(column: 'created_at', title: 'Created', direction: 'asc') %>
+            <%= sortable_th(column: 'updated_at', title: 'Last Updated', direction: 'desc') %>
+        </tr>
+      </thead>
+
+      <tbody>
+        <%- for node in @nodelist -%>
+        <tr>
+          <td><%= node.id %></td>
+          <%- if node.title.blank?
+              title = '(blank)'
+            else
+              title = node.title.truncate(40, :separator => '...')
+            end -%>
+          <td><%= link_to(title,node_path(node)) %></td>
+          <td><%= node.has_page? ? 'Yes' : 'No' %></td>
+          <td><%= node.created_at.to_s %></td>
+          <td><%= node.updated_at.to_s %></td>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+
+  </div>
+</div>

@@ -7,15 +7,13 @@
       <%= link_to('Nodes',nodes_path) %><span class="divider">/</span>
     <%- end -%>
   </li>
-  <%- if local_assigns.has_key?(:showgroups) -%>
-  <li>
-    <%= link_to('Groups',groups_nodes_path) %><span class="divider">/</span>
-  </li>
+
+  <%- if @node_scope and (!local_assigns.has_key?(:endpoint) or endpoint != display_node_scope) -%>
+  <li><%= link_to(display_node_scope,details_nodes_path(node_scope: @node_scope)) %><span class="divider">/</span></li>
   <%- end -%>
-  <%- if @group -%>
-    <%= breadcrumb_li('group') %><%= link_to(@group.name, group_nodes_path(@group)) %><span class="divider">/</span></li>
-  <%- end -%>
+
   <%- if local_assigns.has_key?(:endpoint) and endpoint != 'Nodes'-%>
   <li class='active'><%= endpoint %></li>
   <%- end -%>
 </ul>
+
