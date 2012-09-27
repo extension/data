@@ -13,6 +13,9 @@ class CollectedPageStat < ActiveRecord::Base
   scope :latest_week, lambda{
     where('yearweek = ?',Analytic.latest_yearweek)
   }
+  scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
+  scope :by_metric, lambda{|metric| where(metric: metric)}
+  scope :with_seen_pct, select("#{self.table_name}.*, (seen/pages) as seen_pct")
 
   def self.rebuild
     self.connection.execute("TRUNCATE TABLE #{self.table_name};")

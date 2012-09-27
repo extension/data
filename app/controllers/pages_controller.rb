@@ -71,6 +71,53 @@ class PagesController < ApplicationController
     end
   end
 
+  def aggregate
+    @datatype = params[:datatype]
+    if(!Page::DATATYPES.include?(@datatype))
+      # for now, error later
+      @datatype = 'Article'
+    end
+
+    # todo: contributor, tags
+    if(@group)
+      scope = @group.collected_page_stats.by_datatype(@datatype).by_metric(@metric)
+    else
+      scope = CollectedPageStat.overall.by_datatype(@datatype).by_metric(@metric)
+    end
+
+    # order_by
+    allowed_columns = CollectedPageStat.column_names  + ['seen_pct']
+    if(params[:order_by] and allowed_columns.include?(params[:order_by]))
+      @order_by = params[:order_by]
+    else
+      @order_by = 'yearweek'
+    end
+
+    # direction
+    if(params[:direction] and %w[asc desc].include?(params[:direction]))
+      @direction = params[:direction]
+    else
+      @direction = 'asc'
+    end
+
+    @statlist = scope.with_seen_pct.order("#{@order_by} #{@direction}").page(params[:page])
+
+    case @metric
+    when 'unique_pageviews'
+      metric_label = 'View'
+    else
+      metric_label = @metric.titleize
+    end
+
+    @page_title_display = @page_title = "#{@datatype} Page #{metric_label} Aggregates By Week"
+    @endpoint = "Page #{metric_label} Aggregates By Week"
+
+    if(@group)
+      @page_title += " - Group ##{@group.id}"
+      @page_title_display += " for #{@group.name}"
+    end
+  end
+
   def panda_impact_summary
     if(!params[:weeks].nil?)
       @panda_comparison_weeks =  params[:weeks].to_i

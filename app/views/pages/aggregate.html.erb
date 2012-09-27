@@ -1,0 +1,46 @@
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display.html_safe %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<div class="row">
+  <div class="span12">
+    <%= paginate(@statlist) %>
+
+    <table class="table table-bordered table-striped sortable">
+      <thead>
+        <tr>
+            <%= sortable_th(column: 'yearweek', title: 'YearWeek', direction: 'asc') %>
+            <%= sortable_th(column: 'yearweek_date', title: 'YearWeek Date', direction: 'asc') %>
+            <%= sortable_th(column: 'pages', title: 'Pages', direction: 'desc') %>
+            <%= sortable_th(column: 'seen', title: 'Seen', direction: 'desc') %>
+            <%= sortable_th(column: 'seen_pct', title: '% Seen', direction: 'desc') %>
+            <%= sortable_th(column: 'total', title: 'Total', direction: 'desc') %>
+            <%= sortable_th(column: 'per_page', title: 'Per Page', direction: 'desc') %>
+            <%- Settings.display_percentiles.each do |pct| -%>
+              <%= sortable_th(column: "pct_#{pct}", title: "#{pct}th", direction: 'desc') %>
+            <%- end -%>
+        </tr>
+      </thead>
+
+      <tbody>
+        <%- for stat in @statlist -%>
+        <tr>
+          <td><%= stat.yearweek %></td>
+          <td><%= stat.yearweek_date %></td>
+          <td><%= stat.pages %></td>
+          <td><%= stat.seen %></td>
+          <td><%= stat.seen_pct.nil? ? 'n/a' : number_to_percentage(stat.seen_pct*100, precision: 1)%></td>
+          <td><%= stat.total %></td>
+          <td><%= stat.per_page %></td>
+            <%- Settings.display_percentiles.each do |pct| -%>
+              <td><%= stat.send("pct_#{pct}") %></td>
+            <%- end -%>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+
+  </div>
+</div>
