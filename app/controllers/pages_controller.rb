@@ -27,8 +27,23 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    @stats = Page.by_datatype(@datatype).stats_by_yearweek(@metric)
-    @percentiles = Page.by_datatype(@datatype).percentiles_by_yearweek(@metric)
+    # todo: contributor, tags
+    if(@group)
+      scope = @group.pages.by_datatype(@datatype)
+    else
+      scope = Page.by_datatype(@datatype)
+    end
+
+    @page_title_display = @page_title = "#{@datatype} Details"
+    @endpoint = @datatype.pluralize
+
+    if(@group)
+      @page_title += " - Group ##{@group.id}"
+      @page_title_display += " for #{@group.name}"
+    end
+
+    @stats = scope.stats_by_yearweek(@metric)
+    @percentiles = scope.percentiles_by_yearweek(@metric)
   end
 
 
