@@ -1,4 +1,4 @@
-<% @page_title = "Page Information - #{@datatype}" %>
+<% @page_title = "#{@datatype} Details" %>
 <%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @datatype.pluralize}) %>
 
 <header class="jumbotron subhead" id="overview">
@@ -8,34 +8,16 @@
 
 <div class="page-header">
   <h2>Summary</h2>
+  <p><%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(datatype: @datatype),:class => 'btn') %>
+  <%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(datatype: @datatype),:class => 'btn') %></p>
 </div>
 
 <div class="row">
-  <div class="span4">
-  <p><%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(datatype: @datatype),:class => 'btn') %></p>
+  <div class="span6">
   </div>
 
-  <div class="span4">
-  <p><%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(datatype: @datatype),:class => 'btn') %></p>
+  <div class="span6">
   </div>
-
-  <div class="span4">
-  <p><%= link_to("Page Statistics By Week &raquo;".html_safe,'#',:class => 'btn') %></p>
-  </div>
-</div>
-
-<div class="row">
-  <div class="span4">
-    <h3>Stats</h3>
-  </div>
-
-  <div class="span8">
-    <h3>Top Pages</h3>
-  </div>
-</div>
-
-<div class="page-header">
-  <h2>Graphs</h2>
 </div>
 
 <div class="row">
