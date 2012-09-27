@@ -6,7 +6,7 @@ Positronic::Application.routes.draw do
     end
     collection do
       get :panda_impact_summary
-      get :list
+      get :totals
       post :setdate
       get :comparison_test
       get :graphs

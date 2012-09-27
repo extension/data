@@ -50,4 +50,20 @@ module ApplicationHelper
     end
   end
 
+  # make sure @direction and @order_by are set
+  # before using this helper
+  def sortable_th(options = {})
+    column = options[:column]
+    title = options[:title] || column.titleize
+    link_direction = options[:direction] || 'desc'
+    if(column == @order_by)
+      # current direction
+      css_class = "current #{@direction}"
+      # flip link direction to opposite of current
+      link_direction = (@direction == 'asc') ? 'desc' : 'asc'
+    end
+    "<th>#{link_to(title, params.merge({order_by: column, direction: link_direction}),class: css_class)}</th>".html_safe
+  end
+
+
 end

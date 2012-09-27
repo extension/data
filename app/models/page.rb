@@ -378,6 +378,23 @@ class Page < ActiveRecord::Base
     end
   end
 
+  # used for sort direction verification
+  def self.totals_list_columns
+    pt_columns = PageTotal.column_names.reject{|n| ['id','page_id','metric','created_at'].include?(n)}
+    my_columns = self.column_names
+    (pt_columns + my_columns)
+  end
+
+  def self.totals_list(options = {})
+    metric = options[:metric] || 'unique_pageviews'
+    order_by = options[:order_by] || 'mean'
+    direction = options[:direction] || 'desc'
+    with_scope do
+      with_totals_for_metric(metric).order("#{order_by} #{direction}")
+    end
+  end
+
+
   def self.top_pages(options = {})
     metric = options[:metric] || 'unique_pageviews'
     limit = options[:limit] || 3

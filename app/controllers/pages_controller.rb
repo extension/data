@@ -26,45 +26,18 @@ class PagesController < ApplicationController
       # ToDo: error out
       @datatype = 'Article'
     end
+
+    @stats = Page.by_datatype(@datatype).stats_by_yearweek(@metric)
+    @percentiles = Page.by_datatype(@datatype).percentiles_by_yearweek(@metric)
   end
 
 
-  def list
-    @scope = Page
-    @datatype = params[:datatype]
-    if(!Page::DATATYPES.include?(@datatype))
-      @datatype = nil
-    else
-      @scope = @scope.by_datatype(@datatype)
-    end
-    @pagelist = @scope.filtered_pagelist(params).page(params[:page])
-
-    list_type = @datatype.nil? ? 'Pages' : @datatype.pluralize
-    case(params[:filter])
-    when 'viewed'
-      @page_title = "Viewed #{list_type}"
-      @page_title_display = "Viewed #{list_type}"
-      @endpoint = "Viewed #{@datatype.pluralize}"
-    when 'unviewed'
-      @page_title = "Unviewed #{list_type}"
-      @page_title_display = "Unviewed #{list_type}"
-      @endpoint = "Unviewed #{@datatype.pluralize}"
-    else
-      @page_title = "All #{list_type}"
-      @page_title_display = "All #{list_type}"
-      @endpoint = "All #{@datatype.pluralize}"
-    end
-
-  end
-
-  def graphs
+  def totals
     @datatype = params[:datatype]
     if(!Page::DATATYPES.include?(@datatype))
       # for now, error later
       @datatype = 'Article'
     end
-
-
 
     # todo: contributor, tags
     if(@group)
@@ -73,8 +46,29 @@ class PagesController < ApplicationController
       scope = Page.by_datatype(@datatype)
     end
 
-    @stats = scope.stats_by_yearweek(@metric)
-    @percentiles = scope.percentiles_by_yearweek(@metric)
+    # order_by
+    if(params[:order_by] and Page.totals_list_columns.include?(params[:order_by]))
+      @order_by = params[:order_by]
+    else
+      @order_by = 'mean'
+    end
+
+    # direction
+    if(params[:direction] and %w[asc desc].include?(params[:direction]))
+      @direction = params[:direction]
+    else
+      @direction = 'desc'
+    end
+
+    @pagelist = scope.totals_list({order_by: @order_by, direction: @direction}).page(params[:page])
+
+    @page_title_display = @page_title = "#{@datatype} Page Totals"
+    @endpoint = "Page Totals"
+
+    if(@group)
+      @page_title += " - Group ##{@group.id}"
+      @page_title_display += " for #{@group.name}"
+    end
   end
 
   def panda_impact_summary
@@ -118,6 +112,8 @@ class PagesController < ApplicationController
     end
     true
   end
+
+
 
 
 

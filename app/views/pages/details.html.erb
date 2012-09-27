@@ -5,3 +5,68 @@
   <h1><%= @page_title %></h1>
   <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
 </header>
+
+<div class="page-header">
+  <h2>Summary</h2>
+</div>
+
+<div class="row">
+  <div class="span4">
+  <p><%= link_to("Aggregate Statistics By Week &raquo;".html_safe,'#',:class => 'btn') %></p>
+  </div>
+
+  <div class="span4">
+  <p><%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(datatype: @datatype),:class => 'btn') %></p>
+  </div>
+
+  <div class="span4">
+  <p><%= link_to("Page Statistics By Week &raquo;".html_safe,'#',:class => 'btn') %></p>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span4">
+    <h3>Stats</h3>
+  </div>
+
+  <div class="span8">
+    <h3>Top Pages</h3>
+  </div>
+</div>
+
+<div class="page-header">
+  <h2>Graphs</h2>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3><%= @datatype %> growth</h3>
+    <%= render(partial: 'shared/line_plot', locals: {:data => @stats.to_graph_data('pages',{showrolling: false}), :datalabel => 'pagegrowth'})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>% Viewed</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @stats.to_graph_data('seen',{relative_to: 'pages', relative_percentage: true, showrolling: false}), :datalabel => 'seen_pct', :fill => true, :ymax => 100})%>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+  <h3>Views</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @stats.to_graph_data('per_page'), :datalabel => 'views'})%>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+  <h3>Percentiles</h3>
+    <p><em>click the legend labels to toggle display of the given item</em></p>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @percentiles.to_percentile_graph_data, :labels => @percentiles.to_percentile_graph_labels, datalabel: 'percentiles'})%>
+  </div>
+</div>
+
+

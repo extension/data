@@ -1,0 +1,47 @@
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display.html_safe %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<div class="row">
+  <div class="span12">
+	  <%= paginate(@pagelist) %>
+
+    <table class="table table-bordered table-striped sortable">
+      <thead>
+        <tr>
+            <%= sortable_th(column: 'id', title: '#', direction: 'asc') %>
+            <%= sortable_th(column: 'title', title: 'Page', direction: 'asc') %>
+            <%= sortable_th(column: 'total_weeks', title: 'Weeks Published', direction: 'desc') %>
+            <%= sortable_th(column: 'total', title: 'Total Views', direction: 'desc') %>
+            <%= sortable_th(column: 'mean', title: 'Average Views', direction: 'desc') %>
+            <%= sortable_th(column: 'this_week', title: 'This Week', direction: 'desc') %>
+            <%= sortable_th(column: 'pct_change_week', title: '% Change Week', direction: 'desc') %>
+            <%= sortable_th(column: 'pct_change_year', title: '% Change Year', direction: 'desc') %>
+        </tr>
+      </thead>
+
+      <tbody>
+        <%- for page in @pagelist -%>
+        <tr>
+          <td><%= page.id %></td>
+          <%- if page.title.blank?
+              title = '(blank)'
+            else
+              title = page.title.truncate(40, :separator => '...')
+            end -%>
+          <td><%= link_to(title,page_path(page)) %></td>
+          <td><%= page.total_weeks %></td>
+          <td><%= page.try(:total) %></td>
+          <td><%= page.try(:mean) %></td>
+          <td><%= page.try(:this_week) %></td>
+          <td><%= pct_change(page.pct_change_week)%></td>
+          <td><%= pct_change(page.pct_change_year)%></td>
+        </tr>
+      <%- end -%>
+      </tbody>
+    </table>
+
+  </div>
+</div>
