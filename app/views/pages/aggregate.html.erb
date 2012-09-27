@@ -1,7 +1,8 @@
 <%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title_display.html_safe %></h1>
-  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)
+    <span class='pull-right'><%= link_to("<i class='icon-file'></i>Download (.csv)".html_safe,{datatype: @datatype, download: 'csv'},:class => 'btn') %></span></p>
 </header>
 
 <div class="row">

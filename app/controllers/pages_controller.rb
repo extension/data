@@ -60,15 +60,32 @@ class PagesController < ApplicationController
       @direction = 'desc'
     end
 
-    @pagelist = scope.totals_list({order_by: @order_by, direction: @direction}).page(params[:page])
+    case @metric
+    when 'unique_pageviews'
+      metric_label = 'View'
+    else
+      metric_label = @metric.titleize
+    end
 
-    @page_title_display = @page_title = "#{@datatype} Page Totals"
-    @endpoint = "Page Totals"
+    @page_title_display = @page_title = "#{@datatype} Page #{metric_label} Totals"
+    @endpoint = "Page #{metric_label} Totals"
 
     if(@group)
       @page_title += " - Group ##{@group.id}"
       @page_title_display += " for #{@group.name}"
     end
+
+
+    if(!params[:download].nil? and params[:download] == 'csv')
+      @pagelist = @pagelist = scope.totals_list({order_by: @order_by, direction: @direction, metric: @metric})
+      send_data(totals_csv(@pagelist),
+                :type => 'text/csv; charset=iso-8859-1; header=present',
+                :disposition => "attachment; filename=#{@page_title_display.downcase.gsub(' ','_')}.csv")
+    else
+      @pagelist = scope.totals_list({order_by: @order_by, direction: @direction, metric: @metric}).page(params[:page])
+    end
+
+
   end
 
   def aggregate
@@ -100,7 +117,6 @@ class PagesController < ApplicationController
       @direction = 'asc'
     end
 
-    @statlist = scope.with_seen_pct.order("#{@order_by} #{@direction}").page(params[:page])
 
     case @metric
     when 'unique_pageviews'
@@ -116,7 +132,18 @@ class PagesController < ApplicationController
       @page_title += " - Group ##{@group.id}"
       @page_title_display += " for #{@group.name}"
     end
+
+    if(!params[:download].nil? and params[:download] == 'csv')
+      @statlist = scope.with_seen_pct.order("#{@order_by} #{@direction}")
+      send_data(aggregate_csv(@statlist),
+                :type => 'text/csv; charset=iso-8859-1; header=present',
+                :disposition => "attachment; filename=#{@page_title_display.downcase.gsub(' ','_')}.csv")
+    else
+      @statlist = scope.with_seen_pct.order("#{@order_by} #{@direction}").page(params[:page])
+    end
   end
+
+
 
   def panda_impact_summary
     if(!params[:weeks].nil?)
@@ -160,9 +187,50 @@ class PagesController < ApplicationController
     true
   end
 
+  def totals_csv(collection)
+    CSV.generate do |csv|
+      headers = []
+      Page.totals_list_columns.each do |column|
+        headers << column
+      end
+      csv << headers
+      collection.each do |page|
+        row = []
+        Page.totals_list_columns.each do |column|
+          value = page.send(column)
+          if(value.is_a?(Time))
+            row << value.strftime("%Y-%m-%d %H:%M:%S")
+          else
+            row << value
+          end
+        end
+        csv << row
+      end
+    end
+  end
 
-
-
+  def aggregate_csv(collection)
+    column_list = CollectedPageStat.column_names  + ['seen_pct']
+    CSV.generate do |csv|
+      headers = []
+      column_list.each do |column|
+        headers << column
+      end
+      csv << headers
+      collection.each do |page|
+        row = []
+        column_list.each do |column|
+          value = page.send(column)
+          if(value.is_a?(Time))
+            row << value.strftime("%Y-%m-%d %H:%M:%S")
+          else
+            row << value
+          end
+        end
+        csv << row
+      end
+    end
+  end
 
 
 

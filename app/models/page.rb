@@ -382,7 +382,7 @@ class Page < ActiveRecord::Base
   def self.totals_list_columns
     pt_columns = PageTotal.column_names.reject{|n| ['id','page_id','metric','created_at'].include?(n)}
     my_columns = self.column_names
-    (pt_columns + my_columns)
+    (my_columns + pt_columns)
   end
 
   def self.totals_list(options = {})
