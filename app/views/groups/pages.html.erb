@@ -37,23 +37,25 @@
   <%- end -%>
 </div>
 
+<%- ['Article', 'Faq'].each do |datatype| -%>
 <div class="row">
   <div class="span12">
-    <h3>Views</h3>
+    <h3><%= "#{datatype} Views vs. Overall average" %></h3>
     <%= render(:partial => 'shared/comparison_plot',
-               :locals => {data: @datatype_stats.to_graph_data('per_page'),
-                           labels: @datatype_stats.to_graph_labels,
-                           datalabel: "per_page" }) -%>
+               :locals => {data: @comparators[datatype].to_graph_data('per_page'),
+                           labels: @comparators[datatype].to_graph_labels,
+                           datalabel: "per_page_#{datatype}" }) -%>
   </div>
 </div>
 
 <div class="row">
   <div class="span12">
-    <h3>% Viewed</h3>
+    <h3><%= "#{datatype} % Viewed vs. Overall average" %></h3>
     <%= render(:partial => 'shared/comparison_plot',
-               :locals => {data: @datatype_stats.to_graph_data('seen',{relative_to: 'pages', relative_percentage: true}),
-                           labels: @datatype_stats.to_graph_labels,
-                           datalabel: "seen_pct",
+               :locals => {data: @comparators[datatype].to_graph_data('seen',{relative_to: 'pages', relative_percentage: true}),
+                           labels: @comparators[datatype].to_graph_labels,
+                           datalabel: "seen_pct_#{datatype}",
                            ymax: 100 }) -%>
   </div>
 </div>
+<%- end -%>

@@ -19,9 +19,15 @@ class GroupsController < ApplicationController
   def pages
     @group = Group.find(params[:id])
     @landing_stats = @group.landing_stats.stats_by_yearweek(@metric)
-    @datatype_stats = YearWeekStatsComparator.new
+    @datatype_stats = {}
+    @overall_stats = {}
+    @comparators = {}
     Page::DATATYPES.each do |datatype|
       @datatype_stats[datatype] = @group.pages.by_datatype(datatype).stats_by_yearweek(@metric)
+      @overall_stats[datatype] = Page.by_datatype(datatype).stats_by_yearweek(@metric)
+      @comparators[datatype]= YearWeekStatsComparator.new
+      @comparators[datatype]["Overall #{datatype.pluralize}"] = @overall_stats[datatype]
+      @comparators[datatype]["#{datatype.pluralize}"] = @datatype_stats[datatype]
     end
   end
 
