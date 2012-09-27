@@ -108,5 +108,12 @@ module PagesHelper
     end
   end
 
+  def linked_groups_list_for_page(page)
+    returnlist = []
+    page.groups.each do |group|
+      returnlist << link_to(group.name, group_path(group)).html_safe
+    end
+    returnlist
+  end
 
 end

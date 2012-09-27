@@ -41,7 +41,13 @@ class Group < ActiveRecord::Base
     true
   end
 
-  def self.top_or_bottom_by_views(top_or_bottom,options = {})
+  def self.top_or_bottom_by_metric(top_or_bottom,options = {})
+    yearweek = options[:yearweek] || Analytic.latest_yearweek
+    pagecount = options[:pagecount] || 10
+    limit = options[:limit] || 5
+    datatype = options[:datatype] || 'Article'
+    metric = options[:metric] || 'unique_pageviews'
+
     case top_or_bottom
     when 'top'
       sortorder = 'collected_page_stats.per_page DESC'
@@ -50,26 +56,23 @@ class Group < ActiveRecord::Base
     else
       sortorder = 'collected_page_stats.per_page ASC,collected_page_stats.pages DESC'
     end
-    yearweek = options[:yearweek] || Analytic.latest_yearweek
-    pagecount = options[:pagecount] || 10
-    limit = options[:limit] || 5
-    datatype = options[:datatype] || 'Article'
+    
     with_scope do
       joins(:collected_page_stats)
       .where("collected_page_stats.datatype = ?",datatype)
-      .where("collected_page_stats.metric = 'unique_pageviews'")
+      .where("collected_page_stats.metric = ?",metric)
       .where("collected_page_stats.yearweek = ?",yearweek)
       .where("collected_page_stats.pages >= ?",pagecount)
       .order(sortorder).limit(limit)
     end
   end
 
-  def self.top_views(options = {})
-    self.top_or_bottom_by_views('top',options)
+  def self.top_for_metric(options = {})
+    self.top_or_bottom_by_metric('top',options)
   end
 
-  def self.bottom_views(options = {})
-    self.top_or_bottom_by_views('bottom',options)
+  def self.bottom_for_metric(options = {})
+    self.top_or_bottom_by_metric('bottom',options)
   end
 
 

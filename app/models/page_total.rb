@@ -7,6 +7,8 @@
 
 class PageTotal < ActiveRecord::Base
   belongs_to :page
+  has_many :groups, :through => :page
+
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")

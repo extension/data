@@ -1,21 +1,20 @@
 		<div class="hero-unit">
-		  <h1>Coming Soon</h1>
-		  <p>We are still working on collecting data and building out the data.extension.org site.</p>
+		  <h1>Welcome to data.extension.org</h1>
+		  <p>This site is an evolving platform for data aggregated from Google Analytics and from activity in eXtension's websites and services. At its heart, it's meant as a source for the data to begin exploring the connections between the metrics and the activity in our tools. As such, it's always a work in progress.</p>
 		</div>
 
 <div class="row">
 
   <div class="span4">
     <h2>Pages</h2>
-    <p>Extension faculty and staff have published <span class='mednumber'><%= number_with_delimiter(Page.count)%></span> pages: 
-    <span class='mednumber'><%= number_with_delimiter(Page.articles.count)%></span> articles, 
+    <p>Extension faculty and staff have published <span class='mednumber'><%= number_with_delimiter(Page.count)%></span> pages:
+    <span class='mednumber'><%= number_with_delimiter(Page.articles.count)%></span> articles,
     <span class='mednumber'><%= number_with_delimiter(Page.faqs.count)%></span> faqs,
     <span class='mednumber'><%= number_with_delimiter(Page.events.count)%></span> events, and
-    <span class='mednumber'><%= number_with_delimiter(Page.news.count)%></span> news items from
-    <span class='mednumber'><%= number_with_delimiter(Page.group(:source).count.size)%></span> sources
+    <span class='mednumber'><%= number_with_delimiter(Page.news.count)%></span> news items
     to <a href='http://www.extension.org'>www.extension.org</a>.</p>
     <p>Last week <span class='mednumber'><%= number_with_delimiter(@seen)%></span> of those pages, the home page, and the landing pages
-      for <span class='mednumber'><%= number_with_delimiter(@groups_viewed)%></span> communities had
+      for <span class='mednumber'><%= number_with_delimiter(@groups_viewed)%></span> groups had
       <span class='mednumber'><%= number_with_delimiter(@total_views)%></span> views.</p>
     <p><%= link_to("Explore more &raquo;".html_safe,pages_path,:class => 'btn') %></p>
   </div>
@@ -23,18 +22,38 @@
 
   <div class="span4">
     <h2>Nodes</h2>
-    <%- stats = Node.overall_stats(NodeActivity::ALL_ACTIVITY) -%>
-    <p><span class='mednumber'><%= number_with_delimiter(stats[:items])%></span> content items</p>
-    <p><span class='mednumber'><%= number_with_delimiter(stats[:contributions])%></span> contributions</p>
-    <p><span class='mednumber'><%= number_with_delimiter(stats[:contributors])%></span> contributors</p>
-    <p><%= link_to("More details &raquo;".html_safe,nodes_path,:class => 'btn') %></p>
+    <%- overall_stats = Node.overall_stats(NodeActivity::ALL_ACTIVITY) -%>
+    <p><span class='mednumber'><%= number_with_delimiter(overall_stats[:contributors])%></span> extension faculty
+      and staff working in our content creation tools for
+      <span class='tooltipit mednumber', data-title='since <%= Node.earliest_created_at.strftime("%B %-d, %Y") %>'>
+      <%= time_ago_in_words(Node.earliest_created_at) %></span> have
+      made <span class='mednumber'><%= number_with_delimiter(overall_stats[:contributions])%></span> contributions
+      to <span class='mednumber'><%= number_with_delimiter(overall_stats[:items])%></span> content items ("nodes") now included in
+      the <a href="http://create.extension.org">create.extension.org</a> collaboration environment.</p>
+
+    <p>Last week <span class='mednumber'><%= @last_week_node_stats['all'][:contributors] %></span> contributors
+    made <span class='mednumber'><%= @last_week_node_stats['all'][:contributions] %></span> contributions to
+     <span class='mednumber'><%= @last_week_node_stats['all'][:items] %></span> nodes, including
+     <span class='mednumber'><%= @last_week_node_stats['edit'][:contributions] %></span> edits,
+     <span class='mednumber'><%= @last_week_node_stats['comment'][:contributions] %></span> comments, and
+     <span class='mednumber'><%= @last_week_node_stats['review'][:contributions] %></span> workflow reviews.</p>
+    <p><%= link_to("Explore more &raquo;".html_safe,nodes_path,:class => 'btn') %></p>
   </div>
 
 
   <div class="span4">
     <h2>Groups</h2>
-    <p>Donec id elit non mi porta gravida at eget metus. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus. Etiam porta sem malesuada magna mollis euismod. Donec sed odio dui. </p>
-    <p><%= link_to("More details &raquo;".html_safe,groups_path,:class => 'btn') %></p>
+    <p>eXtension has <span class='mednumber'><%= Group.launched.count %></span>
+      launched groups with <span class='mednumber'><%=  @group_members  %></span> members
+      authoring an average of <span class='mednumber'><%=  @group_pages  %></span> published pages per group.</p>
+    <p>Last week, the <%= link_to('most viewed page',page_path(@top_page), class: 'tooltipit', title: @top_page.title) %> belonged to
+      the <%= linked_groups_list_for_page(@top_page).to_sentence.html_safe %> <%= 'group'.pluralize(@top_page.groups.count) %>.</p>
+    <p><%= link_to("Explore more &raquo;".html_safe,groups_path,:class => 'btn') %></p>
   </div>
 
-</div
+</div>
+
+<script class="code" type="text/javascript">
+  $('.tooltipit').tooltip();
+</script>
+

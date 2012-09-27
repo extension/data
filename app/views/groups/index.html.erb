@@ -33,7 +33,7 @@
       <div class="page-header">
         <h3><%= datatype.pluralize%></h3>
       </div>
-      <%- groupslist = Group.launched.top_views(:datatype => datatype) -%>
+      <%- groupslist = Group.launched.top_for_metric(metric: 'unique_pageviews', datatype: datatype) -%>
       <dl>
       <%- groupslist.each do |group| %>
         <%- group_stats = group.pages.by_datatype(datatype).stats_by_yearweek('unique_pageviews') -%>
