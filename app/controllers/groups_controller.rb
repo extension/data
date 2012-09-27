@@ -13,6 +13,7 @@ class GroupsController < ApplicationController
 
 	def show
     @group = Group.find(params[:id])
+    return redirect_to(pages_group_path(@group))
   end
 
   def pages
