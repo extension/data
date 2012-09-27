@@ -13,57 +13,76 @@
   <div class="row">
     <div class="span4">
       <h3>Overall</h3>
-      <%= overall_c_i_c_stats('all_nodes') %>
+      <%= c_i_c_text(@overall_everything_stats) %>
 
       <h3>Last Week</h3>
-      <%= last_week_c_i_c_stats('all_nodes') %>
+      <%= c_i_c_text(@lastweek_everything_stats) %>
 
     </div>
 
     <div class="span8">
       <h3>Contributors per week over time <small><%= link_to('more graphs...',graphs_nodes_path())%></small></h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => Node.stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributors), :datalabel => 'all_contributors' })%>
+      <%= render(:partial => 'shared/line_plot', :locals => {:data => @everything_stats_by_week.to_graph_data(:contributors), :datalabel => 'all_contributors' })%>
     </div>
   </div>
 
-  <%- ['articles','faqs','news'].each do |node_scope| -%>
   <div class="page-header">
-    <h2><%= node_scope.capitalize %></h2>
+    <h2>Publishable Documents</h2>
   </div>
   <div class="row">
+  <%- Node::PUBLISHED_NODE_SCOPES.each do |node_scope| -%>
+
     <div class="span4">
-      <h3>Overall</h3>
-      <%= overall_c_i_c_stats(node_scope) %>
+      <h3><%= node_scope.capitalize %></h3>
+      <hr/>
+      <h4>Overall</h4>
+      <%= c_i_c_text(@overall_publishable_stats[node_scope]) %>
 
-      <h3>Last Week</h3>
-      <%= last_week_c_i_c_stats(node_scope) %>
+      <h4>Last Week</h4>
+      <%= c_i_c_text(@lastweek_publishable_stats[node_scope])  %>
 
     </div>
-
-    <div class="span8">
-      <h3>Contributors per week over time <small><%= link_to('more graphs...',graphs_nodes_path(:node_scope => node_scope))%></small></h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => Node.send(node_scope).stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributors), :datalabel => "#{node_scope}_contributors" })%>
-    </div>
-  </div>
   <%- end -%>
+  </div>
 
-  <% node_scope = 'nonpublishables' %>
+  <div class="row">
+  <div class="span12">
+    <h3>Contributors By Week</h3>
+    <%= render(:partial => 'shared/comparison_plot',
+               :locals => {data: @publishable_stats_by_week.to_graph_data(:contributors),
+                           labels: @publishable_stats_by_week.to_graph_labels.map{|l| l.capitalize},
+                           datalabel: "publishable_contributors" }) -%>
+  </div>
+  </div>
+
   <div class="page-header">
-    <h2>Other</h2>
+    <h2>Administrative Documents</h2>
   </div>
   <div class="row">
-    <div class="span4">
-      <h3>Overall</h3>
-      <%= overall_c_i_c_stats(node_scope) %>
+  <%- Node::ADMINISTRATIVE_NODE_SCOPES.each do |node_scope| -%>
 
-      <h3>Last Week</h3>
-      <%= last_week_c_i_c_stats(node_scope) %>
+    <div class="span3">
+      <h3><%= Node::ADMINISTRATIVE_NODE_SCOPES_LABELS[node_scope] %></h3>
+      <hr/>
+      <h4>Overall</h4>
+      <%= c_i_c_text(@overall_administrative_stats[node_scope]) %>
+
+      <h4>Last Week</h4>
+      <%= c_i_c_text(@lastweek_administrative_stats[node_scope])  %>
 
     </div>
-
-    <div class="span8">
-      <h3>Contributors per week over time <small><%= link_to('more graphs...',graphs_nodes_path(:node_scope => node_scope))%></small></h3>
-      <%= render(:partial => 'shared/line_plot', :locals => {:data => Node.send(node_scope).stats_by_yearweek(NodeActivity::ALL_ACTIVITY).to_graph_data(:contributors), :datalabel => "#{node_scope}_contributors" })%>
-    </div>
+  <%- end -%>
   </div>
+
+  <div class="row">
+  <div class="span12">
+    <h3>Contributors By Week</h3>
+    <%= render(:partial => 'shared/comparison_plot',
+               :locals => {data: @administrative_stats_by_week.to_graph_data(:contributors),
+                           labels: @administrative_stats_by_week.to_graph_labels.map{|l| Node::ADMINISTRATIVE_NODE_SCOPES_LABELS[l]},
+                           datalabel: "administrative_contributors" }) -%>
+  </div>
+  </div>
+
+
 

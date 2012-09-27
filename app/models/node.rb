@@ -30,15 +30,27 @@ class Node < ActiveRecord::Base
   }
 
   # used as a sanitycheck list
-  NODE_SCOPES = ['all_nodes','articles','faqs','news','publishables','nonpublishables','forums']
+  NODE_SCOPES = ['all_nodes','publishables','articles','faqs','news','administrative','forums','group_admin','extension_admin','other']
+  PUBLISHED_NODE_SCOPES = ['articles','faqs','news']
+  ADMINISTRATIVE_NODE_SCOPES = ['forums','group_admin','extension_admin','other']
+  ADMINISTRATIVE_TYPES = ['forum','cop_document','public_article']
+
+  ADMINISTRATIVE_NODE_SCOPES_LABELS = {'forums' => 'Forums',
+                                       'group_admin' => 'Group Admin',
+                                       'extension_admin' => 'eXtension Admin',
+                                       'other' => 'Other'}
 
   scope :all_nodes, where(1) # just a convenience scope for scoping node types and activity types
+  
   scope :articles, where(node_type: 'article')
   scope :faqs,     where(node_type: 'faq')
   scope :news,     where(node_type: 'news')
-  scope :forums,   where(node_type: 'forum')
   scope :publishables, where("node_type IN (#{PUBLISHED_TYPES.collect{|type| quote_value(type)}.join(', ')})")
-  scope :nonpublishables, where("node_type NOT IN (#{PUBLISHED_TYPES.collect{|type| quote_value(type)}.join(', ')})")
+  scope :administrative,  where("node_type NOT IN (#{PUBLISHED_TYPES.collect{|type| quote_value(type)}.join(', ')})")
+  scope :forums,          where(node_type: 'forum')
+  scope :group_admin,     where(node_type: 'cop_document')
+  scope :extension_admin, where(node_type: 'public_article')
+  scope :other,           where("node_type NOT IN (#{(PUBLISHED_TYPES + ADMINISTRATIVE_TYPES).collect{|type| quote_value(type)}.join(', ')})")
 
   scope :has_page, where(:has_page => true)
   scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date).order("#{self.table_name}.created_at")}

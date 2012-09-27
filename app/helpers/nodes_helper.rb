@@ -51,14 +51,7 @@ module NodesHelper
 		nav_li.html_safe
 	end
 
-	def overall_c_i_c_stats(node_scope,activity_scope = NodeActivity::ALL_ACTIVITY)
-		if(@group.nil?)
-      stats_scope = Node.send(node_scope)
-    else
-      stats_scope = @group.nodes.send(node_scope)
-    end
-
-    stats = stats_scope.overall_stats(activity_scope)
+  def c_i_c_text(stats)
     returnstring = <<-END
     <p><span class='mednumber'>#{stats[:contributions]}</span> contributions</p>
     <p>of <span class='mednumber'>#{stats[:items]}</span> items</p>
@@ -67,21 +60,6 @@ module NodesHelper
     returnstring.html_safe
   end
 
-	def last_week_c_i_c_stats(node_scope,activity_scope = NodeActivity::ALL_ACTIVITY)
-		if(@group.nil?)
-      stats_scope = Node.send(node_scope)
-    else
-      stats_scope = @group.nodes.send(node_scope)
-    end
-
-    stats = stats_scope.latest_activity.overall_stats(activity_scope)
-    returnstring = <<-END
-    <p><span class='mednumber'>#{stats[:contributions]}</span> contributions</p>
-    <p>of <span class='mednumber'>#{stats[:items]}</span> items</p>
-    <p>by <span class='mednumber'>#{stats[:contributors]}</span> contributors</p>
-    END
-    returnstring.html_safe
-  end
 
 
 
