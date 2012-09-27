@@ -1,15 +1,18 @@
-<% @page_title = "#{@datatype} Details" %>
-<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @datatype.pluralize}) %>
-
+<%- if @group -%>
+  <%= render(:partial => 'group_page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- else -%>
+  <%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- end -%>
 <header class="jumbotron subhead" id="overview">
-  <h1><%= @page_title %></h1>
-  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+  <h1><%= @page_title_display.html_safe %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
 </header>
 
 <div class="page-header">
   <h2>Summary</h2>
-  <p><%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(datatype: @datatype),:class => 'btn') %>
-  <%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(datatype: @datatype),:class => 'btn') %></p>
+  <%- link_params = params.delete_if{|k,v| ['action'].include?(k)} -%>
+  <p><%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(link_params),:class => 'btn') %>
+  <%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(link_params),:class => 'btn') %></p>
 </div>
 
 <div class="row">
