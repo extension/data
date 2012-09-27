@@ -148,6 +148,28 @@ class ResetTables < ActiveRecord::Migration
     add_index "node_metacontributions", ["contributor_id"], :name => "contributor_ndx"
     add_index "node_metacontributions", ["node_id"], :name => "node_ndx"
 
+    create_table "node_totals", :force => true do |t|
+      t.integer  "node_id"
+      t.string   "activity", limit: 25, null: false
+      t.float    "total_weeks"
+      t.integer  "contributed_weeks"
+      t.integer  "contributions"
+      t.integer  "contributors"
+      t.float    "mean_weekly_contributions"
+      t.float    "mean_weekly_contributors"
+      t.integer  "yearweek"
+      t.integer  "contributions_this_week"
+      t.integer  "contributors_this_week"
+      t.integer  "max_weekly_contributions"
+      t.integer  "max_yearweek_contributions"
+      t.integer  "max_weekly_contributors"
+      t.integer  "max_yearweek_contributors"
+      t.datetime "created_at",       :null => false
+    end
+
+    add_index "node_totals", ["node_id","activity"], :name => "node_activity_ndx", :unique => true
+
+
     create_table "nodes", :force => true do |t|
       t.integer  "revision_id"
       t.string   "node_type"
