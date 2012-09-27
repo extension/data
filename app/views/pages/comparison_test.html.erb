@@ -1,7 +1,7 @@
 <%- @page_title = "Comparing News To Indexed News "-%>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
-  <%= render(:partial => 'date_changing_lead')%>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
 </header>
 
 <div class="row">

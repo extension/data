@@ -16,14 +16,6 @@
 </div>
 
 <div class="row">
-  <div class="span6">
-  </div>
-
-  <div class="span6">
-  </div>
-</div>
-
-<div class="row">
   <div class="span12">
     <h3><%= @datatype %> growth</h3>
     <%= render(partial: 'shared/line_plot', locals: {:data => @stats.to_graph_data('pages',{showrolling: false}), :datalabel => 'pagegrowth'})%>
