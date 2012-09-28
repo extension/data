@@ -140,7 +140,7 @@ class Node < ActiveRecord::Base
   def overall_stats(activity)
     stats = {}
     contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
-    contributions_count =  "COUNT(node_activities.id) as contributions"
+    contributions_count =  "COUNT(DISTINCT(node_activities.id)) as contributions"
 
     scope = self.node_activities
     if(activity != NodeActivity::ALL_ACTIVITY)
@@ -170,7 +170,7 @@ class Node < ActiveRecord::Base
     stats = {}
     with_scope do
       contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
-      contributions_count =  "COUNT(node_activities.id) as contributions"
+      contributions_count =  "COUNT(DISTINCT(node_activities.id)) as contributions"
       items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
 
       scope = self.joins(:node_activities)

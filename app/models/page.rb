@@ -35,7 +35,11 @@ class Page < ActiveRecord::Base
   scope :events, where(:datatype => 'Event')
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
-  scope :by_datatype, lambda{|datatype| where(:datatype => datatype)}
+  scope :by_datatype, lambda{|datatype| 
+    if(datatype != 'All')
+      where(:datatype => datatype)
+    end
+  }
 
   scope :with_totals_for_metric, lambda{|metric|
     pt_columns = PageTotal.column_names.reject{|n| ['id','page_id','metric','created_at'].include?(n)}
@@ -131,7 +135,7 @@ class Page < ActiveRecord::Base
   def self.pagecount_for_year_week(year,week)
     yearweek = self.yearweek(year,week)
     with_scope do
-      self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek).count
+      self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek).count("DISTINCT #{self.table_name}.id")
     end
   end
 
@@ -139,7 +143,7 @@ class Page < ActiveRecord::Base
   def self.page_counts_by_yearweek
     with_scope do
       yearweek_condition = "YEARWEEK(#{self.table_name}.created_at,3)"
-      pagecounts = self.group(yearweek_condition).count
+      self.group(yearweek_condition).count("DISTINCT #{self.table_name}.id")
     end
   end
 
@@ -234,28 +238,33 @@ class Page < ActiveRecord::Base
       cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : ''})
       Rails.cache.fetch(cache_key,cache_options) do
         with_scope do
-          _stats_by_yearweek(metric)
+          _stats_by_yearweek(metric,cache_options)
         end
       end
     else
       with_scope do
-        _stats_by_yearweek(metric)
+        _stats_by_yearweek(metric,cache_options)
       end
     end
   end
 
   def self._stats_by_yearweek(metric,cache_options = {})
     stats = YearWeekStats.new
+    set_group_concat_size_query = "SET SESSION group_concat_max_len = #{Settings.group_concat_max_len};"
+    self.connection.execute(set_group_concat_size_query)
     with_scope do
       eca = self.earliest_created_at
       if(eca.blank?)
         return stats
       end
 
-      metric_by_yearweek = self.joins(:page_stats).group('page_stats.yearweek').sum("page_stats.#{metric}")
-      metric_counts_by_yearweek =  self.joins(:page_stats).group('page_stats.yearweek').count("page_stats.#{metric}")
+      eligible_page_ids = self.pluck("#{self.table_name}.id")
+      metric_by_yearweek = PageStat.where("page_id IN (#{eligible_page_ids.join(',')})").group('yearweek').sum("#{metric}")
+      metric_counts_by_yearweek = PageStat.where("page_id IN (#{eligible_page_ids.join(',')})").group('yearweek').count("DISTINCT page_stats.id")
+
       year_weeks = Analytic.year_weeks_from_date(eca.to_date)
       pagetotals = self.page_totals_by_yearweek(cache_options)
+
 
       year_weeks.each do |year,week|
         yearweek = self.yearweek(year,week)
@@ -308,12 +317,12 @@ class Page < ActiveRecord::Base
       cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : '', options: options.to_yaml})
       Rails.cache.fetch(cache_key,cache_options) do
         with_scope do
-          _percentiles_by_yearweek(metric,options)
+          _percentiles_by_yearweek(metric,options,cache_options)
         end
       end
     else
       with_scope do
-        _percentiles_by_yearweek(metric,options)
+        _percentiles_by_yearweek(metric,options,cache_options)
       end
     end
   end
@@ -332,7 +341,8 @@ class Page < ActiveRecord::Base
         return returnpercentiles
       end
 
-      week_stats_query = self.joins(:page_stats).group('page_stats.yearweek').select("page_stats.yearweek as yearweek, GROUP_CONCAT(page_stats.#{metric}) as distribution")
+      eligible_page_ids = self.pluck("#{self.table_name}.id")
+      week_stats_query = PageStat.where("page_id IN (#{eligible_page_ids.join(',')})").group('yearweek').select("yearweek, GROUP_CONCAT(#{metric}) as distribution")
       year_weeks = Analytic.year_weeks_from_date(eca.to_date)
       pagetotals = self.page_totals_by_yearweek(cache_options)
 
