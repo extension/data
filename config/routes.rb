@@ -22,9 +22,7 @@ Positronic::Application.routes.draw do
     match "/groups", to: "data#groups", :as => 'data_groups'
   end
 
-
-
-  resources :contributors, :only => [:index, :show] do
+  resources :contributors, :only => [:show] do
     member do
       get :contributions
       get :metacontributions
