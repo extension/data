@@ -15,8 +15,50 @@ class Contributor < ActiveRecord::Base
   has_many :contributed_nodes, :through => :node_activities, :source => :node
   has_many :contributed_pages, :through => :contributed_nodes, :source => :page
 
+  has_many :unique_meta_contributed_nodes, :through => :node_metacontributions, :source => :node, :uniq => true
+  has_many :unique_contributed_nodes, :through => :node_activities, :source => :node, :uniq => true
+
+  has_many :unique_meta_contributed_pages, :through => :meta_contributed_nodes, :source => :page, :uniq => true
+  has_many :unique_contributed_pages, :through => :contributed_nodes, :source => :page, :uniq => true
+
   has_many :contributor_groups
   has_many :groups, through: :contributor_groups
+
+  # duplicated from darmok
+  # TODO - sanity check this
+  scope :patternsearch, lambda {|searchterm|
+    # remove any leading * to avoid borking mysql
+    # remove any '\' characters because it's WAAAAY too close to the return key
+    # strip '+' characters because it's causing a repitition search error
+    # strip parens '()' to keep it from messing up mysql query
+    sanitizedsearchterm = searchterm.gsub(/\\/,'').gsub(/^\*/,'$').gsub(/\+/,'').gsub(/\(/,'').gsub(/\)/,'').strip
+
+    if sanitizedsearchterm == ''
+      return nil
+    end
+
+    # in the format wordone wordtwo?
+    words = sanitizedsearchterm.split(%r{\s*,\s*|\s+})
+    if(words.length > 1)
+      findvalues = {
+       :firstword => words[0],
+       :secondword => words[1]
+      }
+      conditions = ["((first_name rlike :firstword AND last_name rlike :secondword) OR (first_name rlike :secondword AND last_name rlike :firstword))",findvalues]
+    elsif(sanitizedsearchterm.to_i != 0)
+      # special case of an id search - needed in admin/colleague searches
+      conditions = ["id = #{sanitizedsearchterm.to_i}"]
+    else
+      findvalues = {
+       :findlogin => sanitizedsearchterm,
+       :findemail => sanitizedsearchterm,
+       :findfirst => sanitizedsearchterm,
+       :findlast => sanitizedsearchterm
+      }
+      conditions = ["(email rlike :findemail OR idstring rlike :findlogin OR first_name rlike :findfirst OR last_name rlike :findlast)",findvalues]
+    end
+    {:conditions => conditions}
+  }
 
 
   def self.find_by_uid(uid,provider)

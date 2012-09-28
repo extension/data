@@ -18,7 +18,7 @@ class HomeController < ApplicationController
       @seen = CollectedPageStat.overall.latest_week.where(metric: @metric).pluck(:seen).sum
       @seen_page_views = CollectedPageStat.overall.latest_week.where(metric: @metric).pluck(:total).sum
       @home_views = LandingStat.overall.latest_week.first.send(@metric)
-      @group_views = LandingStat.where('group_id > 0').latest_week.sum("#{@metric}") 
+      @group_views = LandingStat.where('group_id > 0').latest_week.sum("#{@metric}")
       @groups_viewed = LandingStat.where('group_id > 0').where("#{@metric} > 0").latest_week.count
       @total_views = (@seen_page_views + @home_views + @group_views).to_i
 
@@ -37,19 +37,37 @@ class HomeController < ApplicationController
    end
 
   def search
+    @search_results_count = 0
     if(params[:q])
       if(params[:q].to_i > 0)
+        @search_type = 'numeric'
         @id_number = params[:q].to_i
-        @page = Page.find_by_id(@id_number)
-        @node = Node.find_by_id(@id_number)
-        if(@page and !@node)
-          return redirect_to(page_path(@page))
-        elsif(@node and !@page and !@node.page.nil?)
-          return redirect_to(node_path(@node))
+        if(@page = Page.find_by_id(@id_number))
+          @search_results_count += 1
+        end
+        if(@node = Node.find_by_id(@id_number))
+          @search_results_count += 1
+        end
+        if(@contributor = Contributor.find_by_id(@id_number))
+          @search_results_count += 1
+        end
+
+        # single result? - go straight to item
+        if(@search_results_count == 1)
+          return redirect_to(page_path(@page)) if @page
+          return redirect_to(node_path(@node)) if @node
+          return redirect_to(contributor_path(@contributor)) if @contributor
         end
       else
-        like= "%".concat(params[:q].concat("%"))
+        @search_type = 'text'
+        # copied from darmok - need to review - see Contributor patternsearch scope for details
+        sanitizedsearchterm = params[:q].gsub(/\\/,'').gsub(/^\*/,'$').gsub(/\+/,'').gsub(/\(/,'').gsub(/\)/,'').strip
+
+        like= "%".concat(sanitizedsearchterm.concat("%"))
         @pagelist = Page.where("title like ?", like)
+        @nodelist = Node.where("title like ?", like)
+        @contributorlist = Contributor.patternsearch(params[:q])
+        @search_results_count = @pagelist.count + @nodelist .count + @contributorlist.count
       end
     end
   end

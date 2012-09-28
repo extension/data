@@ -1,36 +1,60 @@
 <% @page_title = "Search Results" %>
-<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => "search"}) %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
 </header>
 
 <%= form_tag(search_path, { :class => 'well form-search ' }) do -%>
-<%= text_field_tag :q, params[:q], {:class => 'search-query', :placeholder => 'Find page (title, page id, or node id)', :autocomplete => 'off'} -%>
+<%= text_field_tag :q, params[:q], {:class => 'search-query span3', :placeholder => 'Find page, node, or contributor', :autocomplete => 'off'} -%>
 <%- end -%>
 
+<div class="page-header">
+  <h2>Pages, Nodes, or Contributors matching <%= params[:q]%></h2>
+</div>
 <div class="row">
-  <%- if @page or @node -%>
-    <%- if @page -%>
-      <div class="span6">
-        <h3>Page ID results</h3>
-        <p>Found page #<%= @page.id %>: <%= link_to(@page.title,page_path(@page))%></p>
-      </div>
+  <%- if @search_results_count > 0 -%>
+    <%- if @search_type == 'numeric' -%>
+      <div class="span12">
+        <dl class="dl-horizontal">
+        <%- if @page -%>
+         <dt>Page #<%= @page.id %></dt><dd><%= link_to(@page.display_title,page_path(@page))%></dd>
+        <%- end -%>
+        <%- if @node -%>
+         <dt>Node #<%= @node.id %></dt><dd><%= link_to(@node.display_title,node_path(@node))%></dd>
+        <%- end -%>
+        <%- if @contributor -%>
+         <dt>Contributor</dt><dd><%= link_to(@contributor.fullname,contributor_path(@contributor))%></dd>
+        <%- end -%>
+        </dl>
+    <%- else -%>
+    <div class="span12">
+      <div class="span12">
+        <%- if @pagelist -%>
+          <dl class="dl-horizontal">
+          <%- @pagelist.each do |page| -%>
+            <dt>Page #<%= page.id %></dt><dd><%= link_to(page.display_title,page_path(page))%></dd>
+          <%- end -%>
+          </dl>
+          <hr/>
+        <%- end -%>
+
+        <%- if @nodelist -%>
+          <dl class="dl-horizontal">
+          <%- @nodelist.each do |node| -%>
+            <dt>Node #<%= node.id %></dt><dd><%= link_to(node.display_title,node_path(node))%></dd>
+          <%- end -%>
+          </dl>
+          <hr/>
+        <%- end -%>
+
+        <%- if @contributorlist -%>
+          <dl class="dl-horizontal">
+          <%- @contributorlist.each do |contributor| -%>
+            <dt>Contributor</dt><dd><%= link_to(contributor.fullname,contributor_path(contributor))%></dd>
+          <%- end -%>
+          </dl>
+        <%- end -%>
+    </div>
     <%- end -%>
-    <%- if @node -%>
-      <div class="span6">
-        <h3>Node ID results</h3>
-        <p>Found node #<%= @node.id%>: <%= link_to(@node.title,node_path(@node))%></p>
-      </div>
-    <%- end -%>
-  <%- elsif(@pagelist) -%>
-  <div class="span12">
-    <h3>Pages matching <%= params[:q]%></h3>
-    <ul class="unstyled">
-      <%- @pagelist.each do |page| -%>
-      <li><%= link_to(page.title,page_path(page))%></li>
-      <%- end -%>
-    </ul>
-  </div>
   <%- else -%>
   <div class="span12">
     <p>No results. Please search again</p>
