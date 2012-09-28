@@ -25,7 +25,11 @@ class YearWeekStatsComparator < Hash
   end
 
   def yearweeks
-    self.class.yearweeks_between_yearweeks(min_yearweek,max_yearweek)
+    begin
+      self.class.yearweeks_between_yearweeks(min_yearweek,max_yearweek)
+    rescue
+      []
+    end
   end
 
 
