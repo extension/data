@@ -1,0 +1,27 @@
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+        <th>YearWeek</th>
+        <th>YearWeek Date</th>
+        <th>Total</th>
+        <th>Previous Week</th>
+        <th>Previous Year</th>
+        <th>% Change Week</th>
+        <th>% Change Year</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <%- @view_stats.yearweeks.reverse.each do |yearweek| -%>
+    <tr>
+      <td><%= yearweek %></td>
+      <td><%= Page.yearweek_date(yearweek) %></td>
+      <td><%= @view_stats[yearweek]['total'] %></td>
+      <td><%= @view_stats[yearweek]['previous_week'] %></td>
+      <td><%= @view_stats[yearweek]['previous_year'] %></td>
+      <td><%= pct_change(@view_stats[yearweek]['pct_change_week'])%></td>
+      <td><%= pct_change(@view_stats[yearweek]['pct_change_year'])%></td>
+    </tr>
+  <%- end -%>
+  </tbody>
+</table>

@@ -1,5 +1,5 @@
 <%-
-  stats_for_week = page.stats_for_week('unique_pageviews')
+  stats_for_week = page.stats_for_week(@metric)
   views = (stats_for_week['total'] || 0)
 -%>
 <p><span class='bignumber'><%=number_with_precision(views, :precision => 1)%></span> Views</p>

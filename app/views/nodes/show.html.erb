@@ -111,7 +111,8 @@
 
 <div class="row">
   <div class="span12">
-    <h3>Node Event History</h3>
+    <h3>Node Event History <%= button_tag("Show &raquo;".html_safe, id: 'infotoggler', class: 'btn btn-small', data: {toggle: 'collapse', target: '#showinfo'}) %></h3>
+      <div id="showinfo" class="collapse">
       <table class="table table-bordered">
         <thead>
           <tr>
@@ -136,8 +137,23 @@
           <%- end -%>
         </tbody>
       </table>
+      </div>
   </div>
 </div>
+
+
+<script type="text/javascript">
+
+$('#showinfo').on('show', function () {
+  $('#infotoggler').html('Hide &laquo;');
+});
+
+$('#showinfo').on('hide', function () {
+  $('#infotoggler').html('Show &raquo;');
+});
+
+</script>
+
 
 
 

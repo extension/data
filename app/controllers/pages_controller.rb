@@ -18,6 +18,7 @@ class PagesController < ApplicationController
 
   def show
     @page = Page.includes(:node).find(params[:id])
+    @view_stats = @page.stats_by_yearweek(@metric)
   end
 
   def details

@@ -1,0 +1,67 @@
+<table class="table table-bordered">
+
+  <tbody>
+    <tr>
+      <td>Groups</td>
+      <td><%= @page.groups.map{|g| link_to(g.name, group_path(g))}.join(', ').html_safe %></td>
+    </tr>
+    <tr>
+    <tr>
+      <td>Page Type</td>
+      <td><%= @page.datatype %></td>
+    </tr>
+    <tr>
+      <td>Index status</td>
+      <td>
+      <%- if @page.indexed == 1 -%>
+        Indexed. Page can be indexed by all search engines.
+      <%- elsif @page.indexed == 2 -%>
+        Google asked to not index. Page can be indexed by other search engines.
+      <%- else -%>
+        All search engines asked to not index.
+      <%- end -%>
+      </td>
+    </tr>
+    <tr>
+      <td>Words</td>
+      <td><%= number_with_delimiter(@page.content_words) %></td>
+    </tr>
+    <tr>
+      <td>Source Published At</td>
+      <td><%= @page.source_created_at %></td>
+    </tr>
+    <tr>
+      <td>Source Updated At</td>
+      <td><%= @page.source_updated_at %></td>
+    </tr>
+    <%- if(!@page.node.nil?) -%>
+    <tr>
+      <td>Contributors</td>
+      <td>
+        <%- @page.node.contributions_by_contributor.each do |contributor| -%>
+          <p>
+            <%= link_to(contributor.fullname, contributor_path(contributor)) %>
+            : <%= NodeActivity.contributions_display(contributor.contributions).html_safe %>
+          </p>
+        <%- end -%>
+      </td>
+    </tr>
+    <%- meta_activity_counts = @page.node.metacontributions_count -%>
+    <tr>
+      <td>Listed contributors</td>
+      <%- if(meta_activity_counts[:contributors] > 0 ) -%>
+      <td>
+        <%- @page.node.meta_contributions_by_contributor.each do |contributor| -%>
+          <p>
+            <%= link_to(contributor.fullname, contributor_path(contributor)) %>
+            : <%= NodeMetacontribution.contributions_display(contributor.metacontributions).html_safe %>
+          </p>
+        <%- end -%>
+      </td>
+      <%- else -%>
+      <td>n/a</td>
+      <%- end -%>
+    </tr>
+    <%- end -%>
+  </tbody>
+</table>

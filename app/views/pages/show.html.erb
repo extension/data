@@ -6,12 +6,31 @@
 </header>
 
 <div class="row">
-  <div class="span4">
+  <div class="span7">
+    <table class="table table-condensed">
+      <tbody>
+      <tr>
+        <td>Title</td>
+        <td><%= @page.title %></td>
+      </tr>
+      <tr>
+        <td>Published URL</td>
+        <td><%= link_to("http://www.extension.org/pages/#{@page.id}/#{@page.url_title}","http://www.extension.org/pages/#{@page.id}/#{@page.url_title}")%></td>
+      </tr>
+      <tr>
+        <td>Source URL</td>
+        <td><%= link_to(@page.source_url,@page.source_url)%></td>
+      </tr>
+    <tr>
+      <td>More Information</td>
+      <td><%= link_to("http://www.extension.org/pageinfo/#{@page.id}","http://www.extension.org/pageinfo/#{@page.id}")%></td>
+    </tr>
+    </tbody>
+  </table>
+ </div>
+
+  <div class="span5">
     <%= render(:partial => 'page_views_information', :locals => {:page => @page}) %>
-  </div>
-  <div class="span8">
-    <h3>Views over time</h3>
-    <%= render(:partial => 'page_traffic_plot', :locals => {:page => @page})%>
   </div>
 </div>
 
@@ -23,102 +42,44 @@
 <div class="row">
   <div class="span12">
 	 <h3>Page Information</h3>
-	<table class="table table-bordered">
-
-	  <tbody>
-      <tr>
-        <td>Title</td>
-        <td><%= @page.title %></td>
-      </tr>
-      <tr>
-        <td>Published URL</td>
-        <td><%= link_to("http://www.extension.org/pages/#{@page.id}/#{@page.url_title}","http://www.extension.org/pages/#{@page.id}/#{@page.url_title}")%></td>
-      </tr>
-      <tr>
-        <td>Internal Page ID</td>
-        <td><%= @page.id %></td>
-      </tr>
-      <tr>
-        <td>Groups</td>
-        <td><%= @page.groups.map{|g| link_to(g.name, group_path(g))}.join(', ').html_safe %></td>
-      </tr>
-      <tr>
-      <tr>
-        <td>Page Type</td>
-        <td><%= @page.datatype %></td>
-      </tr>
-      <tr>
-        <td>Index status</td>
-        <td>
-        <%- if @page.indexed == 1 -%>
-          Indexed. Page can be indexed by all search engines.
-        <%- elsif @page.indexed == 2 -%>
-          Google asked to not index. Page can be indexed by other search engines.
-        <%- else -%>
-          All search engines asked to not index.
-        <%- end -%>
-        </td>
-      </tr>
-      <tr>
-        <td>Words</td>
-        <td><%= number_with_delimiter(@page.content_words) %></td>
-      </tr>
-      <tr>
-        <td>Source URL</td>
-        <td><%= link_to(@page.source_url,@page.source_url)%></td>
-      </tr>
-
-      <tr>
-        <td>Source Published At</td>
-        <td><%= @page.source_created_at %></td>
-      </tr>
-      <tr>
-        <td>Source Updated At</td>
-        <td><%= @page.source_updated_at %></td>
-      </tr>
-      <%- if(!@page.node.nil?) -%>
-      <tr>
-        <td>Node Data</td>
-        <td><%= link_to("Node ##{@page.node.id}",node_path(@page.node))%></td>
-      </tr>
-      <tr>
-        <td>Contributors</td>
-        <td>
-          <%- @page.node.contributions_by_contributor.each do |contributor| -%>
-            <p>
-              <%= link_to(contributor.fullname, contributor_path(contributor)) %>
-              : <%= NodeActivity.contributions_display(contributor.contributions).html_safe %>
-            </p>
-          <%- end -%>
-        </td>
-      </tr>
-      <%- meta_activity_counts = @page.node.metacontributions_count -%>
-      <tr>
-        <td>Listed contributors</td>
-        <%- if(meta_activity_counts[:contributors] > 0 ) -%>
-        <td>
-          <%- @page.node.meta_contributions_by_contributor.each do |contributor| -%>
-            <p>
-              <%= link_to(contributor.fullname, contributor_path(contributor)) %>
-              : <%= NodeMetacontribution.contributions_display(contributor.metacontributions).html_safe %>
-            </p>
-          <%- end -%>
-        </td>
-        <%- else -%>
-        <td>n/a</td>
-        <%- end -%>
-      </tr>
-      <%- end -%>
-      <tr>
-        <td>More Information</td>
-        <td><%= link_to("http://www.extension.org/pageinfo/#{@page.id}","http://www.extension.org/pageinfo/#{@page.id}")%></td>
-      </tr>
-	  </tbody>
-	</table>
+   <%- if(!@page.node.nil?) -%>
+   <p><%= link_to("Node ##{@page.node.id} &raquo;".html_safe,node_path(@page.node), class: 'btn')%></p>
+   <%- end -%>
+   <%= render(partial: 'page_information_table') %>
   </div>
 </div>
 
+<div class="page-header">
+   <h3>Page Views By Week <%= button_tag("Show Details &raquo;".html_safe, id: 'infotoggler', class: 'btn btn-small', data: {toggle: 'collapse', target: '#showinfo'}) %></h3>
+</div>
 
+<div class="row">
+  <div class="span12">
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @view_stats.to_graph_data('total'), :datalabel => 'views'})%>
+  </div>
+</div>
+<div id="showinfo" class="collapse">
+  <hr/>
+  <div class="row">
+    <div class="span12">
+        <%= render(partial: 'page_stats_table') %>
+    </div>
+  </div>
+ </div>
+
+
+
+<script type="text/javascript">
+
+$('#showinfo').on('show', function () {
+  $('#infotoggler').html('Hide Details &laquo;');
+});
+
+$('#showinfo').on('hide', function () {
+  $('#infotoggler').html('Show Details &raquo;');
+});
+
+</script>
 
 
 
