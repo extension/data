@@ -1,4 +1,6 @@
-<%- if @group -%>
+<%- if @contributor -%>
+  <%= render(:partial => 'contributor_page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- elsif @group -%>
   <%= render(:partial => 'group_page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
 <%- else -%>
   <%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
@@ -11,8 +13,10 @@
 <div class="page-header">
   <h2>Summary</h2>
   <%- link_params = params.delete_if{|k,v| ['action'].include?(k)} -%>
-  <p><%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(link_params),:class => 'btn') %>
-  <%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(link_params),:class => 'btn') %></p>
+  <p>
+  <%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(link_params),:class => 'btn') if (@datatype != 'All' and !@contributor)  %>
+  <%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(link_params),:class => 'btn') %>
+ </p>
 </div>
 
 <div class="row">

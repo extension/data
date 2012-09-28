@@ -1,4 +1,6 @@
-<%- if @group -%>
+<%- if @contributor -%>
+  <%= render(:partial => 'contributor_page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- elsif @group -%>
   <%= render(:partial => 'group_page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
 <%- else -%>
   <%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>

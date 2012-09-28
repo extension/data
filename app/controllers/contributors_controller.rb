@@ -10,6 +10,37 @@ class ContributorsController < ApplicationController
 
   def show
     @contributor = Contributor.find(params[:id])
+    @node_contribution_stats = YearWeekStatsComparator.new
+    ['all_nodes','publishables','administrative'].each do |node_scope|
+      @node_contribution_stats[node_scope] = @contributor.unique_contributed_nodes.send(node_scope).stats_by_yearweek(NodeActivity::ALL_ACTIVITY)
+    end
+
+    # Page contributions
+    @contribution_stats = YearWeekStatsComparator.new
+    @meta_contribution_stats = YearWeekStatsComparator.new
+    @has_contributions = false
+    @has_meta_contributions = false
+
+    # events contributions aren't part of this association
+    ['Article','Faq','News'].each do |datatype|
+      # counts don't work quite right with :uniq => true
+      if(@contributor.contributed_pages.by_datatype(datatype).count('DISTINCT pages.id') > 0)
+        @has_contributions = true
+        @contribution_stats[datatype] = @contributor.unique_contributed_pages.by_datatype(datatype).stats_by_yearweek(@metric)
+      end
+
+      if(@contributor.meta_contributed_pages.by_datatype(datatype).count('DISTINCT pages.id') > 0)
+        @has_meta_contributions = true
+        @meta_contribution_stats[datatype] = @contributor.unique_meta_contributed_pages.by_datatype(datatype).stats_by_yearweek(@metric)
+      end
+    end
+
+    case @metric
+    when 'unique_pageviews'
+      @metric_label = 'View'
+    else
+      @metric_label = @metric.titleize
+    end
   end
 
   def contributions

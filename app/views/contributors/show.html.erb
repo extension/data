@@ -13,8 +13,7 @@
 </div>
 
 <div class="page-header">
-  <h1>Create Contributions
-  </h1>
+  <h2>Create Contributions</h2>
 </div>
 
 <div class="row">
@@ -55,8 +54,60 @@
   </div>
 </div>
 
+<div class="row">
+  <div class="span12">
+    <h3>Direct Contributions By Week</h3>
+    <%= render(:partial => 'shared/comparison_plot',
+               :locals => {data: @node_contribution_stats.to_graph_data(:contributions),
+                           labels: @node_contribution_stats.to_graph_labels.map{|l| l.capitalize},
+                           datalabel: "node_contributions" }) -%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>Direct Contributed Items By Week</h3>
+    <%= render(:partial => 'shared/comparison_plot',
+               :locals => {data: @node_contribution_stats.to_graph_data(:items),
+                           labels: @node_contribution_stats.to_graph_labels.map{|l| l.capitalize},
+                           datalabel: "node_contributed_items" }) -%>
+  </div>
+</div>
 
 
+<%- if @has_contributions -%>
+<div class="page-header">
+  <h2>Direct Contributed Pages</h2>
+</div>
+<div class="row">
+  <%- @contribution_stats.keys.each do |datatype| -%>
+    <div class="span<%= 12 / @contribution_stats.keys.size %>">
+      <h3><%= datatype.pluralize %> <span><%= link_to("details &raquo;".html_safe,
+                     details_pages_path(datatype: datatype, contributor_id: @contributor.id),:class => 'btn btn-small') %></span></h3>
+      <%= render(:partial => 'shared/overall_views_information',
+                 :locals => {:datatype => datatype, :stats_for_week => @contribution_stats[datatype][@latest_yearweek]}) %>
+
+    </div>
+  <%- end -%>
+</div>
+<%- end -%>
+
+<%- if @has_meta_contributions -%>
+<div class="page-header">
+  <h2>Listed Contributed Pages</h2>
+</div>
+<div class="row">
+  <%- @meta_contribution_stats.keys.each do |datatype| -%>
+    <div class="span<%= 12 / @meta_contribution_stats.keys.size %>">
+      <h3><%= datatype.pluralize %> <span><%= link_to("details &raquo;".html_safe,
+                     details_pages_path(datatype: datatype, contributor_id: @contributor.id),:class => 'btn btn-small') %></span></h3>
+      <%= render(:partial => 'shared/overall_views_information',
+                 :locals => {:datatype => datatype, :stats_for_week => @meta_contribution_stats[datatype][@latest_yearweek]}) %>
+
+    </div>
+  <%- end -%>
+</div>
+<%- end -%>
 
 
 

@@ -22,13 +22,21 @@ class PagesController < ApplicationController
 
   def details
     @datatype = params[:datatype]
-    if(!Page::DATATYPES.include?(@datatype))
+    if(!Page::DATATYPES.include?(@datatype) and @datatype != 'All')
       # ToDo: error out
       @datatype = 'Article'
     end
 
-    # todo: contributor, tags
-    if(@group)
+    # todo: tags
+    if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
+      if(params[:contributions] and params[:contributions] == 'meta')
+        @contributions_type = 'Listed'
+        scope = @contributor.unique_meta_contributed_pages.by_datatype(@datatype)
+      else
+        @contributions_type = 'Direct'
+        scope = @contributor.unique_contributed_pages.by_datatype(@datatype)
+      end
+    elsif(@group)
       scope = @group.pages.by_datatype(@datatype)
     else
       scope = Page.by_datatype(@datatype)
@@ -37,7 +45,10 @@ class PagesController < ApplicationController
     @page_title_display = @page_title = "#{@datatype} Details"
     @endpoint = @datatype.pluralize
 
-    if(@group)
+    if(@contributor)
+      @page_title += "- #{@contributions_type} Contributions - #{@contributor.fullname} (ID##{@contributor.id})"
+      @page_title_display += "- #{@contributions_type} Contributions for #{@contributor.fullname}"
+    elsif(@group)
       @page_title += " - Group ##{@group.id}"
       @page_title_display += " for #{@group.name}"
     end
@@ -49,13 +60,21 @@ class PagesController < ApplicationController
 
   def totals
     @datatype = params[:datatype]
-    if(!Page::DATATYPES.include?(@datatype))
+    if(!Page::DATATYPES.include?(@datatype) and @datatype != 'All')
       # for now, error later
       @datatype = 'Article'
     end
 
-    # todo: contributor, tags
-    if(@group)
+    # todo: tags
+    if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
+      if(params[:contributions] and params[:contributions] == 'meta')
+        @contributions_type = 'Listed'
+        scope = @contributor.unique_meta_contributed_pages.by_datatype(@datatype)
+      else
+        @contributions_type = 'Direct'
+        scope = @contributor.unique_contributed_pages.by_datatype(@datatype)
+      end
+    elsif(@group)
       scope = @group.pages.by_datatype(@datatype)
     else
       scope = Page.by_datatype(@datatype)
@@ -85,7 +104,10 @@ class PagesController < ApplicationController
     @page_title_display = @page_title = "#{@datatype} Page #{metric_label} Totals"
     @endpoint = "Page #{metric_label} Totals"
 
-    if(@group)
+    if(@contributor)
+      @page_title += "- #{@contributions_type} Contributions - #{@contributor.fullname} (ID##{@contributor.id})"
+      @page_title_display += "- #{@contributions_type} Contributions for #{@contributor.fullname}"
+    elsif(@group)
       @page_title += " - Group ##{@group.id}"
       @page_title_display += " for #{@group.name}"
     end
@@ -110,7 +132,8 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    # todo: contributor, tags
+    # todo: tags
+    # contributors are likely a no-go for now
     if(@group)
       scope = @group.collected_page_stats.by_datatype(@datatype).by_metric(@metric)
     else
