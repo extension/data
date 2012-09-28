@@ -19,8 +19,8 @@ class PageStat < ActiveRecord::Base
   scope :indexed, includes(:page).where("pages.indexed = ?",Page::INDEXED)
 
 
-  METRICS = ['pageviews','unique_pageviews','entrances','exits','visitors','new_visits']
-  ALL_METRICS = METRICS + ['time_on_page']
+  METRICS = ['pageviews','unique_pageviews','entrances','exits','new_visits']
+  ALL_METRICS = METRICS + ['time_on_page','visitors']
 
   def self.mass_create_or_update_for_pages(year,week)
     select_statement = <<-END
