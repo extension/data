@@ -1,0 +1,43 @@
+<%- @page_title = "Experiments"-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Experiments'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Experiments are just that: experimental views, methods, and ways of exploring the data in data.extension.org.
+    These might be specific questions that we've been asked, or asked ourselves, and we'd like to keep up and available as the data changes week-by-week.
+    Some of these will "graduate" to more official views in the application, some will disappear without warning. If you find one of them useful, let us know!
+  </p>
+</header>
+
+<div class="row">
+  <div class="span12">
+   <h2>Current Experimental Views</h2>
+    <table class="table">
+      <thead>
+        <th>View</th>
+        <th>Description</th>
+        <th>Added on</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= link_to('Panda Impact Summary',{action: 'panda_impact_summary'}) %></td>
+          <td>Percentage impacts per group before and after the U.S. Google algorithm change known as "panda" on <%= EpochDate.panda_epoch_date.date.to_s %></td>
+          <td><span class="label">2012-09-28</span></td>
+        </tr>
+
+        <tr>
+          <td><%= link_to('News vs. Indexed News',{action: 'news_comparison'}) %></td>
+          <td>Comparing views of News vs. News marked as "indexed" - usually by using an 'originalnews' tag</td>
+          <td><span class="label">2012-09-28</span></td>
+        </tr>
+
+        <tr>
+          <td><%= link_to('Metric Comparisons',{action: 'metric_comparisons'}) %></td>
+          <td>Shows a comparison plot for the various metrics available from the Google Analytics data</td>
+          <td><span class="label">2012-09-28</span></td>
+        </tr>
+
+      </tbody>
+    </table>
+  </div>
+</div>

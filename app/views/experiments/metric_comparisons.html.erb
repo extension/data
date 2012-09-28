@@ -1,0 +1,47 @@
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Metric Comparisons'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="well">
+  <h3>Experimentation</h3>
+  <p>Add a "datatype" parameter: <code>?datatype=</code> to the url to explore different datatypes e.g.:</p>
+  <ul>
+    <%- (['All'] + Page::DATATYPES).each do |datatype| -%>
+      <%- link_params = params.merge({datatype: datatype}) -%>
+      <li><%= link_to("?datatype=#{datatype}".html_safe,link_params) %></li>
+    <%- end -%>
+  </ul>
+
+  <p>Add a "group_id" parameter: <code>?group_id=</code> to the url to explore groups e.g.:</p>
+  <ul>
+    <%- link_params = params.delete_if{|k,v| ['contributor_id','contributions'].include?(k)}.merge({group_id: 25}) -%>
+    <li><%= link_to("?group_id=25".html_safe,link_params) %> (Sustainable Ag Energy)</li>
+  </ul>
+
+  <p>Add a "contributor_id" parameter: <code>?contributor_id=</code> to the url to explore contributors.
+    Add <code>contributions=meta</code> to show Listed instead of Direct contributions e.g.:</p>
+  <ul>
+    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({contributor_id: 11}) -%>
+    <li><%= link_to("?contributor_id=11".html_safe,link_params) %> (Jason Young)</li>
+    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({contributor_id: 3381, contributions: 'meta'}) -%>
+    <li><%= link_to("?contributor_id=3381&contributions=meta".html_safe,link_params) %> (Jill Heemstra, meta contributions)</li>
+  </ul>
+  <p>Note: <code>contributor_id=</code> and <code>group_id=</code> are mutually exclusive, contributor_id takes precedence</p>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <h3>Totals</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @stats.to_graph_data('total'), :datalabel => 'total', :labels => @stats.to_graph_labels})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <h3>Per Page</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @stats.to_graph_data('per_page'), :datalabel => 'per_page', :labels => @stats.to_graph_labels})%>
+  </div>
+</div>

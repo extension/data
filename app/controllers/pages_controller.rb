@@ -181,18 +181,6 @@ class PagesController < ApplicationController
     end
   end
 
-
-
-  def panda_impact_summary
-    if(!params[:weeks].nil?)
-      @panda_comparison_weeks =  params[:weeks].to_i
-    else
-      @panda_comparison_weeks = 3
-    end
-    @diffs = CollectedPageStat.panda_impacts(@panda_comparison_weeks)
-  end
-
-
   def setdate
     if(params[:date])
       begin
@@ -208,12 +196,6 @@ class PagesController < ApplicationController
     else
       return redirect_to(root_url)
     end
-  end
-
-  def comparison_test
-    @stats = YearWeekStatsComparator.new
-    @stats['News'] = Page.news.stats_by_yearweek('unique_pageviews')
-    @stats['Indexed News'] = Page.news.indexed.stats_by_yearweek('unique_pageviews')
   end
 
   protected

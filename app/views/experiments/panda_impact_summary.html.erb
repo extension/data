@@ -1,6 +1,20 @@
 <% @page_title = "Panda Impact Summary By Tag (#{@panda_comparison_weeks} weeks Before/After)" %>
-<div class="page-header">
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Panda Impact Summary'}) %>
+
+<header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
+  <p class="lead">Showing changes for <%= @panda_comparison_weeks %> weeks before/after</p>
+</header>
+
+
+<div class="well">
+  <h3>Experimentation</h3>
+  <p>Add a "weeks" parameter: <code>?weeks=</code> to the url to explore different weeks e.g.:</p>
+  <ul>
+    <% [3,6,12,24].each do |weeks| %>
+    <li><%= link_to("?weeks=#{weeks}".html_safe,{weeks: weeks}) %></li>
+    <%- end -%>
+  </ul>
 </div>
 
 <div class="row">

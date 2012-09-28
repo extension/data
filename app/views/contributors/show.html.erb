@@ -100,7 +100,7 @@
   <%- @meta_contribution_stats.keys.each do |datatype| -%>
     <div class="span<%= 12 / @meta_contribution_stats.keys.size %>">
       <h3><%= datatype.pluralize %> <span><%= link_to("details &raquo;".html_safe,
-                     details_pages_path(datatype: datatype, contributor_id: @contributor.id),:class => 'btn btn-small') %></span></h3>
+                     details_pages_path(datatype: datatype, contributor_id: @contributor.id, contributions: 'meta'),:class => 'btn btn-small') %></span></h3>
       <%= render(:partial => 'shared/overall_views_information',
                  :locals => {:datatype => datatype, :stats_for_week => @meta_contribution_stats[datatype][@latest_yearweek]}) %>
 

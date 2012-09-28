@@ -52,6 +52,9 @@ Positronic::Application.routes.draw do
   # home routes
   match '/search', to:'home#search', :as => 'search'
 
+  # experiments named routes
+  match '/experiments', to: 'experiments#index', :as => 'experiments'
+
   # catch all
   match '/:controller(/:action(/:id))'
 
