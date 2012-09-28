@@ -26,8 +26,8 @@
   <ul>
     <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({contributor_id: 11}) -%>
     <li><%= link_to("?contributor_id=11".html_safe,link_params) %> (Jason Young)</li>
-    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({contributor_id: 3381, contributions: 'meta'}) -%>
-    <li><%= link_to("?contributor_id=3381&contributions=meta".html_safe,link_params) %> (Jill Heemstra, meta contributions)</li>
+    <%- link_params = params.delete_if{|k,v| ['group_id'].include?(k)}.merge({contributor_id: 11, contributions: 'meta'}) -%>
+    <li><%= link_to("?contributor_id=11&contributions=meta".html_safe,link_params) %> (Jason Young, meta contributions)</li>
   </ul>
   <p>Note: <code>contributor_id=</code> and <code>group_id=</code> are mutually exclusive, contributor_id takes precedence</p>
 </div>
