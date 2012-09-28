@@ -6,6 +6,7 @@
 #  see LICENSE file
 
 class ApplicationController < ActionController::Base
+  require_dependency 'year_week_stats'
   protect_from_forgery
   include AuthLib
   before_filter :check_for_rebuild, :signin_optional, :set_latest_yearweek, :check_for_metric
