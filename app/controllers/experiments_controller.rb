@@ -64,6 +64,29 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  def percentile_percentages
+    @datatype = params[:datatype]
+    if(!Page::DATATYPES.include?(@datatype) and @datatype != 'All')
+      # ToDo: error out
+      @datatype = 'Article'
+    end
+
+    pagelist = Page.by_datatype(@datatype).with_totals_for_metric('unique_pageviews')
+    @overall_count = pagelist.size
+    @overall_total = pagelist.map(&:total).compact.sum
+    @this_week_total = pagelist.map(&:this_week).compact.sum
+
+    @totals_by_percentile = {}
+    Settings.display_percentiles.each do |pct|
+      @totals_by_percentile[pct] ||= {}
+      pagelist = Page.by_datatype(@datatype).top_pages_by_percentile(pct)
+      @totals_by_percentile[pct][:count] = pagelist.size
+      @totals_by_percentile[pct][:overall] = pagelist.map(&:total).sum
+      @totals_by_percentile[pct][:this_week] = pagelist.map(&:this_week).sum
+    end
+  end
+
+
   protected
 
   def check_for_group

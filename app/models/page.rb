@@ -414,4 +414,14 @@ class Page < ActiveRecord::Base
     end
   end
 
+  def self.top_pages_by_percentile(percentile,options = {})
+    metric = options[:metric] || 'unique_pageviews'
+    value = options[:value] || 'mean'
+    with_scope do
+      distribution = self.joins(:page_totals).where("page_totals.metric = ?",metric).pluck("page_totals.#{value}")
+      percentile_value = distribution.compact.nist_percentile(percentile)
+      with_totals_for_metric(metric).where("#{value} >= ?",percentile_value)
+    end
+  end
+
 end

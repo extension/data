@@ -1,0 +1,43 @@
+<%- @page_title = "Percentage of Views by Percentile Group (#{@datatype})"-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Percentile Percentages'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="well">
+  <h3>Experimentation</h3>
+  <p>Add a "datatype" parameter: <code>?datatype=</code> to the url to explore different datatypes e.g.:</p>
+  <ul>
+    <%- (['All'] + Page::DATATYPES).each do |datatype| -%>
+      <%- link_params = params.merge({datatype: datatype}) -%>
+      <li><%= link_to("?datatype=#{datatype}".html_safe,link_params) %></li>
+    <%- end -%>
+  </ul>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <th>Percentile</th>
+        <th>Page Count</th>
+        <th>% Pages</th>
+        <th>% Overall Views</th>
+        <th>% This Week Views</th>
+      </thead>
+      <tbody>
+        <%- Settings.display_percentiles.each do |pct| -%>
+          <tr>
+            <td><%= pct %><super>th</super> percentile</td>
+            <td><span class='mednumber'><%= @totals_by_percentile[pct][:count] %></span></td>
+            <td><span class='mednumber'><%=number_to_percentage((@totals_by_percentile[pct][:count]/@overall_count)*100, :precision => 2)%></span></td>
+            <td><span class='mednumber'><%=number_to_percentage((@totals_by_percentile[pct][:overall]/@overall_total)*100, :precision => 2)%></span></td>
+            <td><span class='mednumber'><%=number_to_percentage((@totals_by_percentile[pct][:this_week]/@this_week_total)*100, :precision => 2)%></span></td>
+          </tr>
+        <%- end -%>
+        </tbody>
+    </table>
+  </div>
+</div>
