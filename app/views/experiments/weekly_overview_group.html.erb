@@ -1,0 +1,80 @@
+<%- @page_title = "Weekly Group Overview (#{@metric})"-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Weekly Group Overview'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="well">
+  <h3>Experimentation</h3>
+  <p>Add a "metric" parameter: <code>?metric=</code> to the url to explore different metrics e.g.:</p>
+  <ul>
+    <%- PageStat::METRICS.each do |metric| -%>
+      <%- link_params = params.merge({metric: metric}) -%>
+      <li><%= link_to("?metric=#{metric}".html_safe,link_params) %></li>
+    <%- end -%>
+  </ul>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <table class="table table-bordered table-striped">
+      <thead>
+        <tr>
+        <th>&nbsp;</th>
+        <th colspan=3>Landing</th>
+        <%- Page::DATATYPES.each do |datatype| -%>
+        <th colspan=3><%= datatype %></th>
+        <%- end -%>
+        </tr>
+        <tr>
+        <th>Group</th>
+        <th>Average</th>
+        <th>This Week</th>
+        <%- Page::DATATYPES.each do |datatype| -%>
+          <th>Average</th>
+          <th>This Week</th>
+          <th>99th</th>
+        <%- end -%>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= link_to('All',pages_path) %></td>
+          <td><span class='mednumber'><%=number_with_precision((@home_stats.sum_for_hashvalue('total')/@home_stats.yearweeks.count), :precision => 2)%></span></td>
+          <td><span class='mednumber'><%= @home_stats[@latest_yearweek]['total'] %></span></td>
+         <%- Page::DATATYPES.each do |datatype| -%>
+          <td><span class='mednumber'><%= number_with_precision(@page_stats[datatype]['mean'], :precision => 2) %></span></td>
+          <td><span class='mednumber'><%= number_with_precision(@page_stats[datatype]['this_week'], :precision => 2) %></span></td>
+          <td><span class='mednumber'><%= number_with_precision(@page_stats[datatype]['pct_99'], :precision => 2) %></span></td>
+        <%- end -%>         
+        </tr>
+        <%- @landing_stats.each do |group,stats| -%>
+          <tr>
+          <td><%= link_to(group.name,group_path(group)) %></td>
+          <%- if !stats.blank? -%>
+          <td><span class='mednumber'><%=number_with_precision((stats.sum_for_hashvalue('total')/stats.yearweeks.count), :precision => 2)%></span></td>
+          <td><span class='mednumber'><%= stats[@latest_yearweek]['total'] %></span></td>
+          <%- Page::DATATYPES.each do |datatype| -%>
+          <td><span class='mednumber'><%= number_with_precision(@group_page_stats[group][datatype]['mean'], :precision => 2) %></span></td>
+          <td><span class='mednumber'><%= number_with_precision(@group_page_stats[group][datatype]['this_week'], :precision => 2) %></span></td>
+          <td><span class='mednumber'><%= number_with_precision(@group_page_stats[group][datatype]['pct_99'], :precision => 2) %></span></td>
+          <%- end -%>         
+          <%- else -%>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <%- Page::DATATYPES.each do |datatype| -%>
+            <td>0</td>
+            <td>0</td>
+            <td>0</td>
+            <%- end -%>   
+          <%- end -%>
+          </tr>
+        <%- end -%>
+        </tbody>
+    </table>
+  </div>
+</div>

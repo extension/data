@@ -86,6 +86,32 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  def weekly_overview_group
+    @landing_stats = {}
+    @home_stats = LandingStat.overall.stats_by_yearweek(@metric)
+    Group.launched.order('name').each do |group|
+      @landing_stats[group] = group.landing_stats.stats_by_yearweek(@metric)
+    end
+
+    @page_stats = {}
+    @group_page_stats = {}
+    Page::DATATYPES.each do |datatype|
+      @page_stats[datatype] ||= {}
+      @page_stats[datatype]['mean'] = CollectedPageStat.overall.by_metric(@metric).by_datatype(datatype).average('per_page')
+      @page_stats[datatype]['this_week'] = CollectedPageStat.overall.by_metric(@metric).by_datatype(datatype).latest_week.pluck('per_page').first
+      @page_stats[datatype]['pct_99'] = CollectedPageStat.overall.by_metric(@metric).by_datatype(datatype).latest_week.pluck('pct_99').first
+
+      Group.launched.order('name').each do |group|
+        @group_page_stats[group] ||= {}
+        @group_page_stats[group][datatype] ||= {}
+        @group_page_stats[group][datatype]['mean'] = group.collected_page_stats.by_metric(@metric).by_datatype(datatype).average('per_page')
+        @group_page_stats[group][datatype]['this_week'] = group.collected_page_stats.by_metric(@metric).by_datatype(datatype).latest_week.pluck('per_page').first
+        @group_page_stats[group][datatype]['pct_99'] = group.collected_page_stats.by_metric(@metric).by_datatype(datatype).latest_week.pluck('pct_99').first
+      end
+    end
+
+ end
+
 
   protected
 

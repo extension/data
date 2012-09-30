@@ -90,6 +90,21 @@ class LandingStat < ActiveRecord::Base
   end
 
   def self.stats_by_yearweek(metric,cache_options = {})
+    if(!cache_options[:nocache])
+      cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : ''})
+      Rails.cache.fetch(cache_key,cache_options) do
+        with_scope do
+          _stats_by_yearweek(metric)
+        end
+      end
+    else
+      with_scope do
+        _stats_by_yearweek(metric)
+      end
+    end
+  end
+
+  def self._stats_by_yearweek(metric)
     stats = YearWeekStats.new
     with_scope do
       metric_by_yearweek = self.group(:yearweek).sum(metric)
