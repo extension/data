@@ -39,7 +39,10 @@
                   // set to true to replot when toggling series on/off
                   // set to an options object to pass in replot options.
                   seriesToggle: 'normal',
-                  seriesToggleReplot: {resetAxes: true}
+                  seriesToggleReplot: {resetAxes: true},
+                  <%- if local_assigns.has_key?(:legend_columns) -%>
+                  numberColumns: <%= legend_columns %>,
+                  <%- end -%>
               }
           },
           grid: {

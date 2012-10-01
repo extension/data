@@ -109,8 +109,33 @@ class ExperimentsController < ApplicationController
         @group_page_stats[group][datatype]['pct_99'] = group.collected_page_stats.by_metric(@metric).by_datatype(datatype).latest_week.pluck('pct_99').first
       end
     end
+  end
 
- end
+  def weekly_group_graph
+    @groupcount = params[:groupcount] || 10
+    @datatype = params[:datatype]
+    if(!Page::DATATYPES.include?(@datatype) and @datatype != 'All')
+      # ToDo: error out
+      @datatype = 'Article'
+    end
+
+    @groups_list = Group.top_by_page_average.all
+    @groups_of = (@groups_list.size  / @groupcount).ceil
+
+    @statgroups = []
+    @all_stats = Page.by_datatype(@datatype).stats_by_yearweek(@metric)
+    @groups_list.in_groups_of(@groups_of,false).each do |grouplist|
+      stats = YearWeekStatsComparator.new
+      stats['all'] = @all_stats
+      grouplist.each do |group|
+        group_stats =  group.pages.by_datatype(@datatype).stats_by_yearweek(@metric)
+        if(!group_stats.blank?)
+          stats[group.name] = group_stats
+        end
+      end
+      @statgroups << stats
+    end
+  end
 
 
   protected

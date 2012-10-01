@@ -1,0 +1,27 @@
+<%- @page_title = "Weekly Group Graphs - #{@datatype.pluralize}"-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Weekly Group Graphs'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="well">
+  <h3>Experimentation</h3>
+  <p>Add a "datatype" parameter: <code>?datatype=</code> to the url to explore different datatypes e.g.:</p>
+  <ul>
+    <%- (['All'] + Page::DATATYPES).each do |datatype| -%>
+      <%- link_params = params.merge({datatype: datatype}) -%>
+      <li><%= link_to("?datatype=#{datatype}".html_safe,link_params) %></li>
+    <%- end -%>
+  </ul>
+</div>
+
+<div class="row">
+  <%- @statgroups.each_with_index do |stats,index| -%>
+  <div class="span12">
+    <h3><%= @datatype %> Views - Group <%= index+1 %></h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => stats.to_graph_data('per_page'), :datalabel => "views_group_#{index}", :labels => stats.to_graph_labels, :legend_columns => (@groups_of > 8) ? 2 : 1})%>
+  </div>
+  <%- end -%>
+</div>

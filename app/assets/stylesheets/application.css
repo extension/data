@@ -19,4 +19,5 @@
  *= require responsive-tables
  *= require jquery.ui.datepicker
  *= require autocomplete
+ *= require jquery-tablesorter/blue
 */

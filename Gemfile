@@ -22,6 +22,7 @@ group :assets do
   # files for bootstrap-in-asset-pipeline integration
   gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
   gem 'jquery-ui-rails'
+  gem 'jquery-tablesorter'
 end
 
 # server settings

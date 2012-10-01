@@ -56,7 +56,7 @@ class Group < ActiveRecord::Base
     else
       sortorder = 'collected_page_stats.per_page ASC,collected_page_stats.pages DESC'
     end
-    
+
     with_scope do
       joins(:collected_page_stats)
       .where("collected_page_stats.datatype = ?",datatype)
@@ -73,6 +73,33 @@ class Group < ActiveRecord::Base
 
   def self.bottom_for_metric(options = {})
     self.top_or_bottom_by_metric('bottom',options)
+  end
+
+  def self.top_by_page_average(options = {})
+    pagecount = options[:pagecount] || 10
+    limit = options[:limit]
+    offset = options[:offset]
+    datatype = options[:datatype] || 'Article'
+    metric = options[:metric] || 'unique_pageviews'
+    sortorder = 'collected_page_stats.per_page DESC'
+
+
+    with_scope do
+      scope = joins(:collected_page_stats)
+                   .where("collected_page_stats.datatype = ?",datatype)
+                   .where("collected_page_stats.metric = ?",metric)
+                   .select("#{self.table_name}.*, avg(collected_page_stats.per_page) as per_page_average")
+                   .group('groups.id')
+                   .order('per_page_average DESC')
+      if(limit)
+        scope = scope.limit(limit)
+      end
+
+      if(offset)
+        scope = scope.offset(offset)
+      end
+      scope
+    end
   end
 
 

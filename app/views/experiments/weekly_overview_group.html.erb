@@ -19,7 +19,7 @@
 
 <div class="row">
   <div class="span12">
-    <table class="table table-bordered table-striped">
+    <table class="table table-bordered table-striped tablesorter">
       <thead>
         <tr>
         <th>&nbsp;</th>
@@ -48,7 +48,7 @@
           <td><span class='mednumber'><%= number_with_precision(@page_stats[datatype]['mean'], :precision => 2) %></span></td>
           <td><span class='mednumber'><%= number_with_precision(@page_stats[datatype]['this_week'], :precision => 2) %></span></td>
           <td><span class='mednumber'><%= number_with_precision(@page_stats[datatype]['pct_99'], :precision => 2) %></span></td>
-        <%- end -%>         
+        <%- end -%>
         </tr>
         <%- @landing_stats.each do |group,stats| -%>
           <tr>
@@ -60,7 +60,7 @@
           <td><span class='mednumber'><%= number_with_precision(@group_page_stats[group][datatype]['mean'], :precision => 2) %></span></td>
           <td><span class='mednumber'><%= number_with_precision(@group_page_stats[group][datatype]['this_week'], :precision => 2) %></span></td>
           <td><span class='mednumber'><%= number_with_precision(@group_page_stats[group][datatype]['pct_99'], :precision => 2) %></span></td>
-          <%- end -%>         
+          <%- end -%>
           <%- else -%>
             <td>0</td>
             <td>0</td>
@@ -70,7 +70,7 @@
             <td>0</td>
             <td>0</td>
             <td>0</td>
-            <%- end -%>   
+            <%- end -%>
           <%- end -%>
           </tr>
         <%- end -%>
@@ -78,3 +78,7 @@
     </table>
   </div>
 </div>
+
+<script type="text/javascript">
+$('table.tablesorter').tablesorter();
+</script>
