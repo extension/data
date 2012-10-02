@@ -1,0 +1,50 @@
+<%- @page_title = "Reviewed Page Performance "-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Reviewed Page Performance'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>). Showing pages created since <%= EpochDate::CREATE_FINAL_WIKI_MIGRATION %></p>
+</header>
+
+<div class="row">
+  <div class="span12">
+  <h3>Article Totals</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @article_stats.to_graph_data('pages'), :datalabel => 'article_total', :labels => @article_stats.to_graph_labels})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <h3>Article Views</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @article_stats.to_graph_data('per_page'), :datalabel => 'article_views', :labels => @article_stats.to_graph_labels})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <h3>Article Views - 99th Percentile</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @article_percentiles.to_graph_data(99), :datalabel => 'article_99', :labels => @article_percentiles.to_graph_labels})%>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+  <h3>Faq Totals</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @faq_stats.to_graph_data('pages'), :datalabel => 'faq_total', :labels => @faq_stats.to_graph_labels})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <h3>Faq Views</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @faq_stats.to_graph_data('per_page'), :datalabel => 'faq_views', :labels => @faq_stats.to_graph_labels})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+  <h3>Faq Views - 99th Percentile</h3>
+    <%= render(:partial => 'shared/comparison_plot', :locals => {:data => @faq_percentiles.to_graph_data(99), :datalabel => 'faq_99', :labels => @faq_percentiles.to_graph_labels})%>
+  </div>
+</div>

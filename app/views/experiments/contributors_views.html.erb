@@ -1,0 +1,21 @@
+<%- @page_title = "Contributors vs. Views"-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Contributors vs. Views'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="row">
+  <div class="span12">
+    <h3>Articles</h3>
+    <%= render(partial: 'shared/scatter_plot', locals: {:data => [@articles], :datalabel => 'articles', :xlabel => 'Contributors', :ylabel => 'Mean Views', :pointsize => 4})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>Faqs</h3>
+    <%= render(partial: 'shared/scatter_plot', locals: {:data => [@faqs], :datalabel => 'faqs', :xlabel => 'Contributors', :ylabel => 'Mean Views', :pointsize => 4})%>
+  </div>
+</div>

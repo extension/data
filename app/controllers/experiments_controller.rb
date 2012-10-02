@@ -137,6 +137,58 @@ class ExperimentsController < ApplicationController
     end
   end
 
+  def review_performance
+    @base_scope = Page.from_create.where('source_created_at > ?',EpochDate::CREATE_FINAL_WIKI_MIGRATION)
+
+    @reviewed_articles = @base_scope.articles.reviewed
+    @reviewed_faqs = @base_scope.faqs.reviewed
+
+    ra_ids = @reviewed_articles.pluck('pages.id')
+    rf_ids = @reviewed_faqs.pluck('pages.id')
+
+    @unreviewed_articles = @base_scope.articles.where("pages.id NOT IN (#{ra_ids.join(',')})")
+    @unreviewed_faqs = @base_scope.faqs.where("pages.id NOT IN (#{rf_ids.join(',')})")
+
+    @article_stats = YearWeekStatsComparator.new
+    @article_stats['reviewed'] = @reviewed_articles.stats_by_yearweek('unique_pageviews')
+    @article_stats['notreviewed'] = @unreviewed_articles.stats_by_yearweek('unique_pageviews')
+
+    @article_percentiles = YearWeekStatsComparator.new
+    @article_percentiles['reviewed'] = @reviewed_articles.percentiles_by_yearweek('unique_pageviews')
+    @article_percentiles['notreviewed'] = @unreviewed_articles.percentiles_by_yearweek('unique_pageviews')
+
+    @faq_stats = YearWeekStatsComparator.new
+    @faq_stats['reviewed'] = @reviewed_faqs.stats_by_yearweek('unique_pageviews')
+    @faq_stats['notreviewed'] = @unreviewed_faqs.stats_by_yearweek('unique_pageviews')
+
+   @faq_percentiles = YearWeekStatsComparator.new
+    @faq_percentiles['reviewed'] = @reviewed_faqs.percentiles_by_yearweek('unique_pageviews')
+    @faq_percentiles['notreviewed'] = @unreviewed_faqs.percentiles_by_yearweek('unique_pageviews')
+
+  end
+
+  def contributors_views
+    node_contributors = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('contributor_id',:distinct => true)
+
+    articles = Page.from_create.articles.with_totals_for_metric('unique_pageviews')
+    faqs = Page.from_create.faqs.with_totals_for_metric('unique_pageviews')
+
+    @articles = []
+    @faqs = []
+
+    articles.each do |page|
+      if(node_contributors[page.node_id])
+        @articles << [node_contributors[page.node_id],page.mean]
+      end
+    end
+
+    faqs.each do |page|
+      if(node_contributors[page.node_id])
+        @faqs << [node_contributors[page.node_id],page.mean]
+      end
+    end
+    
+  end
 
   protected
 

@@ -16,45 +16,47 @@
       <thead>
         <th>View</th>
         <th>Description</th>
-        <th>Added on</th>
       </thead>
       <tbody>
         <tr>
           <td><%= link_to('Panda Impact Summary',{action: 'panda_impact_summary'}) %></td>
           <td>Percentage impacts per group before and after the U.S. Google algorithm change known as "panda" on <%= EpochDate.panda_epoch_date.date.to_s %></td>
-          <td><span class="label">2012-09-28</span></td>
         </tr>
 
         <tr>
           <td><%= link_to('News vs. Indexed News',{action: 'news_comparison'}) %></td>
           <td>Comparing views of News vs. News marked as "indexed" - usually by using an 'originalnews' tag</td>
-          <td><span class="label">2012-09-28</span></td>
         </tr>
 
         <tr>
           <td><%= link_to('Metric Comparisons',{action: 'metric_comparisons'}) %></td>
           <td>Shows a comparison plot for the various metrics available from the Google Analytics data</td>
-          <td><span class="label">2012-09-28</span></td>
         </tr>
 
         <tr>
           <td><%= link_to('Percentile Percentages',{action: 'percentile_percentages'}) %></td>
           <td>Calculates the Top X% of content (top X% all-time) and the percentage of views overall/for week. Attempts at answering the question: "what if we dumped the bottom Y% of content?"</td>
-          <td><span class="label">2012-09-28</span></td>
         </tr>
 
         <tr>
           <td><%= link_to('Weekly Overview for Groups',{action: 'weekly_overview_group'}) %></td>
           <td>Averages and latest week stats for landing pages and page types for all groups. Interesting to compare top content vs. landing page</td>
-          <td><span class="label">2012-09-30</span></td>
         </tr>
 
         <tr>
           <td><%= link_to('Weekly Group Graphs',{action: 'weekly_group_graph'}) %></td>
           <td>Shows a set of graphs, of top to bottom groups by per_page averages for the selected metric. (Meant to group and compare top/bottom groups and show outliers at a glance)</td>
-          <td><span class="label">2012-10-01</span></td>
         </tr>
 
+        <tr>
+          <td><%= link_to('Review Performance',{action: 'review_performance'}) %></td>
+          <td>Compares workflow-reviewed content vs. content not using workflow published since the final wiki migration (<%= EpochDate::CREATE_FINAL_WIKI_MIGRATION %>)</td>
+        </tr>
+
+        <tr>
+          <td><%= link_to('Contributors vs. Views',{action: 'contributors_views'}) %></td>
+          <td>Scatter plot of node contributor count vs. mean views. Pretty useless as a scatterplot, left as experiment showing the uselessness</td>
+        </tr>
       </tbody>
     </table>
   </div>

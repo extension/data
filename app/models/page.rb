@@ -16,6 +16,7 @@ class Page < ActiveRecord::Base
   has_many :page_stats
   has_many :page_totals
   has_many :meta_contributors, :through => :node, :source => :meta_contributors
+  has_many :node_activities, :through => :node
 
   # index settings
   NOT_INDEXED = 0
@@ -45,6 +46,10 @@ class Page < ActiveRecord::Base
     pt_columns = PageTotal.column_names.reject{|n| ['id','page_id','metric','created_at'].include?(n)}
     select_columns = pt_columns.map{|col| "page_totals.#{col} as #{col}"}
     joins(:page_totals).where('page_totals.metric = ?',metric).select("pages.*, #{select_columns.join(',')}")
+  }
+
+  scope :reviewed, lambda {
+    joins(:node_activities).where('node_activities.activity = ?',NodeActivity::REVIEW_ACTIVITY).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
   }
 
   def display_title(options = {})

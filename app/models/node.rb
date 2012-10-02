@@ -60,6 +60,10 @@ class Node < ActiveRecord::Base
     joins(:node_activities).where("YEARWEEK(node_activities.created_at,3) = ?",yearweek)
   }
 
+  scope :reviewed, lambda {
+    joins(:node_activities).where('node_activities.activity = ?',NodeActivity::REVIEW_ACTIVITY).select("distinct(#{self.table_name}.id),#{self.table_name}.*")
+  }
+
   def display_title(options = {})
     truncate_it = options[:truncate].nil? ? true : options[:truncate]
 
