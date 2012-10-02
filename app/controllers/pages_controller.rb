@@ -4,6 +4,7 @@
 # === LICENSE:
 #  BSD(-compatible)
 #  see LICENSE file
+require 'csv'
 
 class PagesController < ApplicationController
   before_filter :check_for_group
@@ -115,8 +116,10 @@ class PagesController < ApplicationController
 
 
     if(!params[:download].nil? and params[:download] == 'csv')
+      @node_contributors = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('contributor_id',:distinct => true)
+      @node_contributions = NodeActivity.joins(:node).where('nodes.has_page = 1').group('node_id').count('node_activities.id')
       @pagelist = @pagelist = scope.totals_list({order_by: @order_by, direction: @direction, metric: @metric})
-      send_data(totals_csv(@pagelist),
+      send_data(totals_csv(@pagelist,@node_contributors,@node_contributions),
                 :type => 'text/csv; charset=iso-8859-1; header=present',
                 :disposition => "attachment; filename=#{@page_title_display.downcase.gsub(' ','_')}.csv")
     else
@@ -208,12 +211,14 @@ class PagesController < ApplicationController
     true
   end
 
-  def totals_csv(collection)
+  def totals_csv(collection,contributors,contributions)
     CSV.generate do |csv|
       headers = []
       Page.totals_list_columns.each do |column|
         headers << column
       end
+      headers << 'contributors'
+      headers << 'contributions'
       csv << headers
       collection.each do |page|
         row = []
@@ -224,6 +229,13 @@ class PagesController < ApplicationController
           else
             row << value
           end
+        end
+        if(page.node_id)
+          row << contributors[page.node_id] || 0
+          row << contributions[page.node_id] || 0
+        else
+          row << 'n/a'
+          row << 'n/a'
         end
         csv << row
       end
