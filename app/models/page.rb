@@ -429,4 +429,11 @@ class Page < ActiveRecord::Base
     end
   end
 
+  def self.tag_counts(cache_options= {})
+    cache_key = self.get_cache_key(__method__)
+    Rails.cache.fetch(cache_key,cache_options) do
+      joins(:tags).group('tags.id').order('count_all DESC').count
+    end
+  end
+
 end

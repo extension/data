@@ -1,0 +1,43 @@
+<%- if @contributor -%>
+  <%= render(:partial => 'contributor_page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- elsif @group -%>
+  <%= render(:partial => 'group_page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- else -%>
+  <%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => @endpoint}) %>
+<%- end -%>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title_display.html_safe %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="row">
+  <%- Page::DATATYPES.each do |datatype| -%>
+    <div class="span3">
+      <%- if @datatype_stats[datatype][@latest_yearweek] -%>
+        <h3><%= datatype.pluralize %>
+          <%- link_params = params.delete_if{|k,v| ['action'].include?(k)}.merge({datatype: datatype}) -%>
+          <span><%= link_to("details &raquo;".html_safe,details_pages_path(link_params),:class => 'btn btn-small') %></span>
+        </h3>
+        <%= render(:partial => 'shared/overall_views_information',
+                   :locals => {:datatype => datatype, :stats_for_week => @datatype_stats[datatype][@latest_yearweek]}) %>
+     <%- else -%>
+       <h3><%= datatype.pluralize %></h3>
+       <p> No Data </p>
+     <%- end -%>
+    </div>
+  <%- end -%>
+</div>
+
+<%- Page::DATATYPES.each do |datatype| -%>
+<%- if @datatype_stats[datatype][@latest_yearweek] -%>
+<div class="row">
+  <div class="span12">
+    <h3><%= "#{datatype} Views vs. Overall average" %></h3>
+    <%= render(:partial => 'shared/comparison_plot',
+               :locals => {data: @comparators[datatype].to_graph_data('per_page'),
+                           labels: @comparators[datatype].to_graph_labels,
+                           datalabel: "per_page_#{datatype}" }) -%>
+  </div>
+</div>
+<%- end -%>
+<%- end -%>

@@ -62,4 +62,11 @@ class GroupsController < ApplicationController
     end
 
   end
+
+  def pagetags
+    @group = Group.find(params[:id])
+    @tagcounts = Page.tag_counts
+    @tagslist = Tag.pagetags_for_group(@group).order(:name).uniq
+  end
+
 end

@@ -40,6 +40,11 @@ class Tag < ActiveRecord::Base
       update_sql = "UPDATE #{self.table_name} SET group_id = #{group_id} WHERE #{self.table_name}.id = #{community_tag.id}"
       self.connection.execute(update_sql)
     end
+    true
   end
-  true
+
+  def self.pagetags_for_group(group)
+    idlist = group.pages.pluck('pages.id')
+    self.where('group_id IS NULL').joins(:page_taggings).where("page_taggings.page_id IN (#{idlist.join(',')})")
+  end
 end

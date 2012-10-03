@@ -14,7 +14,7 @@
   <h2>Summary</h2>
   <%- link_params = params.delete_if{|k,v| ['action'].include?(k)} -%>
   <p>
-  <%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(link_params),:class => 'btn') if (@datatype != 'All' and !@contributor)  %>
+  <%= link_to("Aggregate Statistics By Week &raquo;".html_safe,aggregate_pages_path(link_params),:class => 'btn') if (@datatype != 'All' and !@contributor and !@tag)  %>
   <%= link_to("Individual Page Totals &raquo;".html_safe,totals_pages_path(link_params),:class => 'btn') %>
  </p>
 </div>

@@ -1,0 +1,23 @@
+<%- @page_title = "Directory of Group Tag Lists"-%>
+<%= render(:partial => 'experiments_breadcrumbs', :locals => {:endpoint => 'Group Tag Lists Directory'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+
+<div class="row">
+  <div class="span12">
+    <table class="table table-bordered table-striped">
+      <tbody>
+        <%- Group.launched.each do |group| -%>
+          <tr>
+            <td><%= link_to(group.name,group_path(group)) %></td>
+            <td><%= link_to('Tags List',pagetags_group_path(group)) %></td>
+          </tr>
+        <%- end -%>
+        </tbody>
+    </table>
+  </div>
+</div>

@@ -17,6 +17,50 @@ class PagesController < ApplicationController
     end
   end
 
+  def overview
+    if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
+      if(params[:contributions] and params[:contributions] == 'meta')
+        @contributions_type = 'Listed'
+        scope = @contributor.unique_meta_contributed_pages
+      else
+        @contributions_type = 'Direct'
+        scope = @contributor.unique_contributed_pages
+      end
+    elsif(@group)
+      scope = @group.pages
+    elsif(params[:tag] and @tag = Tag.find_by_name(params[:tag]))
+      scope = @tag.pages
+    else
+      scope = Page
+    end
+
+    @page_title_display = @page_title = "Page Information"
+
+    if(@contributor)
+      @page_title += "- #{@contributions_type} Contributions - #{@contributor.fullname} (ID##{@contributor.id})"
+      @page_title_display += "- #{@contributions_type} Contributions for #{@contributor.fullname}"
+    elsif(@group)
+      @page_title += " - Group ##{@group.id}"
+      @page_title_display += " for #{@group.name}"
+    elsif(@tag)
+      @page_title += " - Tag ##{@tag.id}"
+      @page_title_display += " for #{@tag.name}"     
+    end
+
+    @endpoint = @page_title
+
+    @datatype_stats = {}
+    @overall_stats = {}
+    @comparators = {}
+    Page::DATATYPES.each do |datatype|
+      @datatype_stats[datatype] = scope.by_datatype(datatype).stats_by_yearweek(@metric)
+      @overall_stats[datatype] = Page.by_datatype(datatype).stats_by_yearweek(@metric)
+      @comparators[datatype]= YearWeekStatsComparator.new
+      @comparators[datatype]["Overall #{datatype.pluralize}"] = @overall_stats[datatype]
+      @comparators[datatype]["#{datatype.pluralize}"] = @datatype_stats[datatype]
+    end
+  end
+
   def show
     @page = Page.includes(:node).find(params[:id])
     @view_stats = @page.stats_by_yearweek(@metric)
@@ -29,7 +73,6 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    # todo: tags
     if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
       if(params[:contributions] and params[:contributions] == 'meta')
         @contributions_type = 'Listed'
@@ -40,6 +83,8 @@ class PagesController < ApplicationController
       end
     elsif(@group)
       scope = @group.pages.by_datatype(@datatype)
+    elsif(params[:tag] and @tag = Tag.find_by_name(params[:tag]))
+      scope = @tag.pages.by_datatype(@datatype)
     else
       scope = Page.by_datatype(@datatype)
     end
@@ -53,6 +98,9 @@ class PagesController < ApplicationController
     elsif(@group)
       @page_title += " - Group ##{@group.id}"
       @page_title_display += " for #{@group.name}"
+    elsif(@tag)
+      @page_title += " - Tag ##{@tag.id}"
+      @page_title_display += " for #{@tag.name}"     
     end
 
     @stats = scope.stats_by_yearweek(@metric)
@@ -67,7 +115,6 @@ class PagesController < ApplicationController
       @datatype = 'Article'
     end
 
-    # todo: tags
     if(params[:contributor_id] and @contributor = Contributor.find_by_id(params[:contributor_id]))
       if(params[:contributions] and params[:contributions] == 'meta')
         @contributions_type = 'Listed'
@@ -78,6 +125,8 @@ class PagesController < ApplicationController
       end
     elsif(@group)
       scope = @group.pages.by_datatype(@datatype)
+    elsif(params[:tag] and @tag = Tag.find_by_name(params[:tag]))
+      scope = @tag.pages.by_datatype(@datatype)
     else
       scope = Page.by_datatype(@datatype)
     end
@@ -112,6 +161,9 @@ class PagesController < ApplicationController
     elsif(@group)
       @page_title += " - Group ##{@group.id}"
       @page_title_display += " for #{@group.name}"
+    elsif(@tag)
+      @page_title += " - Tag ##{@tag.id}"
+      @page_title_display += " for #{@tag.name}"     
     end
 
 
@@ -264,7 +316,5 @@ class PagesController < ApplicationController
       end
     end
   end
-
-
 
 end

@@ -12,6 +12,7 @@ Positronic::Application.routes.draw do
       get :comparison_test
       get :graphs
       get :details
+      get :overview
     end
   end
 
@@ -42,6 +43,7 @@ Positronic::Application.routes.draw do
     member do
       get :pagelist
       get :pages
+      get :pagetags
     end
   end
 

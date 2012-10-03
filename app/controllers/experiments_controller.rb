@@ -187,7 +187,10 @@ class ExperimentsController < ApplicationController
         @faqs << [node_contributors[page.node_id],page.mean]
       end
     end
-    
+
+  end
+
+  def group_tagslists
   end
 
   protected

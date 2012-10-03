@@ -1,0 +1,23 @@
+<% @page_title = "Page Tags for Group ##{@group.id}" %>
+<%= render(:partial => 'group_breadcrumbs', :locals => {:endpoint => "Page Tags"}) %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<div class="row">
+  <div class="span12">
+    <table class="table tablesorter">
+      <thead>
+        <th>Tag</th>
+        <th>Count</th>
+      <tbody>
+        <%- @tagslist.each do |tag| -%>
+        <tr>
+          <td><%= link_to(tag.name,overview_pages_path(tag: tag.name)) %></td>
+          <td><%= @tagcounts[tag.id] %></td>
+        </tr>
+        <%- end -%>
+      </tbody>
+  </table>
+ </div>
