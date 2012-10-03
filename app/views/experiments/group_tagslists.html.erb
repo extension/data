@@ -11,7 +11,7 @@
   <div class="span12">
     <table class="table table-bordered table-striped">
       <tbody>
-        <%- Group.launched.each do |group| -%>
+        <%- Group.launched.order(:name).each do |group| -%>
           <tr>
             <td><%= link_to(group.name,group_path(group)) %></td>
             <td><%= link_to('Tags List',pagetags_group_path(group)) %></td>
