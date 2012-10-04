@@ -89,16 +89,16 @@ end
 namespace :delayed_job do
   desc "stops delayed_job"
   task :stop, :roles => :app do
-    run "sudo god stop delayed_jobs'"
+    run "sudo god stop delayed_jobs"
   end
   
   desc "reloads delayed_job"
   task :reload, :roles => :app do
-    run "sudo god load #{current_path}/config/delayed_job.god'"
+    run "sudo god load #{current_path}/config/delayed_job.god"
   end
   
   desc "starts delayed_job"
   task :start, :roles => :app do
-    run "sudo god start delayed_jobs'"
+    run "sudo god start delayed_jobs"
   end
 end
