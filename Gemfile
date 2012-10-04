@@ -70,6 +70,9 @@ gem 'airbrake'
 # memcached
 gem 'dalli'
 
+#god
+gem "god", :require => false
+
 group :development do
   # require the powder gem
   gem 'powder'
