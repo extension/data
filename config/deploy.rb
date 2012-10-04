@@ -3,7 +3,6 @@ set :default_stage, "demo"
 require 'capistrano/ext/multistage'
 require 'capatross'
 require "bundler/capistrano"
-require "delayed/recipes"
 require './config/boot'
 require "airbrake/capistrano"
 
@@ -26,8 +25,8 @@ after "deploy:update_code", "deploy:cleanup"
 after "deploy", "deploy:web:enable"
 # delayed job
 after "deploy:stop",    "delayed_job:stop"
+before "delayed_job:start", "delayed_job:reload"
 after "deploy:start",   "delayed_job:start"
-after "deploy:restart", "delayed_job:restart"
 
 namespace :deploy do
 
