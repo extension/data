@@ -302,7 +302,7 @@ class Analytic < ActiveRecord::Base
     (earliest_year,earliest_week) = self.earliest_year_week
     (latest_year,latest_week) = self.latest_year_week
     earliest_date = self.date_pair_for_year_week(earliest_year,earliest_week)[0]
-    from_date = (start_date < earliest_date) ? earliest_date : start_date
+    from_date = (start_date.nil? or start_date < earliest_date) ? earliest_date : start_date
     end_date = self.date_pair_for_year_week(latest_year,latest_week)[1]
     self.year_weeks_between_dates(from_date,end_date)
   end
