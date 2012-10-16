@@ -436,4 +436,16 @@ class Page < ActiveRecord::Base
     end
   end
 
+  def self.counts_by_group_for_datatype(datatype,cache_options= {})
+    cache_key = self.get_cache_key(__method__,{datatype: datatype})
+    Rails.cache.fetch(cache_key,cache_options) do
+      pagecounts = {}
+      pagecounts['all'] = Page.by_datatype(datatype).count
+      Group.launched.each do |group|
+        pagecounts[group.id] = group.pages.by_datatype(datatype).count
+      end
+      pagecounts
+    end
+  end
+
 end

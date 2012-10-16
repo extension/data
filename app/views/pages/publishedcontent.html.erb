@@ -1,0 +1,43 @@
+<%- @page_title = "Published Content by Group"-%>
+<%= render(:partial => 'page_breadcrumbs', :locals => {:endpoint => 'Published Content'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
+</header>
+
+<div class="row">
+  <div class="span12">
+    <table class="table table-bordered table-striped tablesorter">
+      <thead>
+        <tr>
+        <th>Group</th>
+        <%- Page::DATATYPES.each do |datatype| -%>
+        <th><%= datatype %></th>
+        <%- end -%>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><%= link_to('All',pages_path) %></td>
+          <%- Page::DATATYPES.each do |datatype| -%>
+          <td><span class='mednumber'><%= @page_counts[datatype]['all'] %></span></td>
+          <%- end -%>
+        </tr>
+        <%- Group.launched.each do |group| -%>
+          <tr>
+          <td><%= link_to(group.name,group_path(group)) %></td>
+          <%- Page::DATATYPES.each do |datatype| -%>
+            <%- stats = @page_counts[datatype][group.id] -%>
+            <%- if !stats.blank? -%>
+              <td><span class='mednumber'><%= @page_counts[datatype][group.id] %></span></td>
+            <%- else -%>
+              <td>0</td>
+            <%- end -%>
+          <%- end -%>
+          </tr>
+        <%- end -%>
+        </tbody>
+    </table>
+  </div>
+</div>

@@ -254,6 +254,13 @@ class PagesController < ApplicationController
     end
   end
 
+  def publishedcontent
+    @page_counts = {}
+    Page::DATATYPES.each do |datatype|
+      @page_counts[datatype] = Page.counts_by_group_for_datatype(datatype)
+    end
+  end
+
   protected
 
   def check_for_group

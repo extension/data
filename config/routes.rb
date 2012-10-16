@@ -13,6 +13,7 @@ Positronic::Application.routes.draw do
       get :graphs
       get :details
       get :overview
+      get :publishedcontent
     end
   end
 
