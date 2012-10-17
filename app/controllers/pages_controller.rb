@@ -278,6 +278,7 @@ class PagesController < ApplicationController
       end
       headers << 'contributors'
       headers << 'contributions'
+      headers << 'tags'
       csv << headers
       collection.each do |page|
         row = []
@@ -296,6 +297,7 @@ class PagesController < ApplicationController
           row << 'n/a'
           row << 'n/a'
         end
+        row << "#{page.tags.map(&:name).join(',')}"
         csv << row
       end
     end
