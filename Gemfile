@@ -64,7 +64,7 @@ gem 'safe_attributes'
 gem "google_visualr", ">= 2.1"
 
 # jqplot
-gem 'jqplot-rails', :git => 'git://github.com/extension/jqplot-rails.git'
+gem 'jqplot-rails', ">= 0.2"
 
 # exception handling
 gem 'airbrake'
