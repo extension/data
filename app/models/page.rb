@@ -24,7 +24,7 @@ class Page < ActiveRecord::Base
   NOT_GOOGLE_INDEXED = 2
 
   PERCENTILES = [99,95,90,75,50,25,10]
-  DATATYPES = ['Article','Faq','Event','News']
+  DATATYPES = ['Article','Faq','News']
 
   scope :not_ignored, where("indexed != ?",NOT_INDEXED )
   scope :indexed, where(:indexed => INDEXED)
@@ -33,7 +33,6 @@ class Page < ActiveRecord::Base
 
   scope :news, where(:datatype => 'News')
   scope :faqs, where(:datatype => 'Faq')
-  scope :events, where(:datatype => 'Event')
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
   scope :by_datatype, lambda{|datatype| 

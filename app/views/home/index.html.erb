@@ -9,8 +9,7 @@
     <h2>Pages</h2>
     <p>Extension faculty and staff have published <span class='mednumber'><%= number_with_delimiter(Page.count)%></span> pages:
     <span class='mednumber'><%= number_with_delimiter(Page.articles.count)%></span> articles,
-    <span class='mednumber'><%= number_with_delimiter(Page.faqs.count)%></span> faqs,
-    <span class='mednumber'><%= number_with_delimiter(Page.events.count)%></span> events, and
+    <span class='mednumber'><%= number_with_delimiter(Page.faqs.count)%></span> faqs, and
     <span class='mednumber'><%= number_with_delimiter(Page.news.count)%></span> news items
     to <a href='http://www.extension.org'>www.extension.org</a>.</p>
     <p>Last week <span class='mednumber'><%= number_with_delimiter(@seen)%></span> of those pages, the home page, and the landing pages

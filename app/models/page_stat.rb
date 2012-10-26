@@ -15,7 +15,6 @@ class PageStat < ActiveRecord::Base
   scope :articles, includes(:page).where('pages.datatype = ?','Article')
   scope :news, includes(:page).where('pages.datatype = ?','News')
   scope :faqs, includes(:page).where('pages.datatype = ?','Faq')
-  scope :events, includes(:page).where('pages.datatype = ?','Event')
   scope :indexed, includes(:page).where("pages.indexed = ?",Page::INDEXED)
 
 

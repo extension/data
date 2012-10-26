@@ -28,7 +28,7 @@
 
 <div class="row">
   <%- Page::DATATYPES.each do |datatype| -%>
-    <div class="span3">
+    <div class="span4">
       <%- if @datatype_stats[datatype][@latest_yearweek] -%>
         <h3><%= datatype.pluralize %>
           <span><%= link_to("details &raquo;".html_safe,details_pages_path(group_id: @group.id,datatype: datatype),:class => 'btn btn-small') %></span>
