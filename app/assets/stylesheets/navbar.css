@@ -1,0 +1,9 @@
+/* app banner
+-----------------------------------------------------------------------------*/
+#extensionNav {text-align: center; background: #53586d; padding: .15em 0 .2em; margin: 0 auto; font-size:.9em;}
+#extensionNav .group {display:inline;}
+#extensionNav .group li {display:inline;}
+#extensionNav a {padding-left: .5em; padding-right: .5em; color: #ddd;text-decoration: none;}
+#extensionNav ul {display:inline; margin: 0;}
+#extensionNav a:hover { text-decoration: underline;}
+
