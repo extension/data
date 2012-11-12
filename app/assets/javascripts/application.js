@@ -13,11 +13,11 @@
 //= require jquery
 //= require jquery_ujs
 //= require twitter/bootstrap
-//= require jqplot
-//= require jqplot/plugins/dateAxisRenderer
-//= require jqplot/plugins/highlighter
-//= require jqplot/plugins/enhancedLegendRenderer
-//= require jqplot/plugins/cursor
+//= require jquery.jqplot
+//= require jqplot-plugins/jqplot.dateAxisRenderer
+//= require jqplot-plugins/jqplot.highlighter
+//= require jqplot-plugins/jqplot.enhancedLegendRenderer
+//= require jqplot-plugins/jqplot.cursor
 //= require responsive-tables
 //= require jquery.ui.datepicker
 //= require jquery.ui.autocomplete

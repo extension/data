@@ -64,7 +64,7 @@ gem 'safe_attributes'
 gem "google_visualr", ">= 2.1"
 
 # jqplot
-gem 'jqplot-rails', ">= 0.2"
+gem 'outfielding-jqplot-rails'
 
 # exception handling
 gem 'airbrake'
