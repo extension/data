@@ -47,8 +47,8 @@ class DataImporter < Thor
     end
 
 
-    def rebuild_single(model,method='rebuild')
-      rebuilder = Rebuild.start(group)
+    def rebuild_single(model,action='rebuild')
+      rebuilder = Rebuild.start(model)
       run_and_log(rebuilder,model,action)
       rebuilder.finish
     end
