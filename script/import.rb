@@ -30,8 +30,12 @@ class DataImporter < Thor
 
     def run_and_log(rebuilder,model,action)
       puts "Starting #{model}##{action}..." if options[:verbose]
-      run_time = rebuilder.run_and_log(model,action)
-      puts "\t Finished #{model}##{action} (#{run_time.round(2)}s)" if options[:verbose]
+      begin
+        run_time = rebuilder.run_and_log(model,action)
+        puts "\t Finished #{model}##{action} (#{run_time.round(2)}s)" if options[:verbose]
+      rescue StandardError => error
+        $stderr.puts "Exception! backtrace: #{error.backtrace}"
+      end
     end
 
     def rebuild_group(group)
