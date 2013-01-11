@@ -136,14 +136,6 @@ class Page < ActiveRecord::Base
     end
   end
 
-  def self.pagecount_for_year_week(year,week)
-    yearweek = self.yearweek(year,week)
-    with_scope do
-      self.where("YEARWEEK(#{self.table_name}.created_at,3) <= ?",yearweek).count("DISTINCT #{self.table_name}.id")
-    end
-  end
-
-
   def self.page_counts_by_yearweek
     with_scope do
       yearweek_condition = "YEARWEEK(#{self.table_name}.created_at,3)"
