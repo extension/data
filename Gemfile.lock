@@ -62,10 +62,10 @@ GEM
     dalli (2.6.2)
     delayed_job (3.0.5)
       activesupport (~> 3.0)
-    delayed_job_active_record (0.3.3)
+    delayed_job_active_record (0.4.0)
       activerecord (>= 2.1.0, < 4)
       delayed_job (~> 3.0)
-    diff-lcs (1.2.0)
+    diff-lcs (1.2.1)
     erubis (2.7.0)
     execjs (1.4.0)
       multi_json (~> 1.0)
@@ -83,12 +83,13 @@ GEM
     hike (1.2.1)
     i18n (0.6.1)
     journey (1.0.4)
-    jquery-rails (2.1.4)
+    jquery-migrate-rails (1.0.0)
+    jquery-rails (2.2.1)
       railties (>= 3.0, < 5.0)
       thor (>= 0.14, < 2.0)
     jquery-tablesorter (1.4.1)
       railties (~> 3.1)
-    jquery-ui-rails (2.0.2)
+    jquery-ui-rails (4.0.1)
       jquery-rails
       railties (>= 3.1.0)
     json (1.7.6)
@@ -100,7 +101,7 @@ GEM
       mime-types (~> 1.16)
       treetop (~> 1.4.8)
     method_source (0.8.1)
-    mime-types (1.20.1)
+    mime-types (1.21)
     multi_json (1.5.0)
     mysql2 (0.3.11)
     net-http-spy (0.2.1)
@@ -204,9 +205,10 @@ DEPENDENCIES
   garb
   god
   google_visualr (>= 2.1)
-  jquery-rails (~> 2.1.4)
+  jquery-migrate-rails
+  jquery-rails
   jquery-tablesorter
-  jquery-ui-rails (~> 2.0.2)
+  jquery-ui-rails
   kaminari
   mysql2
   net-http-spy
