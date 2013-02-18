@@ -41,10 +41,6 @@ gem 'jquery-rails'
 # pagination
 gem 'kaminari'
 
-# Deploy with Capistrano
-gem 'capistrano'
-gem 'capatross'
-
 # background jobs
 gem 'delayed_job_active_record'
 gem 'daemons'
@@ -73,6 +69,13 @@ gem 'airbrake'
 # memcached
 gem 'dalli'
 
+# useragent analysis
+gem 'useragent'
+
+# ip to geo mapping
+gem 'geocoder'
+gem 'geoip'
+
 #god
 gem "god", :require => false
 
@@ -81,12 +84,14 @@ group :development do
   gem 'powder'
   gem 'net-http-spy'
   gem 'pry'
+  gem 'capistrano'
+  gem 'capatross'
 
   # moar advanced stats in dev only
   #gem 'gsl', :git => 'git://github.com/30robots/rb-gsl.git'
   #gem 'statsample-optimization', :require => 'statsample'
 
-  # footnotes
-  gem 'rails-footnotes', '>= 3.7.5.rc4', :group => :development
   gem 'quiet_assets'
+  gem 'meta_request', '0.2.1'
+
 end
