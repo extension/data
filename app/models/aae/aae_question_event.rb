@@ -53,7 +53,7 @@ class AaeQuestionEvent < ActiveRecord::Base
 ## filters
 
 ## associations
-  belongs_to :aae_question, :foreign_key => 'question_id'
+  belongs_to :question, class_name: 'AaeQuestion'
   belongs_to :initiator, :class_name => "AaeUser", :foreign_key => "initiated_by_id"
   belongs_to :submitter, :class_name => "AaeUser", :foreign_key => "submitter_id"
   belongs_to :recipient, :class_name => "AaeUser", :foreign_key => "recipient_id"

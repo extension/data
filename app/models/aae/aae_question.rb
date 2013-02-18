@@ -36,7 +36,7 @@ class AaeQuestion < ActiveRecord::Base
 ## filters
 
 ## associations
-  has_many :aae_question_events, :foreign_key => 'question_id'
+  has_many :question_events, :class_name => 'AaeQuestionEvent', foreign_key: 'question_id'
 
   belongs_to :assignee, :class_name => "AaeUser", :foreign_key => "assignee_id"
   belongs_to :current_resolver, :class_name => "AaeUser", :foreign_key => "current_resolver_id"
@@ -48,14 +48,6 @@ class AaeQuestion < ActiveRecord::Base
   belongs_to :assigned_group, :class_name => "AaeGroup", :foreign_key => "assigned_group_id"
   belongs_to :original_group, :class_name => "AaeGroup", :foreign_key => "original_group_id"
   
-  has_many :comments
-  has_many :ratings
-  has_many :responses
-  has_many :question_viewlogs, dependent: :destroy
-  
-  has_many :taggings, :as => :taggable, dependent: :destroy
-  has_many :tags, :through => :taggings
-
 ## scopes
   scope :answered, where(:status_state => STATUS_RESOLVED)
   scope :submitted, where(:status_state => STATUS_SUBMITTED)
