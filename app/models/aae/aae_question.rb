@@ -46,13 +46,11 @@ class AaeQuestion < ActiveRecord::Base
   belongs_to :original_county, :class_name => "AaeCounty", :foreign_key => "original_county_id"
   belongs_to :submitter, :class_name => "AaeUser", :foreign_key => "submitter_id"
   belongs_to :assigned_group, :class_name => "AaeGroup", :foreign_key => "assigned_group_id"
-  belongs_to :contributing_question, :class_name => "AaeQuestion", :foreign_key => "contributing_question_id"
   belongs_to :original_group, :class_name => "AaeGroup", :foreign_key => "original_group_id"
   
   has_many :comments
   has_many :ratings
   has_many :responses
-  has_many :question_events
   has_many :question_viewlogs, dependent: :destroy
   
   has_many :taggings, :as => :taggable, dependent: :destroy
