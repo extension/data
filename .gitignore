@@ -25,3 +25,4 @@
 /config/settings.local.yml
 /capatross_logs
 /config/capatross.local.yml
+/config/geoip
