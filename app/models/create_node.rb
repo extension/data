@@ -7,7 +7,7 @@
 
 class CreateNode < ActiveRecord::Base
   self.establish_connection :create
-  self.set_table_name 'node'
+  self.table_name= 'node'
 	self.primary_key = 'nid'
   self.inheritance_column = "inheritance_type"
   bad_attribute_names :changed

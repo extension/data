@@ -8,7 +8,7 @@
 class DarmokTag < ActiveRecord::Base
   # connects to the darmok database
   self.establish_connection :darmok
-  self.set_table_name 'tags'
+  self.table_name= 'tags'
 
   has_many :darmok_taggings, :foreign_key => "tag_id"
   has_many :darmok_communities, :through => :darmok_taggings, :source => :darmok_community, :uniq => true

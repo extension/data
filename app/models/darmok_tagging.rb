@@ -8,7 +8,7 @@
 class DarmokTagging < ActiveRecord::Base
   # connects to the darmok database
   self.establish_connection :darmok
-  self.set_table_name 'taggings'
+  self.table_name= 'taggings'
 
   # tagging_kinds
   GENERIC = 0  # table defaults

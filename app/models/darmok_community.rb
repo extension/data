@@ -8,5 +8,5 @@
 class DarmokCommunity < ActiveRecord::Base
   # connects to the darmok database
   self.establish_connection :darmok
-  self.set_table_name 'communities'
+  self.table_name= 'communities'
 end

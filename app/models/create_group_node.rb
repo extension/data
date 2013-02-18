@@ -7,7 +7,7 @@
 
 class CreateGroupNode < ActiveRecord::Base
   self.establish_connection :create
-  self.set_table_name 'field_data_group_audience'
+  self.table_name= 'field_data_group_audience'
 
   def created_at
     Time.at(self.group_audience_created).to_datetime

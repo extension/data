@@ -7,7 +7,7 @@
 
 class CreateRevision < ActiveRecord::Base
   self.establish_connection :create
-  self.set_table_name 'node_revision'
+  self.table_name= 'node_revision'
 	self.primary_key = 'vid'
 
   def created_at

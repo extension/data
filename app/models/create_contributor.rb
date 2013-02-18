@@ -7,7 +7,7 @@
 
 class CreateContributor < ActiveRecord::Base
   self.establish_connection :create
-  self.set_table_name 'field_data_field_contributors'
+  self.table_name= 'field_data_field_contributors'
 
   def contributed_at
     if(!self.field_contributors_contribution_date.nil?)

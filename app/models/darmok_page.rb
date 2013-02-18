@@ -8,7 +8,7 @@
 class DarmokPage < ActiveRecord::Base
   # connects to the darmok database
   self.establish_connection :darmok
-  self.set_table_name 'pages'
+  self.table_name= 'pages'
   JOINER = ", "
   SPLITTER = Regexp.new(/\s*,\s*/)
 

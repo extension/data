@@ -8,7 +8,7 @@
 class DarmokCommunityconnection < ActiveRecord::Base
   # connects to the darmok database
   self.establish_connection :darmok
-  self.set_table_name 'communityconnections'
+  self.table_name= 'communityconnections'
 
   scope :joined, where("communityconnections.connectiontype IN ('leader','member')")
 end
