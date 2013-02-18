@@ -14,7 +14,7 @@ class GeoName < ActiveRecord::Base
   end
 
 
-  def self.find_by_geoip(ipaddress = Settings.request_ip_address)
+  def self.find_by_geoip(ipaddress)
     if(geoip_data = self.get_geoip_data(ipaddress))
       if(geoip_data[:country_code] == 'US')
         self.where("state_abbreviation = '#{geoip_data[:region]}'").where("feature_name = '#{geoip_data[:city]}'").near([geoip_data[:lat], geoip_data[:lon]],10).first
@@ -26,7 +26,7 @@ class GeoName < ActiveRecord::Base
     end
   end
 
-  def self.get_geoip_data(ipaddress = Settings.request_ip_address)
+  def self.get_geoip_data(ipaddress)
     if(geoip_data_file = Settings.geoip_data_file)
       if File.exists?(geoip_data_file)
         returnhash = {}
