@@ -163,8 +163,8 @@ class AaeQuestion < ActiveRecord::Base
     end
 
     return_data.each do |question_data|
-      if(submitter_id = question_data[:submitter])
-        question_data[:submitter] = submitter_id_map[submitter_id]
+      if(submitter_id = question_data['submitter'])
+        question_data['submitter'] = submitter_id_map[submitter_id]
       end
     end
 
