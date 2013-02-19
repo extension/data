@@ -37,6 +37,11 @@ GEM
       railties (>= 3.0)
       sass (>= 3.2)
     arel (3.0.2)
+    better_errors (0.6.0)
+      coderay (>= 1.0.0)
+      erubis (>= 2.6.6)
+    binding_of_caller (0.7.1)
+      debug_inspector (>= 0.0.1)
     builder (3.0.4)
     capatross (1.5.0)
       capistrano (>= 2.11)
@@ -60,6 +65,7 @@ GEM
     crack (0.3.2)
     daemons (1.1.9)
     dalli (2.6.2)
+    debug_inspector (0.0.2)
     delayed_job (3.0.5)
       activesupport (~> 3.0)
     delayed_job_active_record (0.4.1)
@@ -202,6 +208,8 @@ PLATFORMS
 DEPENDENCIES
   airbrake
   anjlab-bootstrap-rails (>= 2.0)
+  better_errors
+  binding_of_caller
   capatross
   capistrano
   coffee-rails (~> 3.2.1)
@@ -218,7 +226,7 @@ DEPENDENCIES
   jquery-tablesorter
   jquery-ui-rails
   kaminari
-  meta_request (= 0.2.1)
+  meta_request
   mysql2
   net-http-spy
   omniauth (~> 1.0)
