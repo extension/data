@@ -4,6 +4,7 @@
 # === LICENSE:
 #  BSD(-compatible)
 #  see LICENSE file
+require 'csv'
 
 class AaeQuestion < ActiveRecord::Base
   # connects to the aae database
@@ -116,27 +117,27 @@ class AaeQuestion < ActiveRecord::Base
         question_data = {}
 
         # question metadata
-        question_data[:response_time] = (question.initial_response_time / (60)).floor
+        question_data['response_time'] = (question.initial_response_time / (60)).floor
 
         if(location = question.location)
-          question_data[:location] = location.name
+          question_data['location'] = location.name
         end
 
         if(county = question.county)
-          question_data[:county] = county.name
+          question_data['county'] = county.name
         end
 
         if(group = question.assigned_group)
-          question_data[:group] = group.name
+          question_data['group'] = group.name
         end
 
         # submitter metadata
         if(submitter = question.submitter)
           submitter_id_map[submitter.id] ||= 1
-          question_data[:submitter] = submitter.id
-          question_data[:has_extension_account] = submitter.has_exid?
-          question_data[:demographics_count] = submitter.demographics.count
-          if(question_data[:demographics_count] >= 1)
+          question_data['submitter'] = submitter.id
+          question_data['has_extension_account'] = submitter.has_exid?
+          question_data['demographics_count'] = submitter.demographics.count
+          if(question_data['demographics_count'] >= 1)
             submitter.demographics.each do |demographic|
               question_data["demographic_#{demographic.demographic_question_id}"] = demographic.response
             end
@@ -144,8 +145,8 @@ class AaeQuestion < ActiveRecord::Base
         end
 
         # evaluation
-        question_data[:evaluation_count] = question.evaluation_answers.count
-        if(question_data[:evaluation_count] >= 1)
+        question_data['evaluation_count'] = question.evaluation_answers.count
+        if(question_data['evaluation_count'] >= 1)
           question.evaluation_answers.each do |ea|
             question_data["evaluation_#{ea.evaluation_question_id}"] = ea.response
           end
@@ -168,6 +169,40 @@ class AaeQuestion < ActiveRecord::Base
     end
 
     return_data.shuffle
+  end
+
+  def self.evaluation_data_csv   
+    with_scope do 
+      evaldata = self.evaluation_data
+      columns = ['response_time','location','county','group','submitter','has_extension_account']
+      columns << 'demographics_count'
+      AaeDemographicQuestion.order(:id).active.each do |adq|
+        columns << "demographic_#{adq.id}"
+      end
+      columns << 'evaluation_count'
+      AaeEvaluationQuestion.order(:id).active.each do |aeq|
+        columns << "evaluation_#{aeq.id}"
+      end    
+      CSV.generate do |csv|
+        headers = []
+        columns.each do |column|
+          headers << column
+        end
+        csv << headers
+        evaldata.each do |question_data|
+          row = []
+          columns.each do |column|
+            value = question_data[column]
+            if(value.is_a?(Time))
+              row << value.strftime("%Y-%m-%d %H:%M:%S")
+            else
+              row << value
+            end
+          end
+          csv << row
+        end
+      end
+    end
   end
 
 end

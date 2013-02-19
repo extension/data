@@ -9,4 +9,9 @@ class AaeDemographicQuestion < ActiveRecord::Base
   # connects to the aae database
   self.establish_connection :aae
   self.table_name='demographic_questions'
+
+  serialize :responses
+
+  scope :active, where(is_active: true)
+
 end

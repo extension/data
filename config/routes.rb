@@ -48,6 +48,13 @@ Positronic::Application.routes.draw do
     end
   end
 
+  # downloads routing
+  namespace "downloads" do
+    namespace 'aae' do
+      match "/:action" 
+    end
+  end
+
   # authentication
   match '/logout', to:'auth#end', :as => 'logout'
   match '/auth/:provider/callback', to: 'auth#success'

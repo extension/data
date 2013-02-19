@@ -1,0 +1,111 @@
+<%- @page_title = "Ask an Expert Evaluation Downloads"-%>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+<div class="row">
+  <div class="span12">
+    <div class="well">
+      <h3>Formats</h3>
+      <p><%= link_to("CSV download",url_for(action: 'evaluation_download_csv'),class: 'btn', id: 'csvdownload') %></p>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+    <h3>Data Key</h3>
+
+    <table class="table table-bordered table-striped">
+      <thead>
+        <th>Variable</th>
+        <th>Description</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>response_time</td>
+          <td>Time of initial response floored to the minute. A question can have multiple responses, this is the created_at time of the first response minus the the created_at time of the question</td>
+        </tr>
+
+        <tr>
+          <td>location</td>
+          <td>The location name attached to the question (if present).</td>
+        </tr>
+
+        <tr>
+          <td>county</td>
+          <td>The county name attached to the question (if present).</td>
+        </tr>
+
+        <tr>
+          <td>group</td>
+          <td>The group name attached to the question (if present).</td>
+        </tr>
+
+        <tr>
+          <td>submitter</td>
+          <td>An anonymized id number for the submitter (this will change every download). Useful for checking for evaluation changes from same submitter for
+            multiple questions</td>
+        </tr>
+
+
+        <tr>
+          <td>has_extension_account</td>
+          <td>Whether the submitter has an eXtensionID.</td>
+        </tr>
+
+        <tr>
+          <td>demographics_count</td>
+          <td>The number of demographics questions answered by the submitter</td>
+        </tr>
+
+        <%- AaeDemographicQuestion.order(:id).active.each do |adq| -%>
+        <tr>
+          <td>demographic_<%= adq.id %></td>
+          <td>
+            <p><%= adq.prompt %></p>
+            <ul>
+              <%- adq.responses.each do |response| %>
+              <li><%= response %>
+              <%- end -%>
+            </ul>
+          </td>
+        </tr>
+        <%- end -%>
+
+        <tr>
+          <td>evaluation_count</td>
+          <td>The number of evaluation questions answered by the submitter</td>
+        </tr>
+
+        <%- AaeEvaluationQuestion.order(:id).active.each do |aeq| -%>
+        <tr>
+          <td>evaluation_<%= aeq.id %></td>
+          <td>
+            <p><%= aeq.prompt %></p>
+           <%- if !aeq.responses.blank? -%>
+            <ul>
+              <%- aeq.responses.each do |response| %>
+              <li><%= response %>
+              <%- end -%>
+            </ul>
+            <%- end -%>
+          </td>
+        </tr>
+        <%- end -%>     
+                        
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script type="text/javascript">
+
+$('#csvdownload').on('click', function () {
+  $('#csvdownload').text('Preparing download...');
+  $('#csvdownload').attr('class', 'btn disabled');
+});
+
+</script>
