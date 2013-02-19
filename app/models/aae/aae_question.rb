@@ -116,7 +116,7 @@ class AaeQuestion < ActiveRecord::Base
         question_data = {}
 
         # question metadata
-        question_data[:response_time] = question.initial_response_time / (60*60*24)
+        question_data[:response_time] = (question.initial_response_time / (60)).floor
 
         if(location = question.location)
           question_data[:location] = location.name
@@ -134,11 +134,11 @@ class AaeQuestion < ActiveRecord::Base
         if(submitter = question.submitter)
           submitter_id_map[submitter.id] ||= 1
           question_data[:submitter] = submitter.id
-          question_data[:has_exid] = submitter.has_exid?
+          question_data[:has_extension_account] = submitter.has_exid?
           question_data[:demographics_count] = submitter.demographics.count
           if(question_data[:demographics_count] >= 1)
             submitter.demographics.each do |demographic|
-              question_data["demographic #{demographic.demographic_question_id}"] = demographic.response
+              question_data["demographic_#{demographic.demographic_question_id}"] = demographic.response
             end
           end
         end
@@ -147,7 +147,7 @@ class AaeQuestion < ActiveRecord::Base
         question_data[:evaluation_count] = question.evaluation_answers.count
         if(question_data[:evaluation_count] >= 1)
           question.evaluation_answers.each do |ea|
-            question_data["evaluation #{ea.evaluation_question_id}"] = ea.response
+            question_data["evaluation_#{ea.evaluation_question_id}"] = ea.response
           end
         end
         return_data << question_data
