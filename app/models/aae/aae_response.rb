@@ -9,4 +9,6 @@ class AaeResponse < ActiveRecord::Base
   # connects to the aae database
   self.establish_connection :aae
   self.table_name='responses'
+
+  belongs_to :question, class_name: 'AaeQuestion'
 end
