@@ -45,7 +45,7 @@ module AuthLib
 
 
   def access_denied
-    redirect_to(:controller=>:auth, :action => :start)
+    redirect_to(:controller=>'/auth', :action => :extension)
   end  
   
   
