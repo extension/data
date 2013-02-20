@@ -8,7 +8,7 @@
 class Rebuild < ActiveRecord::Base
 
   ANALYTIC_IMPORTS = [{'Analytic' => 'import_analytics'}]
-  CREATE_REBUILDS = ['Node','NodeGroup','Revision','AaeNode','NodeActivity','NodeMetacontribution']
+  CREATE_REBUILDS = ['Node','NodeGroup','Revision','NodeActivity','NodeMetacontribution']
   DARMOK_REBUILDS = ['Page','Group','Tag','PageTagging','Contributor','ContributorGroup']
   INTERNAL_REBUILDS = ['PageStat','LandingStat','PageTotal','CollectedPageStat']
   CACHE_REBUILDS = [{'Node' => 'rebuild_activity_cache'}]

@@ -11,14 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130218193242) do
-
-  create_table "aae_nodes", :force => true do |t|
-    t.integer "node_id"
-    t.integer "aae_id"
-  end
-
-  add_index "aae_nodes", ["node_id", "aae_id"], :name => "node_group_ndx"
+ActiveRecord::Schema.define(:version => 20130220222630) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
