@@ -7,7 +7,7 @@ Positronic::Application.configure do
   config.cache_classes = false
 
   # memcached
-  config.cache_store = :dalli_store
+  config.cache_store = :redis_store, "redis://localhost:6379/0/cache"
 
   # Log error messages when you accidentally call methods on nil.
   config.whiny_nils = true

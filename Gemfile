@@ -66,8 +66,8 @@ gem 'outfielding-jqplot-rails'
 # exception handling
 gem 'airbrake'
 
-# memcached
-gem 'dalli'
+# caching
+gem 'redis-rails'
 
 # useragent analysis
 gem 'useragent'
