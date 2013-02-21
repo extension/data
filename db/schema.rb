@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130220222630) do
+ActiveRecord::Schema.define(:version => 20130220224055) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -114,6 +114,21 @@ ActiveRecord::Schema.define(:version => 20130220222630) do
   end
 
   add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
+
+  create_table "downloads", :force => true do |t|
+    t.string   "label"
+    t.string   "filetype"
+    t.string   "objectclass"
+    t.string   "objectmethod"
+    t.integer  "period",            :default => 0
+    t.datetime "last_generated_at"
+    t.float    "last_runtime"
+    t.integer  "last_filesize"
+    t.datetime "created_at",                       :null => false
+    t.datetime "updated_at",                       :null => false
+  end
+
+  add_index "downloads", ["label", "period"], :name => "download_ndx"
 
   create_table "geo_names", :force => true do |t|
     t.string  "feature_name",       :limit => 121
