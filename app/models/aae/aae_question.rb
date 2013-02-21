@@ -25,12 +25,13 @@ class AaeQuestion < ActiveRecord::Base
   STATUS_CLOSED = 5
   
   # status text (to be used when a text version of the status is needed)
-  SUBMITTED_TEXT = 'submitted'
-  RESOLVED_TEXT = 'resolved'
-  ANSWERED_TEXT = 'answered'
-  NO_ANSWER_TEXT = 'not_answered'
-  REJECTED_TEXT = 'rejected'
-  CLOSED_TEXT = 'closed'
+  STATUS_TEXT = {
+    STATUS_SUBMITTED => 'submitted'
+    STATUS_RESOLVED => 'answered'
+    STATUS_NO_ANSWER => 'not_answered'
+    STATUS_REJECTED => 'rejected'
+    STATUS_CLOSED => 'closed'
+  }
 
 ## validations
 
@@ -204,5 +205,32 @@ class AaeQuestion < ActiveRecord::Base
       end
     end
   end
+
+  def self.questions_csv
+    with_scope do
+      self.not_rejected.includes(:responses).find_in_batches.each do |question_group|
+        question_group.each do |question|
+          # detected_location
+          # detected_county
+          # location
+          # county
+          # original_group
+          # assigned_group
+          # status
+          # submitted_from_mobile?
+          # submitted_at
+          # comment_count
+          # public_responders
+          # expert_responders
+          # expert_response_count
+          # public_response_count
+          # initial_response_time
+          # tags
+        end
+      end
+    end
+  end
+
+
 
 end
