@@ -7,7 +7,7 @@
 
 class Analytic < ActiveRecord::Base
   extend Garb::Model
-  extend CacheTools
+  include CacheTools
   extend YearWeek
   metrics :entrances, :pageviews, :unique_pageviews, :exits, :time_on_page, :visitors, :new_visits
   dimensions :page_path

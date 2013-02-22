@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class Node < ActiveRecord::Base
-  extend CacheTools
+  include CacheTools
   extend YearWeek
   has_one :page
   has_many :node_groups
@@ -189,7 +189,7 @@ class Node < ActiveRecord::Base
 
   def stats_by_yearweek(activity,cache_options = {})
     if(!cache_options[:nocache])
-      cache_key = self.class.get_instance_cache_key("#{self.class.name}##{self.id}",__method__,{activity: activity})
+      cache_key = self.get_cache_key(__method__,{activity: activity})
       Rails.cache.fetch(cache_key,cache_options) do
         _stats_by_yearweek(activity)
       end

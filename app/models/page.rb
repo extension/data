@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class Page < ActiveRecord::Base
-  extend CacheTools
+  include CacheTools
   extend YearWeek
   has_many :analytics
   has_many :page_taggings
@@ -167,7 +167,7 @@ class Page < ActiveRecord::Base
 
   def stats_by_yearweek(metric,cache_options = {})
     if(!cache_options[:nocache])
-      cache_key = self.class.get_instance_cache_key("#{self.class.name}##{self.id}",__method__,{metric: metric})
+      cache_key = self.get_cache_key(__method__,{metric: metric})
       Rails.cache.fetch(cache_key,cache_options) do
         _stats_by_yearweek(metric)
       end

@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class LandingStat < ActiveRecord::Base
-  extend CacheTools
+  include CacheTools
   extend YearWeek
   belongs_to :group
 
