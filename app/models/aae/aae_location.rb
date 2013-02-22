@@ -12,6 +12,9 @@ class AaeLocation < ActiveRecord::Base
 
   include CacheTools
 
+
+  has_many :counties, class_name: 'AaeCounty', foreign_key: 'location_id'
+
   def self.find_by_geoip(ipaddress,cache_options = {})
     cache_key = self.get_cache_key(__method__,{ipaddress: ipaddress})
     Rails.cache.fetch(cache_key,cache_options) do

@@ -26,10 +26,10 @@ class AaeQuestion < ActiveRecord::Base
   
   # status text (to be used when a text version of the status is needed)
   STATUS_TEXT = {
-    STATUS_SUBMITTED => 'submitted'
-    STATUS_RESOLVED => 'answered'
-    STATUS_NO_ANSWER => 'not_answered'
-    STATUS_REJECTED => 'rejected'
+    STATUS_SUBMITTED => 'submitted',
+    STATUS_RESOLVED => 'answered',
+    STATUS_NO_ANSWER => 'not_answered',
+    STATUS_REJECTED => 'rejected',
     STATUS_CLOSED => 'closed'
   }
 
@@ -84,9 +84,23 @@ class AaeQuestion < ActiveRecord::Base
     returndata
   end
 
-  def location_from_ip
+  def detected_location
     AaeLocation.find_by_geoip(self.user_ip)
   end
+
+  def detected_county
+    AaeCounty.find_by_geoip(self.user_ip)
+  end
+
+  def is_mobile?
+    if(!self.user_agent.blank?)
+      ua = UserAgent.parse(self.user_agent)
+      ua.mobile?
+    else
+      nil
+    end
+  end
+
 
 
   def initial_response_time
