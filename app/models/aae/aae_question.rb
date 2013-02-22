@@ -52,6 +52,8 @@ class AaeQuestion < ActiveRecord::Base
   
   has_many :responses, class_name: 'AaeResponse', foreign_key: 'question_id'
   has_many :evaluation_answers, class_name: 'AaeEvaluationAnswer', foreign_key: 'question_id' 
+  has_many :comments, class_name: 'AaeComment', foreign_key: 'question_id' 
+
 ## scopes
   scope :answered, where(:status_state => STATUS_RESOLVED)
   scope :submitted, where(:status_state => STATUS_SUBMITTED)
@@ -101,14 +103,16 @@ class AaeQuestion < ActiveRecord::Base
     end
   end
 
-
-
   def initial_response_time
     if(response = self.responses.order('created_at ASC').first)
       response.created_at - self.created_at
     else
       nil
     end
+  end
+
+  def tags
+    AaeTag.includes(:taggings).where('taggings.taggable_type = ?','Question').where('taggings.taggable_id = ?', self.id)
   end
 
   def self.ua_report(filename)
@@ -220,29 +224,61 @@ class AaeQuestion < ActiveRecord::Base
     end
   end
 
-  def self.questions_csv
+  def self.questions_csv(filename)
     with_scope do
-      self.not_rejected.includes(:responses).find_in_batches.each do |question_group|
-        question_group.each do |question|
-          # detected_location
-          # detected_county
-          # location
-          # county
-          # original_group
-          # assigned_group
-          # status
-          # submitted_from_mobile?
-          # submitted_at
-          # comment_count
-          # public_responders
-          # expert_responders
-          # expert_response_count
-          # public_response_count
-          # initial_response_time
-          # tags
+      question_columns = [
+        'question_id',
+        'detected_location',
+        'detected_county',
+        'location',
+        'county',
+        'original_group',
+        'assigned_group',
+        'status',
+        'submitted_from_mobile',
+        'submitted_at',
+        'comment_count',
+        'public_responders',
+        'expert_responders',
+        'expert_response_count',
+        'public_response_count',
+        'initial_response_time',
+        'tags'
+      ]
+      CSV.open(filename,'wb') do |csv|
+        headers = []
+        question_columns.each do |column|
+          headers << column
         end
-      end
-    end
+        csv << headers
+        self.not_rejected.find_in_batches do |question_group|
+          question_group.each do |question|
+            row = []
+            row << question.id
+            [ 'detected_location','detected_county','location','county','original_group','assigned_group' ].each do |qattr|
+              row << self.name_or_nil(question.send(qattr))
+            end
+            row <<  STATUS_TEXT[question.status_state]
+            row << question.is_mobile?
+            row << question.created_at.utc.strftime("%Y-%m-%d %H:%M:%S")
+            row << question.comments.count
+            row << question.responses.public.count('distinct(submitter_id)')
+            row << question.responses.expert.count('distinct(resolver_id)')
+            row << question.responses.public.count
+            row << question.responses.expert.count
+            row << question.initial_response_time
+            row << question.tags.map(&:name).join(',')
+            # tags
+            csv << row
+          end # question
+        end # question group
+      end # csv 
+    end # with_scope
+
+  end 
+
+  def self.name_or_nil(item)
+    item.nil? ? nil : item.name
   end
 
 

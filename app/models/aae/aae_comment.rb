@@ -5,13 +5,11 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class AaeResponse < ActiveRecord::Base
-  # connects to the aae database
+class AaeComment < ActiveRecord::Base
+  # connects to the darmok database
   self.establish_connection :aae
-  self.table_name='responses'
+  self.table_name='comments'
 
   belongs_to :question, class_name: 'AaeQuestion'
 
-  scope :public, where("submitter_id IS NOT NULL")
-  scope :expert, where("resolver_id IS NOT NULL")
 end

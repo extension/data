@@ -120,12 +120,13 @@ ActiveRecord::Schema.define(:version => 20130220224055) do
     t.string   "filetype"
     t.string   "objectclass"
     t.string   "objectmethod"
-    t.integer  "period",            :default => 0
+    t.boolean  "method_writes_file", :default => false
+    t.integer  "period",             :default => 0
     t.datetime "last_generated_at"
     t.float    "last_runtime"
     t.integer  "last_filesize"
-    t.datetime "created_at",                       :null => false
-    t.datetime "updated_at",                       :null => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
   end
 
   add_index "downloads", ["label", "period"], :name => "download_ndx"

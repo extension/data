@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class Download < ActiveRecord::Base
-  attr_accessible :label, :period, :filetype, :last_filesize, :objectclass, :objectmethod, :last_generated_at, :last_runtime
+  attr_accessible :label, :period, :filetype, :last_filesize, :objectclass, :objectmethod, :last_generated_at, :last_runtime, :method_writes_file
 
   # periods
   NONE = 0
@@ -34,8 +34,12 @@ class Download < ActiveRecord::Base
     if(!self.updated? or forceupdate)
       object = Object.const_get(self.objectclass)
       benchmark = Benchmark.measure do
-        data = object.send(self.objectmethod)
-        File.open(this_filename, 'w') {|f| f.write(data)}
+        if(self.method_writes_file)
+          object.send(self.objectmethod,this_filename)
+        else
+          data = object.send(self.objectmethod)
+          File.open(this_filename, 'w') {|f| f.write(data)}
+        end
       end
       self.update_attributes(last_generated_at: Time.now, last_runtime: benchmark.real, last_filesize: File.size(this_filename))
     end

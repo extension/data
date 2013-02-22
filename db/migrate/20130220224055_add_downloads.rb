@@ -5,7 +5,8 @@ class AddDownloads < ActiveRecord::Migration
       t.string   "label"
       t.string   "filetype"
       t.string   "objectclass"
-      t.string   "objectmethod"             
+      t.string   "objectmethod"
+      t.boolean  "method_writes_file", :default => false             
       t.integer  "period", :default => 0
       t.datetime "last_generated_at"
       t.float    "last_runtime"
@@ -17,7 +18,8 @@ class AddDownloads < ActiveRecord::Migration
 
     # create initial downloads
     Download.reset_column_information
-    Download.create(label: 'evaluation', objectclass: 'AaeQuestion', objectmethod: 'evaluation_data_csv', filetype: 'csv', period: Download::DAILY )
+    Download.create(label: 'aae_evaluation', objectclass: 'AaeQuestion', objectmethod: 'evaluation_data_csv', filetype: 'csv', period: Download::WEEKLY )
+    Download.create(label: 'aae_questions', objectclass: 'AaeQuestion', objectmethod: 'questions_csv', filetype: 'csv', period: Download::WEEKLY, method_writes_file: true )
   end
 
 end
