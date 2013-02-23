@@ -58,7 +58,7 @@ class AaeQuestion < ActiveRecord::Base
   scope :answered, where(:status_state => STATUS_RESOLVED)
   scope :submitted, where(:status_state => STATUS_SUBMITTED)
   scope :not_rejected, conditions: "status_state <> #{STATUS_REJECTED}"
-  scope :since_changeover, where("DATE(#{self.table_name}.created_at) >= '2012-12-04'")
+  scope :since_changeover, where("created_at >= ?",Time.parse(Settings.aae_v2_transition))
 
 
   def to_ua_report
@@ -103,9 +103,13 @@ class AaeQuestion < ActiveRecord::Base
     end
   end
 
-  def initial_response_time
-    if(response = self.responses.order('created_at ASC').first)
-      response.created_at - self.created_at
+  def initial_expert_response
+    self.responses.expert.includes(:resolver).order('created_at ASC').first
+  end
+
+  def initial_expert_response_time
+    if(response = initial_expert_response)
+      (((response.created_at - question.created_at) > 0) ? (response.created_at - question.created_at) : nil)
     else
       nil
     end
@@ -114,6 +118,19 @@ class AaeQuestion < ActiveRecord::Base
   def tags
     AaeTag.includes(:taggings).where('taggings.taggable_type = ?','Question').where('taggings.taggable_id = ?', self.id)
   end
+
+  def aae_version
+    (self.created_at >= Time.parse(Settings.aae_v2_transition)) ? 2 : 1
+  end
+
+  def source
+    if(self.aae_version == 1)
+      (self.external_app_id == 'widget') ? 'widget' : 'website'
+    else
+      (self.referrer =~ %r{widget}) ? 'widget' : 'website'
+    end
+  end
+
 
   def self.ua_report(filename)
     CSV.open(filename, "wb") do |csv|
@@ -237,11 +254,15 @@ class AaeQuestion < ActiveRecord::Base
         'status',
         'submitted_from_mobile',
         'submitted_at',
+        'aae_version',
+        'source',
         'comment_count',
         'public_responders',
         'expert_responders',
         'expert_response_count',
         'public_response_count',
+        'initial_responder_location',
+        'initial_responder_county',
         'initial_response_time',
         'tags'
       ]
@@ -251,7 +272,7 @@ class AaeQuestion < ActiveRecord::Base
           headers << column
         end
         csv << headers
-        self.not_rejected.find_in_batches do |question_group|
+        self.includes(:location, :county, :original_group, :assigned_group, :submitter).not_rejected.find_in_batches do |question_group|
           question_group.each do |question|
             row = []
             row << question.id
@@ -261,14 +282,23 @@ class AaeQuestion < ActiveRecord::Base
             row <<  STATUS_TEXT[question.status_state]
             row << question.is_mobile?
             row << question.created_at.utc.strftime("%Y-%m-%d %H:%M:%S")
+            row << question.aae_version
+            row << question.source
             row << question.comments.count
             row << question.responses.public.count('distinct(submitter_id)')
             row << question.responses.expert.count('distinct(resolver_id)')
             row << question.responses.public.count
             row << question.responses.expert.count
-            row << question.initial_response_time
+            if(response = question.initial_expert_response)
+              row << self.name_or_nil(response.resolver.location)              
+              row << self.name_or_nil(response.resolver.county)
+              row << (((response.created_at - question.created_at) > 0) ? (response.created_at - question.created_at) : nil)
+            else
+              row << nil
+              row << nil
+              row << nil
+            end
             row << question.tags.map(&:name).join(',')
-            # tags
             csv << row
           end # question
         end # question group

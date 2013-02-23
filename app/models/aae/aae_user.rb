@@ -11,6 +11,9 @@ class AaeUser < ActiveRecord::Base
   self.table_name='users'
 
   has_many :demographics, class_name: 'AaeDemographic', foreign_key: 'user_id'
+  belongs_to :location, class_name: 'AaeLocation'
+  belongs_to :county, class_name: 'AaeCounty'
+
   def has_exid?
     return self.kind == 'User'
   end
