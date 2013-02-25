@@ -1,7 +1,7 @@
 <ul class="breadcrumb">
   <li>
     <%- if local_assigns.has_key?(:endpoint) and endpoint == 'Downloads' -%>
-      Pages<span class="divider">/</span>
+      Downloads<span class="divider">/</span>
     <%- else -%>
       <%= link_to('Downloads',downloads_path) %><span class="divider">/</span>
     <%- end -%>
