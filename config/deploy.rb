@@ -5,6 +5,7 @@ require 'capatross'
 require "bundler/capistrano"
 require './config/boot'
 require "airbrake/capistrano"
+require "delayed/recipes"
 
 set :application, "positronic"
 set :repository,  "git@github.com:extension/positronic.git"
@@ -25,8 +26,8 @@ after "deploy:update_code", "deploy:cleanup"
 after "deploy", "deploy:web:enable"
 # delayed job
 after "deploy:stop",    "delayed_job:stop"
-before "delayed_job:start", "delayed_job:reload"
 after "deploy:start",   "delayed_job:start"
+after "deploy:restart", "delayed_job:restart"
 
 namespace :deploy do
 
@@ -83,22 +84,5 @@ namespace :deploy do
       invoke_command "rm -f #{shared_path}/system/maintenancemode"
     end
 
-  end
-end
-
-namespace :delayed_job do
-  desc "stops delayed_job"
-  task :stop, :roles => :app do
-    run "sudo god stop delayed_jobs"
-  end
-  
-  desc "reloads delayed_job"
-  task :reload, :roles => :app do
-    run "sudo god load #{current_path}/config/delayed_job.god"
-  end
-  
-  desc "starts delayed_job"
-  task :start, :roles => :app do
-    run "sudo god start delayed_jobs"
   end
 end
