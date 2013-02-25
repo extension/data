@@ -6,7 +6,7 @@
 #  see LICENSE file
 
 class Download < ActiveRecord::Base
-  attr_accessible :label, :period, :filetype, :last_filesize, :objectclass, :objectmethod, :last_generated_at, :last_runtime, :method_writes_file, :is_private, :display_label
+  attr_accessible :label, :period, :filetype, :last_filesize, :objectclass, :objectmethod, :last_generated_at, :last_runtime, :method_writes_file, :is_private, :display_label, :in_progress
 
   # periods
   NONE = 0

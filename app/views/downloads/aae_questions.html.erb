@@ -1,0 +1,205 @@
+<%- @page_title = "Ask an Expert Question Data"-%>
+<%= render(:partial => 'download_breadcrumbs', :locals => {:endpoint => 'AaE Question Data'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+<div class="row">
+  <div class="span6">
+    <table class="table table-bordered">
+      <tbody>
+          <tr>
+            <td>Period</td>
+            <td><%= @download.period_to_s %></td>
+          </tr>
+          <tr><td>Format</td><td><%= @download.filetype %></td></tr>
+          <tr><td>Last Export Size</td><td><%= humanize_bytes(@download.last_filesize,'n/a') %></td></tr>
+          <tr><td>Last Export Size</td><td><%= (@download.last_generated_at.blank? ? 'n/a' : @download.last_generated_at.strftime("%Y-%m-%d %H:%M:%S %Z")) %></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class='span6'>
+    <div class="well">
+      <p>
+    <%- if @download.available_for_download? %>
+      <%= link_to("Download",getfile_download_path(@download),class: 'btn') %>
+    <%- elsif(@download.in_progress?) -%>
+      Export in progress. Please check back in a few minutes.
+    <%- elsif(!@download.updated?) -%>
+      <%- @download.delay.dump_to_file -%>
+      Export not up to date. Please check back in a few minutes.
+    <%- end -%>
+      </p>
+    </div>
+  </div>
+</div>
+
+
+<div class="row">
+  <div class="span12">
+    <h3>Data Key</h3>
+
+    <table class="table table-bordered table-striped">
+      <thead>
+        <th>Variable</th>
+        <th>Description</th>
+      </thead>
+      <tbody>
+        <tr>
+          <td>question_id</td>
+          <td>The id number assigned to the question.</td>
+        </tr>
+
+        <tr>
+          <td>detected_location</td>
+          <td>
+            The location of the question submitter, determined by the ip address to location mapping if the ip address is stored for the question.  Please note, this is the location determined <strong>at the time the report was generated</strong>. This may differ from the location attached to the question (and will likely differ for most widget questions submitted in AaE version 1).
+          </td>
+        </tr>
+
+        <tr>
+          <td>detected_county</td>
+          <td>
+            The county of the question submitter, determined by the ip address to location mapping if the ip address is stored for the question.  Please note, this is the county determined <strong>at the time the report was generated</strong>. This may differ from the county attached to the question (and will likely differ for most widget questions submitted in AaE version 1).
+          </td>
+        </tr>
+
+        <tr>
+          <td>location</td>
+          <td>
+            The location assigned to the question.
+          </td>
+        </tr>
+
+        <tr>
+          <td>county</td>
+          <td>
+            The county assigned to the question.
+          </td>
+        </tr>
+
+        <tr>
+          <td>original_group</td>
+          <td>
+            The group assigned to the question at the time of submission. 
+          </td>
+        </tr>
+
+        <tr>
+          <td>assigned_group</td>
+          <td>
+            The group assigned to the question at the time the report was generated. This is considered the "answering group" for reporting.
+          </td>
+        </tr>        
+
+        <tr>
+          <td>status</td>
+          <td>
+            The question's current status (submitted, answered, closed, or "not answered")
+          </td>
+        </tr>            
+
+        <tr>
+          <td>submitted_from_mobile</td>
+          <td>
+            If the information is available to make a determination, a true/false value if whether or not the question was submitted from a mobile browser.
+          </td>
+        </tr>
+
+        <tr>
+          <td>submitter_id</td>
+          <td>
+            The id number assigned to the question submitter.
+          </td>
+        </tr>
+
+        <tr>
+          <td>submitter_is_extension</td>
+          <td>
+            Whether the submitter of the question did so using an eXtension Account (true/false).
+          </td>
+        </tr>
+
+        <tr>
+          <td>aae_version</td>
+          <td>
+            The version of AaE used for this question (either '1' or '2').
+          </td>
+        </tr>                     
+
+        <tr>
+          <td>source</td>
+          <td>
+            If available, the source of the question (either 'widget' or 'website' - which is www.extension.org for AaEv1 and ask.extension.org for AaEv2).
+          </td>
+        </tr>   
+
+        <tr>
+          <td>comment_count</td>
+          <td>
+            The number of comments the question has received (can be from the public or from other experts).
+          </td>
+        </tr>   
+
+        <tr>
+          <td>submitter_response_count</td>
+          <td>
+            The number of follow-up responses the question has received from the submitter.
+          </td>
+        </tr>   
+
+        <tr>
+          <td>expert_response_count</td>
+          <td>
+            The number of responses the question has received from experts.
+          </td>
+        </tr>           
+
+        <tr>
+          <td>expert_responders</td>
+          <td>
+            The number of different experts that have responded to the question.
+          </td>
+        </tr>          
+
+        <tr>
+          <td>initial_responder_id</td>
+          <td>
+            The id number of the <strong>initial</strong> expert responder to the question.
+          </td>
+        </tr>
+
+        <tr>
+          <td>initial_responder_location</td>
+          <td>
+            The primary location (if specified at people.extension.org) of the <strong>initial</strong> expert responder to the question.
+          </td>
+        </tr>
+
+        <tr>
+          <td>initial_responder_county</td>
+          <td>
+            The primary county (if specified at people.extension.org) of the <strong>initial</strong> expert responder to the question.
+          </td>
+        </tr>                 
+
+        <tr>
+          <td>initial_response_time</td>
+          <td>
+            The time (rounded to the minute) from question submission to response for the <strong>initial</strong> expert response to the question.
+          </td>
+        </tr>                   
+
+        <tr>
+          <td>tags</td>
+          <td>
+            A comma-delimited list of tags assigned to the question.
+          </td>
+        </tr>    
+
+      </tbody>
+    </table>
+  </div>
+</div>

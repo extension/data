@@ -49,11 +49,16 @@ Positronic::Application.routes.draw do
   end
 
   # downloads routing
-  resources :downloads, :only => [:index, :show] do 
+  resources :downloads, :only => [:index] do 
     collection do
       get 'aae_evaluation'
       get 'aae_questions'
     end
+
+    member do
+      get 'getfile'
+    end
+    
   end
 
   # authentication

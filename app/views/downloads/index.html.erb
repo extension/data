@@ -1,4 +1,5 @@
 <%- @page_title = "Available Downloads" -%>
+<%= render(:partial => 'download_breadcrumbs', :locals => {:endpoint => 'Downloads'}) %>
 
 
 <div class="page-header">
@@ -27,9 +28,18 @@
                 (<%= link_to('Details',action: download.label) %>)
               <%- end -%>
             </td>
-            <td><%= humanize_bytes(download.last_filesize) %></td>
-            <td><%= (download.last_generated_at.blank? ? '' : download.last_generated_at.strftime("%Y-%m-%d %H:%M:%S")) %></td>
-            <td>#TODO download</td>
+            <td><%= humanize_bytes(download.last_filesize,'n/a') %></td>
+            <td><%= (download.last_generated_at.blank? ? 'n/a' : download.last_generated_at.strftime("%Y-%m-%d %H:%M:%S %Z")) %></td>
+            <td>
+              <%- if download.available_for_download? %>
+                <%= link_to("Download",getfile_download_path(download),class: 'btn') %>
+              <%- elsif(download.in_progress?) -%>
+                Export in progress. Please check back in a few minutes.
+              <%- elsif(!download.updated?) -%>
+                <%- download.delay.dump_to_file -%>
+                Export not up to date. Please check back in a few minutes.
+              <%- end -%>
+            </td>
           </tr>
         <%- end -%>
       </tbody>

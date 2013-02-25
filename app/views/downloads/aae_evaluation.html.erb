@@ -1,14 +1,37 @@
-<%- @page_title = "Ask an Expert Evaluation Downloads"-%>
+<%- @page_title = "Ask an Expert Evaluation Data"-%>
+<%= render(:partial => 'download_breadcrumbs', :locals => {:endpoint => 'AaE Evaluation Data'}) %>
 
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
 </header>
 
 <div class="row">
-  <div class="span12">
+  <div class="span6">
+    <table class="table table-bordered">
+      <tbody>
+          <tr>
+            <td>Period</td>
+            <td><%= @download.period_to_s %></td>
+          </tr>
+          <tr><td>Format</td><td><%= @download.filetype %></td></tr>
+          <tr><td>Last Export Size</td><td><%= humanize_bytes(@download.last_filesize,'n/a') %></td></tr>
+          <tr><td>Last Export Size</td><td><%= (@download.last_generated_at.blank? ? 'n/a' : @download.last_generated_at.strftime("%Y-%m-%d %H:%M:%S %Z")) %></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class='span6'>
     <div class="well">
-      <h3>Formats</h3>
-      <p><%= link_to("CSV download",url_for(action: 'evaluation_download_csv'),class: 'btn', id: 'csvdownload') %></p>
+      <p>
+    <%- if @download.available_for_download? %>
+      <%= link_to("Download",getfile_download_path(@download),class: 'btn') %>
+    <%- elsif(@download.in_progress?) -%>
+      Export in progress. Please check back in a few minutes.
+    <%- elsif(!@download.updated?) -%>
+      <%- @download.delay.dump_to_file -%>
+      Export not up to date. Please check back in a few minutes.
+    <%- end -%>
+      </p>
     </div>
   </div>
 </div>

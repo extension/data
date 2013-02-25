@@ -254,13 +254,15 @@ class AaeQuestion < ActiveRecord::Base
         'status',
         'submitted_from_mobile',
         'submitted_at',
+        'submitter_id',
+        'submitter_is_extension',        
         'aae_version',
         'source',
         'comment_count',
-        'public_responders',
-        'expert_responders',
+        'submitter_response_count',
         'expert_response_count',
-        'public_response_count',
+        'expert_responders',
+        'initial_responder_id',
         'initial_responder_location',
         'initial_responder_county',
         'initial_response_time',
@@ -280,20 +282,24 @@ class AaeQuestion < ActiveRecord::Base
               row << self.name_or_nil(question.send(qattr))
             end
             row <<  STATUS_TEXT[question.status_state]
+
             row << question.is_mobile?
             row << question.created_at.utc.strftime("%Y-%m-%d %H:%M:%S")
+            row << question.submitter_id
+            row << question.submitter.blank? ? nil : question.submitter.has_exid?
             row << question.aae_version
             row << question.source
             row << question.comments.count
-            row << question.responses.public.count('distinct(submitter_id)')
-            row << question.responses.expert.count('distinct(resolver_id)')
             row << question.responses.public.count
             row << question.responses.expert.count
+            row << question.responses.expert.count('distinct(resolver_id)')            
             if(response = question.initial_expert_response)
+              row << response.resolver_id
               row << self.name_or_nil(response.resolver.location)              
               row << self.name_or_nil(response.resolver.county)
-              row << (((response.created_at - question.created_at) > 0) ? (response.created_at - question.created_at) : nil)
+              row << (((response.created_at - question.created_at) > 0) ? ((response.created_at - question.created_at)  / (60)).round : nil)
             else
+              row << nil
               row << nil
               row << nil
               row << nil
