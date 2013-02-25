@@ -49,9 +49,10 @@ Positronic::Application.routes.draw do
   end
 
   # downloads routing
-  namespace "downloads" do
-    namespace 'aae' do
-      match "/:action" 
+  resources :downloads, :only => [:index, :show] do 
+    collection do
+      get 'aae_evaluation'
+      get 'aae_questions'
     end
   end
 

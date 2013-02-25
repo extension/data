@@ -1,0 +1,38 @@
+<%- @page_title = "Available Downloads" -%>
+
+
+<div class="page-header">
+  <h1>Available Downloads</h1>
+</div>
+
+<div class='row'>
+  <div class='span12'>
+    <table class="table table-bordered table-striped">
+      <thead>
+        <th>Name</th>
+        <th>Period</th>
+        <th>Format</th>
+        <th>Last Export Size</th>
+        <th>Last Export At</th>
+        <th>&nbsp;</th>
+      </thead>
+      <tbody>
+        <%- Download.public.all.each do |download| -%>
+          <tr>
+            <td><%= download.display_label %></td>
+            <td><%= download.period_to_s %></td>
+            <td>
+              <%= download.filetype %>
+              <%- if controller.class.instance_methods(false).include?(download.label.to_sym) -%>
+                (<%= link_to('Details',action: download.label) %>)
+              <%- end -%>
+            </td>
+            <td><%= humanize_bytes(download.last_filesize) %></td>
+            <td><%= (download.last_generated_at.blank? ? '' : download.last_generated_at.strftime("%Y-%m-%d %H:%M:%S")) %></td>
+            <td>#TODO download</td>
+          </tr>
+        <%- end -%>
+      </tbody>
+    </table>
+  </div>
+</div>

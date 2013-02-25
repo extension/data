@@ -5,16 +5,16 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class Downloads::AaeController < ApplicationController
+class DownloadsController < ApplicationController
   before_filter :signin_required
 
   def index
   end
 
-  def evaluation
+  def aae_questions
   end
 
-  def evaluation_download_csv
+  def aae_evaluation_download_csv
       send_data(AaeQuestion.evaluation_data_csv,
                 :type => 'text/csv; charset=iso-8859-1; header=present',
                 :disposition => "attachment; filename=evaluation_data_#{Date.today.to_s}.csv")
