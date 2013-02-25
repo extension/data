@@ -15,7 +15,7 @@ class Download < ActiveRecord::Base
   MONTHLY = 3
 
 
-  scope :public, where(is_private: false)
+  scope :not_private, where(is_private: false)
 
   def filename
     now = Time.now.utc

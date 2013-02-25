@@ -18,7 +18,7 @@
         <th>&nbsp;</th>
       </thead>
       <tbody>
-        <%- Download.public.all.each do |download| -%>
+        <%- Download.not_private.all.each do |download| -%>
           <tr>
             <td><%= download.display_label %></td>
             <td><%= download.period_to_s %></td>

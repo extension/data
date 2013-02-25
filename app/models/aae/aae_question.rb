@@ -290,7 +290,7 @@ class AaeQuestion < ActiveRecord::Base
             row << question.aae_version
             row << question.source
             row << question.comments.count
-            row << question.responses.public.count
+            row << question.responses.nonexpert.count
             row << question.responses.expert.count
             row << question.responses.expert.count('distinct(resolver_id)')            
             if(response = question.initial_expert_response)
