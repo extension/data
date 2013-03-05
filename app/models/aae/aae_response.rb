@@ -10,6 +10,9 @@ class AaeResponse < ActiveRecord::Base
   self.establish_connection :aae
   self.table_name='responses'
 
+  # reporting scopes
+  YEARWEEK_RESOLVED = 'YEARWEEK(responses.created_at,3)'
+
   belongs_to :question, class_name: 'AaeQuestion'
   belongs_to :resolver, :class_name => "AaeUser", :foreign_key => "resolver_id"
   belongs_to :submitter, :class_name => "AaeUser", :foreign_key => "submitter_id"
