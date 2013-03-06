@@ -2,5 +2,4 @@
 :verbose: false
 :pidfile: /tmp/pids/sidekiq.pid
 :logfile: ./log/sidekiq.log
-:namespace: data_queue
 :concurrency:  10
