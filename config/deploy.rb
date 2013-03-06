@@ -5,7 +5,7 @@ require 'capatross'
 require "bundler/capistrano"
 require './config/boot'
 require "airbrake/capistrano"
-require "delayed/recipes"
+require 'sidekiq/capistrano'
 
 set :application, "positronic"
 set :repository,  "git@github.com:extension/positronic.git"
@@ -24,10 +24,6 @@ after "deploy:update_code", "deploy:update_maint_msg"
 after "deploy:update_code", "deploy:link_and_copy_configs"
 after "deploy:update_code", "deploy:cleanup"
 after "deploy", "deploy:web:enable"
-# delayed job
-after "deploy:stop",    "delayed_job:stop"
-after "deploy:start",   "delayed_job:start"
-after "deploy:restart", "delayed_job:restart"
 
 namespace :deploy do
 

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130220224055) do
+ActiveRecord::Schema.define(:version => 20130306155347) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -98,22 +98,6 @@ ActiveRecord::Schema.define(:version => 20130220224055) do
   end
 
   add_index "contributors", ["openid_uid"], :name => "openid_ndx"
-
-  create_table "delayed_jobs", :force => true do |t|
-    t.integer  "priority"
-    t.integer  "attempts"
-    t.text     "handler"
-    t.text     "last_error"
-    t.datetime "run_at"
-    t.datetime "locked_at"
-    t.datetime "failed_at"
-    t.string   "locked_by"
-    t.string   "queue"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
-  add_index "delayed_jobs", ["priority", "run_at"], :name => "delayed_jobs_priority"
 
   create_table "downloads", :force => true do |t|
     t.string   "label"

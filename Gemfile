@@ -42,8 +42,7 @@ gem 'jquery-rails'
 gem 'kaminari'
 
 # background jobs
-gem 'delayed_job_active_record'
-gem 'daemons'
+gem 'sidekiq'
 
 # google analytics retrieval
 gem "garb" # garb for now until it breaks June 2012
