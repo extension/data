@@ -313,8 +313,13 @@ class AaeQuestion < ActiveRecord::Base
               row << self.name_or_nil(response.resolver.location)              
               row << self.name_or_nil(response.resolver.county)
               row << (response.time_since_last / 3600).to_f
-              row << (question.response_times.mean / 3600).to_f
-              row << (question.response_times.median / 3600).to_f
+              if(!question.response_times.blank?)
+                row << (question.response_times.mean / 3600).to_f
+                row << (question.response_times.median / 3600).to_f
+              else
+                row << nil # mean
+                row << nil # median
+              end                
             else
               row << nil # response_at
               row << nil # id
