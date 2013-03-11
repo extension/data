@@ -37,7 +37,7 @@ class AaeQuestion < ActiveRecord::Base
   }
 
   # reporting scopes
-  YEARWEEK_RESOLVED = 'YEARWEEK(questions.created_at,3)'
+  YEARWEEK_SUBMITTED = 'YEARWEEK(questions.created_at,3)'
 
 ## validations
 
@@ -55,7 +55,8 @@ class AaeQuestion < ActiveRecord::Base
   belongs_to :submitter, :class_name => "AaeUser", :foreign_key => "submitter_id"
   belongs_to :assigned_group, :class_name => "AaeGroup", :foreign_key => "assigned_group_id"
   belongs_to :original_group, :class_name => "AaeGroup", :foreign_key => "original_group_id"
-  
+  belongs_to :initial_response,  class_name: 'AaeResponse', :foreign_key => "initial_response_id"
+
   has_many :responses, class_name: 'AaeResponse', foreign_key: 'question_id'
   has_many :evaluation_answers, class_name: 'AaeEvaluationAnswer', foreign_key: 'question_id' 
   has_many :comments, class_name: 'AaeComment', foreign_key: 'question_id' 
@@ -109,16 +110,13 @@ class AaeQuestion < ActiveRecord::Base
     end
   end
 
-  def initial_expert_response
-    self.responses.expert.includes(:resolver).order('created_at ASC').first
+
+  def response_times
+    self.responses.expert_after_public.pluck(:time_since_last)
   end
 
-  def initial_expert_response_time
-    if(response = initial_expert_response)
-      (((response.created_at - question.created_at) > 0) ? (response.created_at - question.created_at) : nil)
-    else
-      nil
-    end
+  def mean_response_time
+    self.response_times.mean
   end
 
   def tags
@@ -255,7 +253,9 @@ class AaeQuestion < ActiveRecord::Base
         'detected_county',
         'location',
         'county',
+        'original_group_id',
         'original_group',
+        'assigned_group_id',
         'assigned_group',
         'status',
         'submitted_from_mobile',
@@ -268,10 +268,14 @@ class AaeQuestion < ActiveRecord::Base
         'submitter_response_count',
         'expert_response_count',
         'expert_responders',
+        'initial_response_at',
         'initial_responder_id',
+        'initial_responder_name',
         'initial_responder_location',
         'initial_responder_county',
         'initial_response_time',
+        'mean_response_time',
+        'median_response_time',
         'tags'
       ]
       CSV.open(filename,'wb') do |csv|
@@ -284,11 +288,14 @@ class AaeQuestion < ActiveRecord::Base
           question_group.each do |question|
             row = []
             row << question.id
-            [ 'detected_location','detected_county','location','county','original_group','assigned_group' ].each do |qattr|
+            [ 'detected_location','detected_county','location','county'].each do |qattr|
               row << self.name_or_nil(question.send(qattr))
             end
+            row << question.original_group_id
+            row << self.name_or_nil(question.original_group)
+            row << question.assigned_group_id
+            row << self.name_or_nil(question.assigned_group)
             row <<  STATUS_TEXT[question.status_state]
-
             row << question.is_mobile?
             row << question.created_at.utc.strftime("%Y-%m-%d %H:%M:%S")
             row << question.submitter_id
@@ -296,19 +303,27 @@ class AaeQuestion < ActiveRecord::Base
             row << question.aae_version
             row << question.source
             row << question.comments.count
-            row << question.responses.nonexpert.count
+            row << question.responses.non_expert.count
             row << question.responses.expert.count
             row << question.responses.expert.count('distinct(resolver_id)')            
-            if(response = question.initial_expert_response)
+            if(response = question.initial_response)
+              row << response.created_at.utc.strftime("%Y-%m-%d %H:%M:%S")
               row << response.resolver_id
+              row << self.name_or_nil(response.resolver)
               row << self.name_or_nil(response.resolver.location)              
               row << self.name_or_nil(response.resolver.county)
-              row << (((response.created_at - question.created_at) > 0) ? ((response.created_at - question.created_at)  / (60)).round : nil)
+              row << (response.time_since_last / 3600).to_f
+              row << (question.response_times.mean / 3600).to_f
+              row << (question.response_times.median / 3600).to_f
             else
-              row << nil
-              row << nil
-              row << nil
-              row << nil
+              row << nil # response_at
+              row << nil # id
+              row << nil # name
+              row << nil # location
+              row << nil # county
+              row << nil # response_time
+              row << nil # mean
+              row << nil # median
             end
             row << question.tags.map(&:name).join(',')
             csv << row
@@ -317,7 +332,7 @@ class AaeQuestion < ActiveRecord::Base
       end # csv 
     end # with_scope
 
-  end 
+  end
 
   def self.name_or_nil(item)
     item.nil? ? nil : item.name
@@ -368,13 +383,13 @@ class AaeQuestion < ActiveRecord::Base
 
       case metric
       when 'questions'
-        metric_by_yearweek = self.group(YEARWEEK_RESOLVED).count(:id)
+        metric_by_yearweek = self.group(YEARWEEK_SUBMITTED).count(:id)
       when 'experts'
         eligible_ids = self.pluck("#{self.table_name}.id")
         metric_by_yearweek = AaeResponse.where("question_id IN (#{eligible_ids.join(',')})").group(AaeResponse::YEARWEEK_RESOLVED).count('DISTINCT(responses.resolver_id)')
       when 'responsetime'
-        questions_by_yearweek = self.group(YEARWEEK_RESOLVED).count(:id)
-        responsetime_by_yearweek = self.group(YEARWEEK_RESOLVED).sum(:initial_response_time)
+        questions_by_yearweek = self.group(YEARWEEK_SUBMITTED).count(:id)
+        responsetime_by_yearweek = self.group(YEARWEEK_SUBMITTED).sum(:initial_response_time)
         metric_by_yearweek = {}
         responsetime_by_yearweek.each do |yearweek,total_response_time|
           metric_by_yearweek[yearweek] = ((questions_by_yearweek[yearweek].nil? or questions_by_yearweek[yearweek] == 0) ? 0 : total_response_time / questions_by_yearweek[yearweek].to_f / 3600.to_f)

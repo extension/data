@@ -81,11 +81,25 @@
         </tr>
 
         <tr>
+          <td>original_group_id</td>
+          <td>
+            The id number of the group assigned to the question at the time of submission. 
+          </td>
+        </tr>        
+
+        <tr>
           <td>original_group</td>
           <td>
             The group assigned to the question at the time of submission. 
           </td>
         </tr>
+
+        <tr>
+          <td>assigned_group_id</td>
+          <td>
+            The id number of the group assigned to the question at the time the report was generated. This is considered the "answering group" for reporting.
+          </td>
+        </tr>        
 
         <tr>
           <td>assigned_group</td>
@@ -107,6 +121,13 @@
             If the information is available to make a determination, a true/false value if whether or not the question was submitted from a mobile browser.
           </td>
         </tr>
+
+        <tr>
+          <td>submitted_at</td>
+          <td>
+            The date and time the question was submitted (UTC).
+          </td>
+        </tr>        
 
         <tr>
           <td>submitter_id</td>
@@ -165,32 +186,60 @@
         </tr>          
 
         <tr>
+          <td>initial_response_at</td>
+          <td>
+            The date and time of the initinal expert response (UTC).
+          </td>
+        </tr>   
+
+        <tr>
           <td>initial_responder_id</td>
           <td>
-            The id number of the <strong>initial</strong> expert responder to the question.
+            The id number of the initial expert responder to the question.
+          </td>
+        </tr>
+
+        <tr>
+          <td>initial_responder_name</td>
+          <td>
+            The name of the initial expert responder to the question.
           </td>
         </tr>
 
         <tr>
           <td>initial_responder_location</td>
           <td>
-            The primary location (if specified at people.extension.org) of the <strong>initial</strong> expert responder to the question.
+            The primary location (if specified at people.extension.org) of the initial expert responder to the question.
           </td>
         </tr>
 
         <tr>
           <td>initial_responder_county</td>
           <td>
-            The primary county (if specified at people.extension.org) of the <strong>initial</strong> expert responder to the question.
+            The primary county (if specified at people.extension.org) of the initial expert responder to the question.
           </td>
         </tr>                 
 
         <tr>
           <td>initial_response_time</td>
           <td>
-            The time (rounded to the minute) from question submission to response for the <strong>initial</strong> expert response to the question.
+            The time in hours from question submission to response for the initial expert response to the question.
           </td>
         </tr>                   
+
+        <tr>
+          <td>mean_response_time</td>
+          <td>
+            The mean time in hours between public response and followup expert response for all expert responses to the question.
+          </td>
+        </tr>  
+
+        <tr>
+          <td>median_response_time</td>
+          <td>
+            The median time in hours between public response and followup expert response for all expert responses to the question.
+          </td>
+        </tr>  
 
         <tr>
           <td>tags</td>
