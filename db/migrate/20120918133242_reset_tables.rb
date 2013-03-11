@@ -1,5 +1,33 @@
 class ResetTables < ActiveRecord::Migration
   def change
+ 
+  create_table "analytics", :force => true do |t|
+    t.integer  "page_id"
+    t.integer  "yearweek"
+    t.integer  "year"
+    t.integer  "week"
+    t.text     "analytics_url"
+    t.string   "url_type"
+    t.integer  "url_page_id"
+    t.integer  "url_migrated_id"
+    t.string   "url_wiki_title"
+    t.string   "url_widget_id"
+    t.string   "analytics_url_hash"
+    t.integer  "pageviews"
+    t.integer  "unique_pageviews"
+    t.integer  "entrances"
+    t.integer  "time_on_page"
+    t.integer  "exits"
+    t.integer  "visitors"
+    t.integer  "new_visits"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.integer  "tag_id"
+  end
+ 
+  add_index "analytics", ["analytics_url_hash"], :name => "recordsignature", :unique => true
+  add_index "analytics", ["tag_id"], :name => "tag_id_ndx"
+  add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
     create_table "aae_nodes", :force => true do |t|
       t.integer "node_id"
