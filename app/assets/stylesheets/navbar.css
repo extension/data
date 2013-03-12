@@ -1,5 +1,5 @@
 /* app banner
 -----------------------------------------------------------------------------*/
-.extension_global_nav {background:#53586d !important;}
-.extension_global_nav a {color:#ddd !important;}
+ul.extension_global_nav {background:#53586d;}
+ul.extension_global_nav a {color:#ddd;}
 
