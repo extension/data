@@ -15,7 +15,6 @@
  *= require media_pagination
  *= require jquery.jqplot
  *= require numbers
- *= require navbar
  *= require sortable
  *= require responsive-tables
  *= require jquery.ui.datepicker
