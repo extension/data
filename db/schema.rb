@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130306155347) do
+ActiveRecord::Schema.define(:version => 20130318004656) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -99,6 +99,20 @@ ActiveRecord::Schema.define(:version => 20130306155347) do
 
   add_index "contributors", ["openid_uid"], :name => "openid_ndx"
 
+  create_table "counties", :force => true do |t|
+    t.integer "fipsid",                    :default => 0,  :null => false
+    t.integer "location_id",               :default => 0,  :null => false
+    t.integer "state_fipsid",              :default => 0,  :null => false
+    t.string  "countycode",   :limit => 3, :default => "", :null => false
+    t.string  "name",                      :default => "", :null => false
+    t.string  "censusclass",  :limit => 2, :default => "", :null => false
+  end
+
+  add_index "counties", ["fipsid"], :name => "fipsid_ndx", :unique => true
+  add_index "counties", ["location_id"], :name => "location_ndx"
+  add_index "counties", ["name"], :name => "name_ndx"
+  add_index "counties", ["state_fipsid"], :name => "state_fipsid_ndx"
+
   create_table "downloads", :force => true do |t|
     t.string   "label"
     t.string   "display_label"
@@ -171,6 +185,17 @@ ActiveRecord::Schema.define(:version => 20130306155347) do
   end
 
   add_index "landing_stats", ["group_id", "yearweek", "year", "week"], :name => "recordsignature", :unique => true
+
+  create_table "locations", :force => true do |t|
+    t.integer "fipsid",                     :default => 0,  :null => false
+    t.integer "entrytype",                  :default => 0,  :null => false
+    t.string  "name",                       :default => "", :null => false
+    t.string  "abbreviation", :limit => 10, :default => "", :null => false
+    t.string  "office_link"
+  end
+
+  add_index "locations", ["fipsid"], :name => "fipsid_ndx", :unique => true
+  add_index "locations", ["name"], :name => "name_ndx", :unique => true
 
   create_table "node_activities", :force => true do |t|
     t.integer  "node_id"
@@ -316,6 +341,39 @@ ActiveRecord::Schema.define(:version => 20130306155347) do
   add_index "pages", ["migrated_id"], :name => "index_pages_on_migrated_id"
   add_index "pages", ["node_id"], :name => "node_ndx"
   add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
+
+  create_table "questions", :force => true do |t|
+    t.integer  "detected_location_id"
+    t.integer  "detected_county_id"
+    t.integer  "location_id"
+    t.integer  "county_id"
+    t.integer  "original_group_id"
+    t.string   "original_group_name"
+    t.integer  "assigned_group_id"
+    t.string   "assigned_group_name"
+    t.string   "status"
+    t.boolean  "submitted_from_mobile"
+    t.datetime "submitted_at"
+    t.integer  "submitter_id"
+    t.boolean  "submitter_is_extension"
+    t.integer  "aae_version"
+    t.string   "source"
+    t.integer  "comment_count"
+    t.integer  "submitter_response_count"
+    t.integer  "expert_response_count"
+    t.integer  "expert_responders"
+    t.datetime "initial_response_at"
+    t.integer  "initial_responder_id"
+    t.float    "initial_response_time"
+    t.float    "mean_response_time"
+    t.float    "median_response_time"
+    t.text     "tags"
+  end
+
+  add_index "questions", ["detected_location_id", "detected_county_id", "location_id", "county_id"], :name => "location_ndx"
+  add_index "questions", ["initial_responder_id"], :name => "contributor_ndx"
+  add_index "questions", ["source", "aae_version", "status"], :name => "filter_ndx"
+  add_index "questions", ["submitted_at", "initial_response_at"], :name => "datetime_ndx"
 
   create_table "rebuilds", :force => true do |t|
     t.string   "group"
