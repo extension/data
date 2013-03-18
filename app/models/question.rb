@@ -83,6 +83,99 @@ class Question < ActiveRecord::Base
     item.nil? ? 'NULL' : ActiveRecord::Base.quote_value(item.name)
   end
 
+  def self.name_or_nil(item)
+    item.nil? ? 'nil' : item.name
+  end
+
+  def self.questions_csv(filename)
+    with_scope do
+      question_columns = [
+        'question_id',
+        'detected_location',
+        'detected_county',
+        'location',
+        'county',
+        'original_group_id',
+        'original_group',
+        'assigned_group_id',
+        'assigned_group',
+        'status',
+        'submitted_from_mobile',
+        'submitted_at',
+        'submitter_id',
+        'submitter_is_extension',        
+        'aae_version',
+        'source',
+        'comment_count',
+        'submitter_response_count',
+        'expert_response_count',
+        'expert_responders',
+        'initial_response_at',
+        'initial_responder_id',
+        'initial_responder_name',
+        'initial_responder_location',
+        'initial_responder_county',
+        'initial_response_time',
+        'mean_response_time',
+        'median_response_time',
+        'tags'
+      ]
+      CSV.open(filename,'wb') do |csv|
+        headers = []
+        question_columns.each do |column|
+          headers << column
+        end
+        csv << headers
+        self.includes(:detected_location, :detected_county, :location, :county).find_in_batches do |question_group|
+          question_group.each do |question|
+            row = []
+            row << question.id
+            [ 'detected_location','detected_county','location','county'].each do |qattr|
+              row << self.name_or_nil(question.send(qattr))
+            end
+            row << question.original_group_id
+            row << question.original_group_name
+            row << question.assigned_group_id
+            row << question.assigned_group_name
+            row << question.status
+            row << question.submitted_from_mobile?
+            row << question.submitted_at.utc.strftime("%Y-%m-%d %H:%M:%S")
+            row << question.submitter_id
+            row << question.submitter_is_extension?
+            row << question.aae_version
+            row << question.source
+            row << question.comment_count
+            row << question.submitter_response_count
+            row << question.expert_response_count
+            row << question.expert_responders       
+            if(responder = question.initial_responder)
+              row << question.initial_response_at.utc.strftime("%Y-%m-%d %H:%M:%S")
+              row << responder.id
+              row << responder.fullname
+              row << self.name_or_nil(responder.location)              
+              row << self.name_or_nil(responder.county)
+              row << question.initial_response_time
+              row << question.mean_response_time
+              row << question.median_response_time
+            else
+              row << nil # response_at
+              row << nil # id
+              row << nil # name
+              row << nil # location
+              row << nil # county
+              row << nil # response_time
+              row << nil # mean
+              row << nil # median
+            end
+            row << question.tags
+            csv << row
+          end # question
+        end # question group
+      end # csv 
+    end # with_scope
+
+  end
+
 
 
  

@@ -24,6 +24,9 @@ class Contributor < ActiveRecord::Base
   has_many :contributor_groups
   has_many :groups, through: :contributor_groups
 
+  belongs_to :location
+  belongs_to :county
+
   # duplicated from darmok
   # TODO - sanity check this
   scope :patternsearch, lambda {|searchterm|

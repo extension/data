@@ -48,6 +48,9 @@ class AaeQuestionEvent < ActiveRecord::Base
                             ASSIGNED_TO_GROUP => 'assigned to group',
                             CHANGED_GROUP => 'group changed',
                             CHANGED_LOCATION => 'location changed' }
+
+  HANDLING_EVENTS = [ASSIGNED_TO, ASSIGNED_TO_GROUP, RESOLVED, NO_ANSWER, CLOSED]
+
 ## validations
 
 ## filters
@@ -66,10 +69,13 @@ class AaeQuestionEvent < ActiveRecord::Base
   belongs_to :changed_group, class_name: 'AaeGroup'
 
 ## scopes
-  scope :latest, {:order => "created_at desc", :limit => 1}
-  scope :latest_handling, {:conditions => "event_state IN (#{ASSIGNED_TO},#{ASSIGNED_TO_GROUP},#{RESOLVED},#{REJECTED},#{NO_ANSWER})",:order => "created_at desc", :limit => 1}
-  scope :handling_events, :conditions => "event_state IN (#{ASSIGNED_TO},#{ASSIGNED_TO_GROUP},#{RESOLVED},#{REJECTED},#{NO_ANSWER})"
+  scope :latest, order("#{self.table_name}.created_at desc")
+  scope :handling_events, where("event_state IN (#{HANDLING_EVENTS.join(',')})")
+  scope :individual_assignments, where("event_state = ?",ASSIGNED_TO)
 
+  def next_handling_event
+    self.question.question_events.handling_events.where("question_events.created_at >= ?",self.created_at).where("question_events.id != ?",self.id).first
+  end
 
 
 end
