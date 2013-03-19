@@ -84,7 +84,7 @@ class Question < ActiveRecord::Base
   end
 
   def self.name_or_nil(item)
-    item.nil? ? 'nil' : item.name
+    item.nil? ? nil : item.name
   end
 
   def self.questions_csv(filename)
