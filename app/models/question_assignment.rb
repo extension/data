@@ -6,6 +6,10 @@
 #  see LICENSE file
 
 class QuestionAssignment < ActiveRecord::Base
+  belongs_to :question
+  belongs_to :contributor
+  belongs_to :assigner, class_name: 'Contributor', foreign_key: 'assigned_by'
+  belongs_to :handler, class_name: 'Contributor', foreign_key: 'next_handled_by' 
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")

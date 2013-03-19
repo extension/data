@@ -27,6 +27,12 @@ class Contributor < ActiveRecord::Base
   belongs_to :location
   belongs_to :county
 
+  has_many :initial_responded_questions, class_name: 'Question', foreign_key: 'initial_responder_id'
+  has_many :question_assignments
+  has_many :assigned_question_assignments, class_name: 'QuestionAssignment', foreign_key: 'assigned_by'
+  has_many :handled_question_assignments, class_name: 'QuestionAssignment', foreign_key: 'next_handled_by'
+
+
   # duplicated from darmok
   # TODO - sanity check this
   scope :patternsearch, lambda {|searchterm|
