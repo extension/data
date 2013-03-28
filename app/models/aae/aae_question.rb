@@ -39,6 +39,11 @@ class AaeQuestion < ActiveRecord::Base
   # reporting scopes
   YEARWEEK_SUBMITTED = 'YEARWEEK(questions.created_at,3)'
 
+  AAE_V2_TRANSITION = '2012-12-03 12:00:00 UTC'
+  DEMOGRAPHIC_ELIGIBLE = '2012-12-03 12:00:00 UTC'
+  EVALUATION_ELIGIBLE = '2013-03-15 00:00:00 UTC' # beware the ides of March
+
+
 ## validations
 
 ## filters
@@ -65,7 +70,7 @@ class AaeQuestion < ActiveRecord::Base
   scope :answered, where(:status_state => STATUS_RESOLVED)
   scope :submitted, where(:status_state => STATUS_SUBMITTED)
   scope :not_rejected, conditions: "status_state <> #{STATUS_REJECTED}"
-  scope :since_changeover, where("created_at >= ?",Time.parse(Settings.aae_v2_transition))
+  scope :since_changeover, where("created_at >= ?",Time.parse(AAE_V2_TRANSITION))
 
 
   def to_ua_report
@@ -108,6 +113,14 @@ class AaeQuestion < ActiveRecord::Base
     else
       nil
     end
+  end
+
+  def demographic_eligible?
+    (self.created_at >= Time.parse(DEMOGRAPHIC_ELIGIBLE) && self.evaluation_sent?)
+  end
+
+  def evaluation_eligible?
+    (self.created_at >= Time.parse(EVALUATION_ELIGIBLE) && self.evaluation_sent?)
   end
 
 
@@ -153,11 +166,11 @@ class AaeQuestion < ActiveRecord::Base
     return_data = []
     submitter_id_map = {}
     with_scope do
-      self.where(evaluation_sent: true).each do |question|
+      self.answered.since_changeover.each do |question|
         question_data = {}
 
         # question metadata
-        question_data['response_time'] = (question.initial_response_time / (60)).floor
+        question_data['response_time'] = (question.initial_response_time / (3600.to_f)).to_f
 
         if(location = question.location)
           question_data['location'] = location.name
@@ -176,6 +189,7 @@ class AaeQuestion < ActiveRecord::Base
           submitter_id_map[submitter.id] ||= 1
           question_data['submitter'] = submitter.id
           question_data['has_extension_account'] = submitter.has_exid?
+          question_data['demographic_eligible'] = question.demographic_eligible?
           question_data['demographics_count'] = submitter.demographics.count
           if(question_data['demographics_count'] >= 1)
             submitter.demographics.each do |demographic|
@@ -185,10 +199,12 @@ class AaeQuestion < ActiveRecord::Base
         end
 
         # evaluation
+        question_data['evaluation_eligible'] = question.evaluation_eligible?
         question_data['evaluation_count'] = question.evaluation_answers.count
         if(question_data['evaluation_count'] >= 1)
           question.evaluation_answers.each do |ea|
-            question_data["evaluation_#{ea.evaluation_question_id}"] = ea.response
+            question_data["evaluation_#{ea.evaluation_question_id}_response"] = ea.response
+            question_data["evaluation_#{ea.evaluation_question_id}_value"] = ea.evaluation_question.reporting_response_value(ea.response)
           end
         end
         return_data << question_data
@@ -215,13 +231,16 @@ class AaeQuestion < ActiveRecord::Base
     with_scope do 
       evaldata = self.evaluation_data
       columns = ['response_time','location','county','group','submitter','has_extension_account']
+      columns << 'demographic_eligible'
       columns << 'demographics_count'
       AaeDemographicQuestion.order(:id).active.each do |adq|
         columns << "demographic_#{adq.id}"
       end
+      columns << 'evaluation_eligible'
       columns << 'evaluation_count'
       AaeEvaluationQuestion.order(:id).active.each do |aeq|
-        columns << "evaluation_#{aeq.id}"
+        columns << "evaluation_#{aeq.id}_response"
+        columns << "evaluation_#{aeq.id}_value"
       end    
       CSV.generate do |csv|
         headers = []

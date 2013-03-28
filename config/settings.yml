@@ -13,4 +13,3 @@ flat_percentage: 0.025
 group_concat_max_len: 1048576
 geoip_data_file: 'notset'
 downloads_data_dir: 'notset'
-aae_v2_transition: '2012-12-03 12:00:00 UTC'

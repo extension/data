@@ -40,7 +40,7 @@
 <div class="row">
   <div class="span12">
     <h3>Data Key</h3>
-
+    <p>Evaluation questions are split into _response (raw response) and _value (numeric value, if applicable) columns</p>
     <table class="table table-bordered table-striped">
       <thead>
         <th>Variable</th>
@@ -49,7 +49,7 @@
       <tbody>
         <tr>
           <td>response_time</td>
-          <td>Time of initial response floored to the minute. A question can have multiple responses, this is the created_at time of the first response minus the the created_at time of the question</td>
+          <td>Time of initial response in hours. A question can have multiple responses, this is the created_at time of the first response minus the the created_at time of the question</td>
         </tr>
 
         <tr>
@@ -80,6 +80,11 @@
         </tr>
 
         <tr>
+          <td>demographic_eligible</td>
+          <td>This question was eligible to have a demographic response</td>
+        </tr>        
+
+        <tr>
           <td>demographics_count</td>
           <td>The number of demographics questions answered by the submitter</td>
         </tr>
@@ -99,19 +104,43 @@
         <%- end -%>
 
         <tr>
+          <td>evaluation_eligible</td>
+          <td>This question was eligible to have a demographic response</td>
+        </tr>   
+
+        <tr>
           <td>evaluation_count</td>
           <td>The number of evaluation questions answered by the submitter</td>
         </tr>
 
         <%- AaeEvaluationQuestion.order(:id).active.each do |aeq| -%>
         <tr>
-          <td>evaluation_<%= aeq.id %></td>
           <td>
-            <p><%= aeq.prompt %></p>
+            evaluation_<%= aeq.id %>
+          </td>
+          <td>
+            <p>
+              <%- if aeq.responsetype == AaeEvaluationQuestion::SCALE -%>
+                <%= aeq.prompt %> <em>(on a scale from <%= aeq.range_start %> to <%= aeq.range_end %>)</em>
+              <%- else -%>
+                <%= aeq.prompt %>
+              <%- end -%>
+            </p>
+
+
            <%- if !aeq.responses.blank? -%>
             <ul>
-              <%- aeq.responses.each do |response| %>
-              <li><%= response %>
+              <%- if aeq.responsetype == AaeEvaluationQuestion::SCALE -%>
+                <li><span class="badge"><%= aeq.range_start %></span> : <%= aeq.responses[0] %></li>
+                <li><span class="badge"><%= aeq.range_end %></span> : <%= aeq.responses[1] %></li>
+              <%- elsif aeq.responsetype == AaeEvaluationQuestion::MULTIPLE_CHOICE -%>
+                <%- aeq.responses.each_with_index do |response_text,index| %>                
+                  <li><span class="badge"><%= aeq.reporting_response_value(response_text) %></span> : <%= response_text %></li>              
+                <%- end -%>
+              <%- else -%>
+                <%- aeq.responses.each_with_index do |response_text,index| %>
+                <li><%= response_text %></li>
+                <%- end -%>
               <%- end -%>
             </ul>
             <%- end -%>
