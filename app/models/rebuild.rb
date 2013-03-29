@@ -11,7 +11,7 @@ class Rebuild < ActiveRecord::Base
   CREATE_REBUILDS = ['Node','NodeGroup','Revision','NodeActivity','NodeMetacontribution']
   DARMOK_REBUILDS = ['Page','Group','Tag','PageTagging','Contributor','ContributorGroup']
   INTERNAL_REBUILDS = ['PageStat','LandingStat','PageTotal','CollectedPageStat']
-  AAE_REBUILDS = ['Question','QuestionAssignment']
+  AAE_REBUILDS = ['Question','QuestionAssignment','QuestionActivity']
   CACHE_REBUILDS = [{'Node' => 'rebuild_activity_cache'}]
 
   def run_and_log(model,action)
