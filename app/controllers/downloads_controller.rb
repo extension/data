@@ -25,17 +25,17 @@ class DownloadsController < ApplicationController
     if(@download.label == 'aae_evaluation')
       if(!@currentcontributor.groups.include?(Group.find(Group::EXTENSION_STAFF)))
         flash[:notice] = 'This export is currently restricted to staff only.'
-        return redirect_to(index_url)
+        return redirect_to(downloads_url)
       end
     end        
 
     if(@download.in_progress?)
       flash[:notice] = 'This export is currently in progress. Check back in a few minutes.'
-      return redirect_to(index_url)
+      return redirect_to(downloads_url)
     elsif(!@download.updated?)
       @download.delay.dump_to_file
       flash[:notice] = 'This export has not been updated. Check back in a few minutes.'
-      return redirect_to(index_url)
+      return redirect_to(downloads_url)
     else
       send_file(@download.filename,
                 :type => 'text/csv; charset=iso-8859-1; header=present',
