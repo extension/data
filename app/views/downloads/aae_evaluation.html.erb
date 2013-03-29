@@ -5,6 +5,28 @@
   <h1><%= @page_title %></h1>
 </header>
 
+<%- if !@is_staff -%>
+
+<div class="row">
+  <div class="span12">
+    <div class="well">
+      <h3>Restricted download</h3>
+      <p>For submitter privacy reasons, this download is currently restricted to eXtension Staff.</p>
+    </div>
+  </div>
+</div>
+
+<%- else -%>
+
+<div class="row">
+  <div class="span12">
+    <div class="well">
+      <h3>Note! Restricted download!</h3>
+      <p>For submitter privacy reasons, this download is currently restricted to eXtension Staff. Please do not share this raw report with others outside of eXtension staff at this time.</p>
+    </div>
+  </div>
+</div>
+
 <div class="row">
   <div class="span6">
     <table class="table table-bordered">
@@ -152,12 +174,4 @@
     </table>
   </div>
 </div>
-
-<script type="text/javascript">
-
-$('#csvdownload').on('click', function () {
-  $('#csvdownload').text('Preparing download...');
-  $('#csvdownload').attr('class', 'btn disabled');
-});
-
-</script>
+<%- end -%>
