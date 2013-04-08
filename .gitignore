@@ -12,6 +12,8 @@
 /.powenv
 /.powrc
 /.tm_properties
+/.ruby-gemset
+/.ruby-version
 
 # Ignore the default SQLite database.
 /db/*.sqlite3

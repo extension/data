@@ -137,7 +137,7 @@ class AaeQuestion < ActiveRecord::Base
   end
 
   def aae_version
-    (self.created_at >= Time.parse(Settings.aae_v2_transition)) ? 2 : 1
+    (self.created_at >= Time.parse(AAE_V2_TRANSITION)) ? 2 : 1
   end
 
   def source

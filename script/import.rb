@@ -34,7 +34,8 @@ class DataImporter < Thor
         run_time = rebuilder.run_and_log(model,action)
         puts "\t Finished #{model}##{action} (#{run_time.round(2)}s)" if options[:verbose]
       rescue StandardError => error
-        $stderr.puts "Exception! backtrace: #{error.backtrace}"
+        $stderr.puts "Exception in #{model}##{action} !"
+        $stderr.puts "Backtrace:\n  #{error.backtrace.join("\n  ").html_safe}"
       end
     end
 
