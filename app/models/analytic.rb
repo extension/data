@@ -338,6 +338,9 @@ class Analytic < ActiveRecord::Base
       associated = self.associate_with_pages_for_year_week(year,week)
       results[yearweek] = {imported: imported, associated: associated}
     end
+
+    # force cache update for latest_year_week
+    self.latest_year_week({force: true})
     results
   end
 
