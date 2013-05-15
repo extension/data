@@ -34,9 +34,14 @@ class Group < ActiveRecord::Base
       insert_list << group.id
       insert_list << group.drupal_node_id
       insert_list << ActiveRecord::Base.quote_value(group.name)
-      insert_list << group.is_launched
+      if(group.publishing_community? and pc = DarmokPublishingCommunity.find_by_id(group.id))
+        insert_list << pc.is_launched
+      else
+        insert_list << 0
+      end
       insert_list << ActiveRecord::Base.quote_value(group.created_at.to_s(:db))
       insert_list << ActiveRecord::Base.quote_value(group.updated_at.to_s(:db))
+      insert_list << group.publishing_community
       insert_values << "(#{insert_list.join(',')})"
     end
     insert_sql = "INSERT INTO #{self.table_name} VALUES #{insert_values.join(',')};"

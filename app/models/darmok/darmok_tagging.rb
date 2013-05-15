@@ -17,7 +17,7 @@ class DarmokTagging < ActiveRecord::Base
   CONTENT = 3
   CONTENT_PRIMARY = 4  # for public communities, indicates the primary content tag for the community, if more than one
 
-  belongs_to :darmok_community, :foreign_key => "taggable_id", :conditions => "taggable_type = 'Community' AND tagging_kind = #{CONTENT}"
+  belongs_to :darmok_community, :foreign_key => "taggable_id", :conditions => "taggable_type = 'PublishingCommunity' AND tagging_kind = #{CONTENT}"
 
   scope :page_content, where("taggable_type = 'Page'").where("tagging_kind = #{CONTENT}")
 

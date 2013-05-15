@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130329195103) do
+ActiveRecord::Schema.define(:version => 20130515012101) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -161,8 +161,9 @@ ActiveRecord::Schema.define(:version => 20130329195103) do
     t.integer  "create_gid"
     t.string   "name"
     t.boolean  "is_launched"
-    t.datetime "created_at",  :null => false
-    t.datetime "updated_at",  :null => false
+    t.datetime "created_at",                              :null => false
+    t.datetime "updated_at",                              :null => false
+    t.boolean  "publishing_community", :default => false
   end
 
   add_index "groups", ["create_gid"], :name => "create_group_ndx"
