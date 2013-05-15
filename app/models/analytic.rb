@@ -224,8 +224,8 @@ class Analytic < ActiveRecord::Base
   end
 
   def self.latest_year_week(cache_options = {})
-    cachekey = self.get_cache_key(__method__)
-    Rails.cache.fetch(cachekey,cache_options) do
+    # cachekey = self.get_cache_key(__method__)
+    # Rails.cache.fetch(cachekey,cache_options) do
       if(yearweek = self._latest_year_week)
         latest_year = yearweek[0]
         latest_week = yearweek[1]
@@ -233,7 +233,7 @@ class Analytic < ActiveRecord::Base
         (latest_year,latest_week) = self.last_year_week
       end
       [latest_year,latest_week]
-    end
+    # end
   end
 
   def self.latest_date
