@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130515012101) do
+ActiveRecord::Schema.define(:version => 20130523015246) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -399,6 +399,9 @@ ActiveRecord::Schema.define(:version => 20130515012101) do
     t.float    "mean_response_time"
     t.float    "median_response_time"
     t.text     "tags"
+    t.string   "ip_address"
+    t.integer  "original_location_id"
+    t.integer  "original_county_id"
   end
 
   add_index "questions", ["detected_location_id", "detected_county_id", "location_id", "county_id"], :name => "location_ndx"

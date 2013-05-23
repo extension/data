@@ -53,9 +53,23 @@
         </tr>
 
         <tr>
+          <td>detectable_location</td>
+          <td>
+            True/False if an IP was recorded so that the location could be detected.
+          </td>
+        </tr>        
+
+        <tr>
           <td>detected_location</td>
           <td>
             The location of the question submitter, determined by the ip address to location mapping if the ip address is stored for the question.  Please note, this is the location determined <strong>at the time the report was generated</strong>. This may differ from the location assigned to the question.
+          </td>
+        </tr>
+
+        <tr>
+          <td>detected_location_fips</td>
+          <td>
+            The FIPS code of the detected location.  Please note, this is the location determined <strong>at the time the report was generated</strong>. This may differ from the location assigned to the question.
           </td>
         </tr>
 
@@ -67,6 +81,13 @@
         </tr>
 
         <tr>
+          <td>detected_county_fips</td>
+          <td>
+            The FIPS code of the detected county.  Please note, this is the location determined <strong>at the time the report was generated</strong>. This may differ from the location assigned to the question.
+          </td>
+        </tr>
+
+        <tr>
           <td>location</td>
           <td>
             The location assigned to the question.
@@ -74,11 +95,39 @@
         </tr>
 
         <tr>
+          <td>location_fips</td>
+          <td>
+            The FIPS code of the location assigned to the question
+          </td>
+        </tr>      
+
+        <tr>
+          <td>location_changed</td>
+          <td>
+            True/False if the question location was changed by an expert (relevant to AaEv2 only)
+          </td>
+        </tr>           
+
+        <tr>
           <td>county</td>
           <td>
             The county assigned to the question.
           </td>
         </tr>
+
+        <tr>
+          <td>county_fips</td>
+          <td>
+            The FIPS code of the county assigned to the question
+          </td>
+        </tr>  
+
+        <tr>
+          <td>county_changed</td>
+          <td>
+            True/False if the question county was changed by an expert (relevant to AaEv2 only)
+          </td>
+        </tr>         
 
         <tr>
           <td>original_group_id</td>
@@ -214,11 +263,25 @@
         </tr>
 
         <tr>
+          <td>initial_responder_location_fips</td>
+          <td>
+            The FIPS code of the responder location
+          </td>
+        </tr>     
+
+        <tr>
           <td>initial_responder_county</td>
           <td>
             The primary county (if specified at people.extension.org) of the initial expert responder to the question.
           </td>
         </tr>                 
+
+        <tr>
+          <td>initial_responder_county_fips</td>
+          <td>
+            The FIPS code of the responder county
+          </td>
+        </tr>      
 
         <tr>
           <td>initial_response_time</td>

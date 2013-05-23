@@ -23,18 +23,21 @@ class Question < ActiveRecord::Base
       question_group.each do |question|
         insert_list = []
         insert_list << question.id
+        insert_list << self.quoted_value_or_null(question.user_ip)
         dl = question.detected_location
         dc = question.detected_county
         insert_list << (dl.blank? ? 'NULL' : dl.id)
         insert_list << (dc.blank? ? 'NULL' : dc.id)
         insert_list << self.value_or_null(question.location_id)
         insert_list << self.value_or_null(question.county_id)
+        insert_list << self.value_or_null(question.original_location_id)
+        insert_list << self.value_or_null(question.original_county_id)        
         insert_list << self.value_or_null(question.original_group_id)
         insert_list << self.name_or_null(question.original_group)
         insert_list << self.value_or_null(question.assigned_group_id)
         insert_list << self.name_or_null(question.assigned_group)
         insert_list << ActiveRecord::Base.quote_value(AaeQuestion::STATUS_TEXT[question.status_state])
-        insert_list << (question.is_mobile? ? 1 : 0)
+        insert_list << (question.is_mobile?.nil? ? 'NULL' : question.is_mobile?)
         insert_list << ActiveRecord::Base.quote_value(question.created_at.utc.to_s(:db))
         insert_list << self.value_or_null(question.submitter_id)
         insert_list << (question.submitter.blank? ? 'NULL' : (question.submitter.has_exid? ? 1 : 0))
@@ -75,6 +78,10 @@ class Question < ActiveRecord::Base
     end # all questions
   end
 
+  def self.quoted_value_or_null(value)
+    value.blank? ? 'NULL' : ActiveRecord::Base.quote_value(value)
+  end
+
   def self.value_or_null(value)
     value.blank? ? 'NULL' : value
   end
@@ -91,10 +98,17 @@ class Question < ActiveRecord::Base
     with_scope do
       question_columns = [
         'question_id',
+        'detectable_location',
         'detected_location',
+        'detected_location_fips',
         'detected_county',
+        'detected_county_fips',
         'location',
+        'location_fips',
+        'location_changed',
         'county',
+        'county_fips',
+        'county_changed',
         'original_group_id',
         'original_group',
         'assigned_group_id',
@@ -114,7 +128,9 @@ class Question < ActiveRecord::Base
         'initial_responder_id',
         'initial_responder_name',
         'initial_responder_location',
+        'initial_responder_location_fips',  
         'initial_responder_county',
+        'initial_responder_county_fips',
         'initial_response_time',
         'mean_response_time',
         'median_response_time',
@@ -130,9 +146,17 @@ class Question < ActiveRecord::Base
           question_group.each do |question|
             row = []
             row << question.id
-            [ 'detected_location','detected_county','location','county'].each do |qattr|
-              row << self.name_or_nil(question.send(qattr))
-            end
+            row << (!question.ip_address.blank?)
+            row << self.name_or_nil(question.detected_location)
+            row << ((question.detected_location.nil?) ? nil : question.detected_location.fips)
+            row << self.name_or_nil(question.detected_county)
+            row << ((question.detected_county.nil?) ? nil : question.detected_county.fips)
+            row << self.name_or_nil(question.location)
+            row << ((question.location.nil?) ? nil : question.location.fips)
+            row << (question.location_id == question.original_location_id)            
+            row << self.name_or_nil(question.county)
+            row << ((question.county.nil?) ? nil : question.county.fips)
+            row << (question.county_id == question.original_county_id)                  
             row << question.original_group_id
             row << question.original_group_name
             row << question.assigned_group_id
@@ -153,7 +177,9 @@ class Question < ActiveRecord::Base
               row << responder.id
               row << responder.fullname
               row << self.name_or_nil(responder.location)              
+              row << ((responder.location.nil?) ? nil : responder.location.fips)
               row << self.name_or_nil(responder.county)
+              row << ((responder.county.nil?) ? nil : responder.county.fips)
               row << question.initial_response_time
               row << question.mean_response_time
               row << question.median_response_time
@@ -162,7 +188,9 @@ class Question < ActiveRecord::Base
               row << nil # id
               row << nil # name
               row << nil # location
+              row << nil # location_fips
               row << nil # county
+              row << nil # county_fips
               row << nil # response_time
               row << nil # mean
               row << nil # median
