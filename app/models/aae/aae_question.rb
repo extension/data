@@ -169,6 +169,9 @@ class AaeQuestion < ActiveRecord::Base
       self.answered.since_changeover.each do |question|
         question_data = {}
 
+        # hotfix for corrupt data
+        next if question.initial_response_time.nil?
+        
         # question metadata
         question_data['response_time'] = (question.initial_response_time / (3600.to_f)).to_f
 
@@ -227,7 +230,7 @@ class AaeQuestion < ActiveRecord::Base
     return_data.shuffle
   end
 
-  def self.evaluation_data_csv   
+  def self.evaluation_data_csv
     with_scope do 
       evaldata = self.evaluation_data
       columns = ['response_time','location','county','group','submitter','has_extension_account']
