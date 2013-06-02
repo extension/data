@@ -70,6 +70,8 @@ class Question < ActiveRecord::Base
           insert_list << 'NULL' # median
         end
         insert_list << (question.tags.count > 0 ? ActiveRecord::Base.quote_value(question.tags.map(&:name).join(',')) : 'NULL')
+        insert_list << question.demographic_eligible?
+        insert_list << question.evaluation_eligible?
         insert_values << "(#{insert_list.join(',')})"
       end # question_group
       columns = self.column_names
@@ -134,6 +136,8 @@ class Question < ActiveRecord::Base
         'initial_response_time',
         'mean_response_time',
         'median_response_time',
+        'demographic_eligible',
+        'evaluation_eligible',
         'tags'
       ]
       CSV.open(filename,'wb') do |csv|
@@ -195,6 +199,8 @@ class Question < ActiveRecord::Base
               row << nil # mean
               row << nil # median
             end
+            row << question.demographic_eligible?
+            row << question.evaluation_eligible?            
             row << question.tags
             csv << row
           end # question

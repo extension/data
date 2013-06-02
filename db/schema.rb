@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130523015246) do
+ActiveRecord::Schema.define(:version => 20130602181311) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -374,10 +374,13 @@ ActiveRecord::Schema.define(:version => 20130523015246) do
   add_index "question_assignments", ["question_id"], :name => "question_ndx"
 
   create_table "questions", :force => true do |t|
+    t.string   "ip_address"
     t.integer  "detected_location_id"
     t.integer  "detected_county_id"
     t.integer  "location_id"
     t.integer  "county_id"
+    t.integer  "original_location_id"
+    t.integer  "original_county_id"
     t.integer  "original_group_id"
     t.string   "original_group_name"
     t.integer  "assigned_group_id"
@@ -399,9 +402,8 @@ ActiveRecord::Schema.define(:version => 20130523015246) do
     t.float    "mean_response_time"
     t.float    "median_response_time"
     t.text     "tags"
-    t.string   "ip_address"
-    t.integer  "original_location_id"
-    t.integer  "original_county_id"
+    t.boolean  "demographic_eligible"
+    t.boolean  "evaluation_eligible"
   end
 
   add_index "questions", ["detected_location_id", "detected_county_id", "location_id", "county_id"], :name => "location_ndx"
