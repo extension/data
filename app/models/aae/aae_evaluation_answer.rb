@@ -22,5 +22,4 @@ class AaeEvaluationAnswer < ActiveRecord::Base
 
   ## scopes
 
-
 end

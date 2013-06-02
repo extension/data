@@ -16,7 +16,7 @@ class DownloadsController < ApplicationController
   end
 
   def aae_evaluation
-    @is_staff = @currentcontributor.groups.include?(Group.find(Group::EXTENSION_STAFF))
+    #@is_staff = @currentcontributor.groups.include?(Group.find(Group::EXTENSION_STAFF))
     @download = Download.find_by_label('aae_evaluation')
   end
 

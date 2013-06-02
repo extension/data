@@ -71,7 +71,8 @@ class AaeQuestion < ActiveRecord::Base
   scope :submitted, where(:status_state => STATUS_SUBMITTED)
   scope :not_rejected, conditions: "status_state <> #{STATUS_REJECTED}"
   scope :since_changeover, where("created_at >= ?",Time.parse(AAE_V2_TRANSITION))
-
+  scope :evaluation_eligible,  lambda{ where("#{self.table_name}.created_at > ?",Time.parse(EVALUATION_ELIGIBLE))
+                                       .where(:evaluation_sent => true) }
 
   def to_ua_report
     returndata = []
@@ -162,98 +163,137 @@ class AaeQuestion < ActiveRecord::Base
 
 
 
-  def self.evaluation_data
-    return_data = []
-    submitter_id_map = {}
-    with_scope do
-      self.answered.since_changeover.each do |question|
-        question_data = {}
+  # def self.evaluation_data
+  #   return_data = []
+  #   submitter_id_map = {}
+  #   with_scope do
+  #     self.answered.since_changeover.each do |question|
+  #       question_data = {}
 
-        # hotfix for corrupt data
-        next if question.initial_response_time.nil?
+  #       # hotfix for corrupt data
+  #       next if question.initial_response_time.nil?
         
-        # question metadata
-        question_data['response_time'] = (question.initial_response_time / (3600.to_f)).to_f
+  #       # question metadata
+  #       question_data['response_time'] = (question.initial_response_time / (3600.to_f)).to_f
 
-        if(location = question.location)
-          question_data['location'] = location.name
+  #       if(location = question.location)
+  #         question_data['location'] = location.name
+  #       end
+
+  #       if(county = question.county)
+  #         question_data['county'] = county.name
+  #       end
+
+  #       if(group = question.assigned_group)
+  #         question_data['group'] = group.name
+  #       end
+
+  #       # submitter metadata
+  #       if(submitter = question.submitter)
+  #         submitter_id_map[submitter.id] ||= 1
+  #         question_data['submitter'] = submitter.id
+  #         question_data['has_extension_account'] = submitter.has_exid?
+  #         question_data['demographic_eligible'] = question.demographic_eligible?
+  #         question_data['demographics_count'] = submitter.demographics.count
+  #         if(question_data['demographics_count'] >= 1)
+  #           submitter.demographics.each do |demographic|
+  #             question_data["demographic_#{demographic.demographic_question_id}"] = demographic.response
+  #           end
+  #         end
+  #       end
+
+
+  #       return_data << question_data
+  #     end # questions
+  #   end #scope
+
+  #   # anonymize submitters
+  #   submitter_pool_size = submitter_id_map.keys.length
+  #   random_id_array = (1..submitter_pool_size).to_a.sample(submitter_pool_size)
+  #   submitter_id_map.each_with_index do |(submitter_id,value),index| 
+  #     submitter_id_map[submitter_id] = random_id_array[index]
+  #   end
+
+  #   return_data.each do |question_data|
+  #     if(submitter_id = question_data['submitter'])
+  #       question_data['submitter'] = submitter_id_map[submitter_id]
+  #     end
+  #   end
+
+  #   return_data.shuffle
+  # end
+
+  # def self.evaluation_data_csv(filename)
+  #   with_scope do
+  #     self.answered.since_changeover.each do |question|
+
+
+  #     evaldata = self.evaluation_data
+  #     columns = ['response_time','location','county','group','submitter','has_extension_account']
+  #     columns << 'demographic_eligible'
+  #     columns << 'demographics_count'
+  #     AaeDemographicQuestion.order(:id).active.each do |adq|
+  #       columns << "demographic_#{adq.id}"
+  #     end
+  #     columns << 'evaluation_eligible'
+  #     columns << 'evaluation_count'
+  #     AaeEvaluationQuestion.order(:id).active.each do |aeq|
+  #       columns << "evaluation_#{aeq.id}_response"
+  #       columns << "evaluation_#{aeq.id}_value"
+  #     end    
+  #     CSV.generate do |csv|
+  #       headers = []
+  #       columns.each do |column|
+  #         headers << column
+  #       end
+  #       csv << headers
+  #       evaldata.each do |question_data|
+  #         row = []
+  #         columns.each do |column|
+  #           value = question_data[column]
+  #           if(value.is_a?(Time))
+  #             row << value.strftime("%Y-%m-%d %H:%M:%S")
+  #           else
+  #             row << value
+  #           end
+  #         end
+  #         csv << row
+  #       end
+  #     end
+  #   end
+  # end
+
+
+  def self.evaluation_data_csv(filename)
+    with_scope do
+      CSV.open(filename,'wb') do |csv|
+        headers = []
+        headers << 'question_id'
+        headers << 'evaluation_count'
+        eval_columns = []
+        AaeEvaluationQuestion.order(:id).active.each do |aeq|
+          eval_columns << "evaluation_#{aeq.id}_response"
+          eval_columns << "evaluation_#{aeq.id}_value"
         end
+        headers += eval_columns
+        csv << headers
 
-        if(county = question.county)
-          question_data['county'] = county.name
-        end
-
-        if(group = question.assigned_group)
-          question_data['group'] = group.name
-        end
-
-        # submitter metadata
-        if(submitter = question.submitter)
-          submitter_id_map[submitter.id] ||= 1
-          question_data['submitter'] = submitter.id
-          question_data['has_extension_account'] = submitter.has_exid?
-          question_data['demographic_eligible'] = question.demographic_eligible?
-          question_data['demographics_count'] = submitter.demographics.count
-          if(question_data['demographics_count'] >= 1)
-            submitter.demographics.each do |demographic|
-              question_data["demographic_#{demographic.demographic_question_id}"] = demographic.response
-            end
-          end
-        end
-
-        # evaluation
-        question_data['evaluation_eligible'] = question.evaluation_eligible?
-        question_data['evaluation_count'] = question.evaluation_answers.count
-        if(question_data['evaluation_count'] >= 1)
+        # data
+        # evaluation_answer_questions
+        questions_with_evals = AaeEvaluationAnswer.pluck(:question_id).uniq
+        self.answered.since_changeover.evaluation_eligible.where("id in (#{questions_with_evals.join(',')})").each do |question|
+          eval_count = question.evaluation_answers.count
+          next if (eval_count == 0)
+          row = []
+          row << question.id
+          row << eval_count
+          question_data = {}
           question.evaluation_answers.each do |ea|
             question_data["evaluation_#{ea.evaluation_question_id}_response"] = ea.response
             question_data["evaluation_#{ea.evaluation_question_id}_value"] = ea.evaluation_question.reporting_response_value(ea.response)
           end
-        end
-        return_data << question_data
-      end # questions
-    end #scope
 
-    # anonymize submitters
-    submitter_pool_size = submitter_id_map.keys.length
-    random_id_array = (1..submitter_pool_size).to_a.sample(submitter_pool_size)
-    submitter_id_map.each_with_index do |(submitter_id,value),index| 
-      submitter_id_map[submitter_id] = random_id_array[index]
-    end
-
-    return_data.each do |question_data|
-      if(submitter_id = question_data['submitter'])
-        question_data['submitter'] = submitter_id_map[submitter_id]
-      end
-    end
-
-    return_data.shuffle
-  end
-
-  def self.evaluation_data_csv
-    with_scope do 
-      evaldata = self.evaluation_data
-      columns = ['response_time','location','county','group','submitter','has_extension_account']
-      columns << 'demographic_eligible'
-      columns << 'demographics_count'
-      AaeDemographicQuestion.order(:id).active.each do |adq|
-        columns << "demographic_#{adq.id}"
-      end
-      columns << 'evaluation_eligible'
-      columns << 'evaluation_count'
-      AaeEvaluationQuestion.order(:id).active.each do |aeq|
-        columns << "evaluation_#{aeq.id}_response"
-        columns << "evaluation_#{aeq.id}_value"
-      end    
-      CSV.generate do |csv|
-        headers = []
-        columns.each do |column|
-          headers << column
-        end
-        csv << headers
-        evaldata.each do |question_data|
-          row = []
-          columns.each do |column|
+          eval_columns.each do |column|
             value = question_data[column]
             if(value.is_a?(Time))
               row << value.strftime("%Y-%m-%d %H:%M:%S")
@@ -261,8 +301,9 @@ class AaeQuestion < ActiveRecord::Base
               row << value
             end
           end
+
           csv << row
-        end
+        end 
       end
     end
   end

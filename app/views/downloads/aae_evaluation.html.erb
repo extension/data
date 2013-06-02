@@ -5,27 +5,6 @@
   <h1><%= @page_title %></h1>
 </header>
 
-<%- if !@is_staff -%>
-
-<div class="row">
-  <div class="span12">
-    <div class="well">
-      <h3>Restricted download</h3>
-      <p>For submitter privacy reasons, this download is currently restricted to eXtension Staff.</p>
-    </div>
-  </div>
-</div>
-
-<%- else -%>
-
-<div class="row">
-  <div class="span12">
-    <div class="well">
-      <h3>Note! Restricted download!</h3>
-      <p>For submitter privacy reasons, this download is currently restricted to eXtension Staff. Please do not share this raw report with others outside of eXtension staff at this time.</p>
-    </div>
-  </div>
-</div>
 
 <div class="row">
   <div class="span6">
@@ -70,65 +49,9 @@
       </thead>
       <tbody>
         <tr>
-          <td>response_time</td>
-          <td>Time of initial response in hours. A question can have multiple responses, this is the created_at time of the first response minus the the created_at time of the question</td>
+          <td>question_id</td>
+          <td>Question ID that this evaluation is associated with.</td>
         </tr>
-
-        <tr>
-          <td>location</td>
-          <td>The location name attached to the question (if present).</td>
-        </tr>
-
-        <tr>
-          <td>county</td>
-          <td>The county name attached to the question (if present).</td>
-        </tr>
-
-        <tr>
-          <td>group</td>
-          <td>The group name attached to the question (if present).</td>
-        </tr>
-
-        <tr>
-          <td>submitter</td>
-          <td>An anonymized id number for the submitter (this will change every download). Useful for checking for evaluation changes from same submitter for
-            multiple questions</td>
-        </tr>
-
-
-        <tr>
-          <td>has_extension_account</td>
-          <td>Whether the submitter has an eXtensionID.</td>
-        </tr>
-
-        <tr>
-          <td>demographic_eligible</td>
-          <td>This question was eligible to have a demographic response</td>
-        </tr>        
-
-        <tr>
-          <td>demographics_count</td>
-          <td>The number of demographics questions answered by the submitter</td>
-        </tr>
-
-        <%- AaeDemographicQuestion.order(:id).active.each do |adq| -%>
-        <tr>
-          <td>demographic_<%= adq.id %></td>
-          <td>
-            <p><%= adq.prompt %></p>
-            <ul>
-              <%- adq.responses.each do |response| %>
-              <li><%= response %>
-              <%- end -%>
-            </ul>
-          </td>
-        </tr>
-        <%- end -%>
-
-        <tr>
-          <td>evaluation_eligible</td>
-          <td>This question was eligible to have a demographic response</td>
-        </tr>   
 
         <tr>
           <td>evaluation_count</td>
@@ -174,4 +97,3 @@
     </table>
   </div>
 </div>
-<%- end -%>
