@@ -9,4 +9,7 @@ class AaeDemographic < ActiveRecord::Base
   # connects to the aae database
   self.establish_connection :aae
   self.table_name='demographics'
+
+  belongs_to :demographic_question, class_name: 'AaeDemographicQuestion'
+
 end

@@ -16,13 +16,33 @@ class DownloadsController < ApplicationController
   end
 
   def aae_evaluation
-    #@is_staff = @currentcontributor.groups.include?(Group.find(Group::EXTENSION_STAFF))
     @download = Download.find_by_label('aae_evaluation')
+    eligible_questions = Question.where(evaluation_eligible: true).pluck(:id)
+    response_questions = AaeEvaluationAnswer.pluck(:question_id).uniq
+    eligible_response_questions = eligible_questions & response_questions
+    @response_rate = {eligible: eligible_questions.size, responses: eligible_response_questions.size}
   end
+
+  def aae_demographics
+    @download = Download.find_by_label('aae_demographics')
+    eligible_submitters = Question.where(demographic_eligible: true).pluck(:submitter_id).uniq
+    response_submitters = AaeDemographic.pluck(:user_id).uniq
+    eligible_response_submitters = eligible_submitters & response_submitters
+    @response_rate = {eligible: eligible_submitters.size, responses: eligible_response_submitters.size}    
+  end    
+
+  def aae_demographics_private
+    @is_staff = @currentcontributor.groups.include?(Group.find(Group::EXTENSION_STAFF))
+    @download = Download.find_by_label('aae_demographics_private')
+    eligible_submitters = Question.where(demographic_eligible: true).pluck(:submitter_id).uniq
+    response_submitters = AaeDemographic.pluck(:user_id).uniq
+    eligible_response_submitters = eligible_submitters & response_submitters
+    @response_rate = {eligible: eligible_submitters.size, responses: eligible_response_submitters.size}        
+  end    
 
   def getfile
     @download = Download.find(params[:id])
-    if(@download.label == 'aae_evaluation')
+    if(@download.label == 'aae_demographics_private')
       if(!@currentcontributor.groups.include?(Group.find(Group::EXTENSION_STAFF)))
         flash[:notice] = 'This export is currently restricted to staff only.'
         return redirect_to(downloads_url)
