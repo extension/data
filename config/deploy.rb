@@ -5,7 +5,6 @@ require 'capatross'
 require "bundler/capistrano"
 require './config/boot'
 require "airbrake/capistrano"
-require 'sidekiq/capistrano'
 
 set :application, "positronic"
 set :repository,  "git@github.com:extension/positronic.git"
@@ -24,6 +23,11 @@ after "deploy:update_code", "deploy:update_maint_msg"
 after "deploy:update_code", "deploy:link_and_copy_configs"
 after "deploy:update_code", "deploy:cleanup"
 after "deploy", "deploy:web:enable"
+
+# relevant to positronic only, since it hasn't shifted
+# to the non-web-disable deploy
+after "deploy:web:disable",    "sidekiq:stop"
+before "deploy:web:enable",   "sidekiq:start"
 
 namespace :deploy do
 
@@ -82,3 +86,21 @@ namespace :deploy do
 
   end
 end
+
+namespace :sidekiq do
+  desc 'Stop sidekiq'
+  task 'stop', :roles => :app do
+    invoke_command 'sudo stop workers'
+  end
+
+  desc 'Start sidekiq'
+  task 'start', :roles => :app do
+    invoke_command 'sudo start workers'
+  end
+
+  desc 'Restart sidekiq'
+  task 'restart', :roles => :app do
+    stop
+    start
+  end
+end     
