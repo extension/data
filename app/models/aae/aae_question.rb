@@ -163,48 +163,48 @@ class AaeQuestion < ActiveRecord::Base
 
 
   def self.evaluation_data_csv(filename)
-    with_scope do
-      CSV.open(filename,'wb') do |csv|
-        headers = []
-        headers << 'question_id'
-        headers << 'submitter_is_extension'
-        headers << 'evaluation_count'
-        eval_columns = []
-        AaeEvaluationQuestion.order(:id).active.each do |aeq|
-          eval_columns << "evaluation_#{aeq.id}_response"
-          eval_columns << "evaluation_#{aeq.id}_value"
-        end
-        headers += eval_columns
-        csv << headers
-
-        # data
-        # evaluation_answer_questions
-        questions_with_evals = AaeEvaluationAnswer.pluck(:question_id).uniq
-        self.answered.since_changeover.evaluation_eligible.where("id in (#{questions_with_evals.join(',')})").includes(:submitter).each do |question|
-          eval_count = question.evaluation_answers.count
-          next if (eval_count == 0)
-          row = []
-          row << question.id
-          row << question.submitter.has_exid?
-          row << eval_count
-          question_data = {}
-          question.evaluation_answers.each do |ea|
-            question_data["evaluation_#{ea.evaluation_question_id}_response"] = ea.response
-            question_data["evaluation_#{ea.evaluation_question_id}_value"] = ea.evaluation_question.reporting_response_value(ea.response)
-          end
-
-          eval_columns.each do |column|
-            value = question_data[column]
-            if(value.is_a?(Time))
-              row << value.strftime("%Y-%m-%d %H:%M:%S")
-            else
-              row << value
-            end
-          end
-
-          csv << row
-        end 
+    CSV.open(filename,'wb') do |csv|
+      headers = []
+      headers << 'question_id'
+      headers << 'submitter_is_extension'
+      headers << 'evaluation_count'
+      eval_columns = []
+      AaeEvaluationQuestion.order(:id).active.each do |aeq|
+        eval_columns << "evaluation_#{aeq.id}_response"
+        eval_columns << "evaluation_#{aeq.id}_value"
       end
+      headers += eval_columns
+      csv << headers
+
+      # data
+      # evaluation_answer_questions
+      eligible_questions = Question.where(evaluation_eligible: true).pluck(:id)
+      response_questions = AaeEvaluationAnswer.pluck(:question_id).uniq
+      eligible_response_questions = eligible_questions & response_questions
+      self.where("id in (#{eligible_response_questions.join(',')})").includes(:submitter).each do |question|
+        eval_count = question.evaluation_answers.count
+        next if (eval_count == 0)
+        row = []
+        row << question.id
+        row << question.submitter.has_exid?
+        row << eval_count
+        question_data = {}
+        question.evaluation_answers.each do |ea|
+          question_data["evaluation_#{ea.evaluation_question_id}_response"] = ea.response
+          question_data["evaluation_#{ea.evaluation_question_id}_value"] = ea.evaluation_question.reporting_response_value(ea.response)
+        end
+
+        eval_columns.each do |column|
+          value = question_data[column]
+          if(value.is_a?(Time))
+            row << value.strftime("%Y-%m-%d %H:%M:%S")
+          else
+            row << value
+          end
+        end
+
+        csv << row
+      end 
     end
   end
 
