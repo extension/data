@@ -41,7 +41,13 @@ class AaeEvaluationQuestion < ActiveRecord::Base
     when SCALE
       response.to_i
     when OPEN_DOLLAR_VALUE
-      response.gsub(%r{[^\d\.]},'').to_i
+      # use the mean of all the numbers we find
+      all_numerics = response.scan(%r{[\d\.,]+}).map{|i| i.tr(',','').to_i}
+      if(all_numerics.size >= 1)
+        all_numerics.mean.to_i
+      else
+        nil
+      end
     when OPEN_TIME_VALUE
       # interpret as days
       response.gsub(%r{[^\d]},'').to_i
