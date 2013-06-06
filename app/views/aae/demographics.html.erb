@@ -6,7 +6,13 @@
 
 
 <%- @demographic_questions.each do |dq| -%>
-<%- response_data = dq.response_data -%>
+<%- 
+    if(params[:forcecacheupdate]) 
+      response_data = dq.response_data({force: true})
+    else
+      response_data = dq.response_data
+    end 
+-%>
 
 <div class="row">
   <div class="span12">

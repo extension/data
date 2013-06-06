@@ -31,7 +31,7 @@ class AaeDemographicQuestion < ActiveRecord::Base
 
   def _response_data
     data = {}
-    limit_to_pool = Question.demographic_eligible.pluck(:submitter_id).uniq
+    limit_to_pool = Question.public_only.demographic_eligible.pluck(:submitter_id).uniq
     data[:eligible] = limit_to_pool.size
     response_counts = self.demographics.where("demographics.user_id IN (#{limit_to_pool.join(',')})").group('LOWER(response)').count
     data[:responses] = response_counts.values.sum

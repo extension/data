@@ -13,7 +13,7 @@ class Question < ActiveRecord::Base
   belongs_to :detected_county, class_name: 'County'
   belongs_to :county
 
-
+  scope :public_only, lambda { where(submitter_is_extension: false) }
   scope :demographic_eligible, lambda{ where(demographic_eligible: true)}
   scope :evaluation_eligible, lambda{ where(evaluation_eligible: true)}
 
