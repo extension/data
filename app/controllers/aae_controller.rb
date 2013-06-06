@@ -9,5 +9,12 @@ class AaeController < ApplicationController
 
   def index
   end
+
+  def demographics
+    @demographic_questions = AaeDemographicQuestion.order(:questionorder).active
+  end
+
+  def evaluation
+  end
   
 end

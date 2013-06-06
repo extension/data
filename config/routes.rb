@@ -61,6 +61,12 @@ Positronic::Application.routes.draw do
     
   end
 
+  resources :aae, :only => [:index] do 
+    collection do
+      get 'demographics'
+    end
+  end    
+
   # authentication
   match '/logout', to:'auth#end', :as => 'logout'
   match '/auth/:provider/callback', to: 'auth#success'

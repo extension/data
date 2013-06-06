@@ -18,7 +18,12 @@
 //= require jqplot-plugins/jqplot.dateAxisRenderer
 //= require jqplot-plugins/jqplot.highlighter
 //= require jqplot-plugins/jqplot.enhancedLegendRenderer
+//= require jqplot-plugins/jqplot.barRenderer
+//= require jqplot-plugins/jqplot.categoryAxisRenderer
+//= require jqplot-plugins/jqplot.canvasTextRenderer
+//= require jqplot-plugins/jqplot.canvasAxisTickRenderer
 //= require jqplot-plugins/jqplot.cursor
+//= require jqplot-plugins/jqplot.pointLabels
 //= require responsive-tables
 //= require jquery.ui.datepicker
 //= require jquery.ui.autocomplete

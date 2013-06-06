@@ -14,6 +14,9 @@ class Question < ActiveRecord::Base
   belongs_to :county
 
 
+  scope :demographic_eligible, lambda{ where(demographic_eligible: true)}
+  scope :evaluation_eligible, lambda{ where(evaluation_eligible: true)}
+
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")
