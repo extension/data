@@ -25,7 +25,7 @@ class AaeDemographicQuestion < ActiveRecord::Base
         _response_data
       end
     else
-      _response_data(metric)
+      _response_data
     end
   end
 

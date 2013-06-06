@@ -64,6 +64,7 @@ Positronic::Application.routes.draw do
   resources :aae, :only => [:index] do 
     collection do
       get 'demographics'
+      get 'evaluations'
     end
   end    
 

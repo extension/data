@@ -14,7 +14,9 @@ class AaeController < ApplicationController
     @demographic_questions = AaeDemographicQuestion.order(:questionorder).active
   end
 
-  def evaluation
+  def evaluations
+    @evaluation_questions = AaeEvaluationQuestion.order(:questionorder).active
+
   end
   
 end
