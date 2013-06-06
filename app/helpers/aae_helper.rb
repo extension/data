@@ -6,5 +6,4 @@
 
 module AaeHelper
 
-
 end
