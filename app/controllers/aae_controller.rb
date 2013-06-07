@@ -15,7 +15,7 @@ class AaeController < ApplicationController
     end
     @question_stats = Question.answered_stats_by_yearweek('questions',options)
     @expert_stats = QuestionActivity.stats_by_yearweek(options)
-    # @responsetime_stats = Question.answered_stats_by_yearweek('responsetime',options)    
+    @responsetime_stats = Question.answered_stats_by_yearweek('responsetime',options)    
     @evaluation_response_rate = AaeEvaluationQuestion.mean_response_rate
     @demographic_response_rate = AaeDemographicQuestion.mean_response_rate
   end
