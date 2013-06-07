@@ -17,18 +17,12 @@ class DownloadsController < ApplicationController
 
   def aae_evaluation
     @download = Download.find_by_label('aae_evaluation')
-    eligible_questions = Question.public_only.evaluation_eligible.pluck(:id)
-    response_questions = AaeEvaluationAnswer.pluck(:question_id).uniq
-    eligible_response_questions = eligible_questions & response_questions
-    @response_rate = {eligible: eligible_questions.size, responses: eligible_response_questions.size}
+    @response_rate = AaeEvaluationQuestion.mean_response_rate
   end
 
   def aae_demographics
     @download = Download.find_by_label('aae_demographics')
-    eligible_submitters = Question.public_only.demographic_eligible.pluck(:submitter_id).uniq
-    response_submitters = AaeDemographic.pluck(:user_id).uniq
-    eligible_response_submitters = eligible_submitters & response_submitters
-    @response_rate = {eligible: eligible_submitters.size, responses: eligible_response_submitters.size}    
+    @response_rate = AaeDemographicQuestion.mean_response_rate
   end    
 
   def aae_demographics_private

@@ -34,6 +34,14 @@ class AaeEvaluationQuestion < ActiveRecord::Base
 ## scopes
   scope :active, where(is_active: true)
 
+  def self.mean_response_rate
+    response_rate = {}
+    limit_pool = Question.public_only.evaluation_eligible.pluck(:id).uniq
+    response_rate[:eligible] = limit_pool.size
+    limit_list = self.active.pluck(:id)
+    response_rate[:responses] = (AaeEvaluationAnswer.where("question_id IN (#{limit_pool.join(',')})").where("evaluation_question_id IN (#{limit_list.join(',')})").count / limit_list.size)
+    response_rate
+  end
 
   
   def response_value(response)

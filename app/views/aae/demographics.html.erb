@@ -1,6 +1,7 @@
+<%= render(:partial => 'aae_breadcrumbs', :locals => {:endpoint => 'Demographics'}) %>
 
 <header class="jumbotron subhead" id="overview">
-  <h1>AaE Demographics</h1>
+  <h1>AaE Demographics <small><%= link_to("Download raw data &raquo;".html_safe,aae_demographics_downloads_path,:class => 'btn') %></small></h1>
   <p class="lead">Data through <%= year_week_for_last_week%> (<%= date_range_for_last_week%>)</p>
 </header>
 

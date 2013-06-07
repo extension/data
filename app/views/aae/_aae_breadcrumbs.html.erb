@@ -1,0 +1,14 @@
+<%- # TODO: there have to be better ways of doing this that utilize the action names -%>
+<ul class="breadcrumb">
+  <li>
+    <%- if local_assigns.has_key?(:endpoint) and endpoint == 'AaE' -%>
+      AaE Data<span class="divider">/</span>
+    <%- else -%>
+      <%= link_to('AaE Data',aae_index_path) %><span class="divider">/</span>
+    <%- end -%>
+  </li>
+  
+  <%- if local_assigns.has_key?(:endpoint) and endpoint != 'AaE'-%>
+  <li class='active'><%= endpoint %></li>
+  <%- end -%>
+</ul>

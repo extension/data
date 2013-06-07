@@ -1,0 +1,41 @@
+<% @page_title = "Ask an Expert Data" %>
+<%= render(:partial => 'aae_breadcrumbs', :locals => {:endpoint => 'AaE'}) %>
+
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+<div class="row">
+
+  <div class="span6">
+    <h2>Evaluation</h2>
+    <p>Mean Public Response Rate: <span class="mednumber"><%= response_rate(@evaluation_response_rate) %></span></p>
+    <p><%= link_to("Explore more &raquo;".html_safe,evaluations_aae_index_path,:class => 'btn') %></p>
+  </div>
+
+  <div class="span6">
+    <h2>Demographics</h2>
+    <p>Mean Public Response Rate: <span class="mednumber"><%= response_rate(@demographic_response_rate) %></span></p>
+    <p><%= link_to("Explore more &raquo;".html_safe,demographics_aae_index_path,:class => 'btn') %></p>
+  </div>  
+
+</div>
+
+<div class="page-header">
+  <h2>Growth and Performance over time <small><%= link_to("Download raw data &raquo;".html_safe,aae_questions_downloads_path,:class => 'btn') %></small></h2>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>Answered Questions by Week</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @question_stats.to_graph_data('questions'), :datalabel => 'questions'})%>
+  </div>
+</div>
+
+<div class="row">
+  <div class="span12">
+    <h3>Active Experts by Week</h3>
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @expert_stats.to_graph_data('experts'), :datalabel => 'experts'})%>
+  </div>
+</div>
+

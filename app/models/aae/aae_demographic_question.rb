@@ -18,6 +18,15 @@ class AaeDemographicQuestion < ActiveRecord::Base
 
   scope :active, where(is_active: true)
 
+  def self.mean_response_rate
+    response_rate = {}
+    limit_pool = Question.public_only.demographic_eligible.pluck(:submitter_id).uniq
+    response_rate[:eligible] = limit_pool.size
+    limit_list = self.active.pluck(:id)
+    response_rate[:responses] = (AaeDemographic.where("user_id in (#{limit_pool.join(',')})").where("demographic_question_id IN (#{limit_list.join(',')})").count / limit_list.size)
+    response_rate
+  end
+
   def response_data(cache_options = {})
     if(!cache_options[:nocache])
       cache_key = self.get_cache_key(__method__)

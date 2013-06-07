@@ -6,6 +6,8 @@
 #  see LICENSE file
 
 class Question < ActiveRecord::Base
+  include CacheTools
+  extend YearWeek
 
   belongs_to :initial_responder, class_name: 'Contributor'
   belongs_to :detected_location, class_name: 'Location'
@@ -17,6 +19,14 @@ class Question < ActiveRecord::Base
   scope :demographic_eligible, lambda{ where(demographic_eligible: true)}
   scope :evaluation_eligible, lambda{ where(evaluation_eligible: true)}
 
+  YEARWEEK_SUBMITTED = 'YEARWEEK(questions.submitted_at,3)'
+  YEARWEEK_ANSWERED = 'YEARWEEK(questions.initial_response_at,3)'
+
+  AAE_V2_TRANSITION = '2012-12-03 12:00:00 UTC'
+  DEMOGRAPHIC_ELIGIBLE = '2012-12-03 12:00:00 UTC'
+  EVALUATION_ELIGIBLE = '2013-03-15 00:00:00 UTC' # beware the ides of March
+
+  scope :answered, where(:status => 'answered')
 
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")
@@ -213,6 +223,95 @@ class Question < ActiveRecord::Base
 
   end
 
+  def self.increase_group_concat_length
+    set_group_concat_size_query = "SET SESSION group_concat_max_len = #{Settings.group_concat_max_len};"
+    self.connection.execute(set_group_concat_size_query)
+  end
+
+  def self.earliest_resolved_at
+    with_scope do
+      era = self.minimum(:initial_response_at)
+      (era < EpochDate::WWW_LAUNCH) ? EpochDate::WWW_LAUNCH : era
+    end
+  end
+
+  def self.latest_resolved_at
+    with_scope do
+      self.maximum(:initial_response_at)
+    end
+  end
+
+  def self.answered_stats_by_yearweek(metric,cache_options = {})
+    if(!cache_options[:nocache])
+      cache_key = self.get_cache_key(__method__,{metric: metric, scope_sql: current_scope ? current_scope.to_sql : ''})
+      Rails.cache.fetch(cache_key,cache_options) do
+        with_scope do
+          _answered_stats_by_yearweek(metric,cache_options)
+        end
+      end
+    else
+      with_scope do
+        _answered_stats_by_yearweek(metric,cache_options)
+      end
+    end
+  end
+
+  def self._answered_stats_by_yearweek(metric,cache_options = {})
+    stats = YearWeekStats.new
+    # increase_group_concat_length
+    with_scope do
+      era = self.answered.earliest_resolved_at
+      if(era.blank?)
+        return stats
+      end
+      lra = self.answered.latest_resolved_at - 1.week
+
+      case metric
+      when 'questions'
+        metric_by_yearweek = self.answered.group(YEARWEEK_ANSWERED).count(:id)
+      when 'responsetime'
+        questions_by_yearweek = self.answered.group(YEARWEEK_ANSWERED).count(:id)
+        responsetime_by_yearweek = self.answered.group(YEARWEEK_ANSWERED).sum(:initial_response_time)
+        metric_by_yearweek = {}
+        responsetime_by_yearweek.each do |yearweek,total_response_time|
+          metric_by_yearweek[yearweek] = ((questions_by_yearweek[yearweek].nil? or questions_by_yearweek[yearweek] == 0) ? 0 : total_response_time / questions_by_yearweek[yearweek].to_f )
+        end
+      else
+        return stats
+      end
+
+      year_weeks = self.year_weeks_between_dates(era.to_date,lra.to_date)
+      year_weeks.each do |year,week|
+        yw = self.yearweek(year,week)
+        stats[yw] = {}
+        metric_value = metric_by_yearweek[yw] || 0
+        stats[yw][metric] = metric_value
+
+        previous_year_key = self.yearweek(year-1,week)
+        (previous_year,previous_week) = self.previous_year_week(year,week)
+        previous_week_key = self.yearweek(previous_year,previous_week)
+
+        previous_week = (metric_by_yearweek[previous_week_key]  ? metric_by_yearweek[previous_week_key] : 0)
+        stats[yw]["previous_week_#{metric}"] = previous_week
+        previous_year = (metric_by_yearweek[previous_year_key]  ? metric_by_yearweek[previous_year_key] : 0)
+        stats[yw]["previous_year_#{metric}"] = previous_year
+
+        # pct_change
+        if(previous_week == 0)
+          stats[yw]["pct_change_week_#{metric}"] = nil
+        else
+          stats[yw]["pct_change_week_#{metric}"] = (metric_value - previous_week) / previous_week.to_f
+        end
+
+        if(previous_year == 0)
+          stats[yw]["pct_change_year_#{metric}"] = nil
+        else
+          stats[yw]["pct_change_year_#{metric}"] = (metric_value - previous_year) / previous_year.to_f
+        end
+      end
+    end
+    stats
+  end  
 
 
  

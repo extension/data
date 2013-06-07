@@ -194,9 +194,7 @@ class ExperimentsController < ApplicationController
   end
 
   def aae_exploration
-    @question_stats = AaeQuestion.answered.stats_by_yearweek('questions')
-    @expert_stats = AaeQuestion.answered.stats_by_yearweek('experts')
-    @responsetime_stats = AaeQuestion.answered.stats_by_yearweek('responsetime')
+    return redirect_to(aae_index_url)
   end
 
   # def aae_response_time
