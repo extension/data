@@ -5,19 +5,12 @@
 <!-- Core Navigation -->
 <%- if !@hide_navbar%>
 <ul class="nav">
-  <li class="divider-vertical"></li>
-
-	<%= form_tag(search_path, { :class => 'navbar-search pull-left' }) do -%>
-    <%= text_field_tag :q, params[:q], {:class => 'search-query span3', :placeholder => 'Find page, node, or contributor', :autocomplete => 'off'} -%>
-	<%- end -%>
-  <li class="divider-vertical"></li>
-
-
 	<%= nav_item(pages_path,'Pages') %>
 	<%= nav_item(nodes_path,'Nodes') %>
 	<%= nav_item(groups_path,'Groups') %>
 	<%= nav_item(aae_index_path,'Ask an Expert') %>
 	<%= nav_item(experiments_path,'Experiments') %>
+	<%= nav_item(search_path,'Search') %>
 </ul>
 
 

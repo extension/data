@@ -1,4 +1,4 @@
-<% @page_title = "Search Results" %>
+<% @page_title = "Search" %>
 <header class="jumbotron subhead" id="overview">
   <h1><%= @page_title %></h1>
 </header>
@@ -7,6 +7,7 @@
 <%= text_field_tag :q, params[:q], {:class => 'search-query span3', :placeholder => 'Find page, node, or contributor', :autocomplete => 'off'} -%>
 <%- end -%>
 
+<%- if !params[:q].blank? -%>
 <div class="page-header">
   <h2>Pages, Nodes, or Contributors matching <%= params[:q]%></h2>
 </div>
@@ -60,5 +61,5 @@
     <p>No results. Please search again</p>
   </div>
   <%- end -%>
-
 </div>
+<%- end -%>
