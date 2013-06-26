@@ -11,7 +11,7 @@ class DarmokTag < ActiveRecord::Base
   self.table_name= 'tags'
 
   has_many :darmok_taggings, :foreign_key => "tag_id"
-  has_many :darmok_communities, :through => :darmok_taggings, :source => :darmok_community, :uniq => true
+  has_many :darmok_communities, :through => :darmok_taggings, :source => :darmok_publishing_community, :uniq => true
 
 
 

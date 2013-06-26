@@ -5,10 +5,8 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class DarmokAccount < ActiveRecord::Base
-  # connects to the darmok database
-  self.establish_connection :darmok
-  self.table_name= 'accounts'
-  self.inheritance_column = "inheritance_type"
-
+class LearnLearner < ActiveRecord::Base
+  # connects to the learn database
+  self.establish_connection :learn
+  self.table_name='learners'
 end

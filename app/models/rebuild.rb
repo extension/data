@@ -6,12 +6,15 @@
 #  see LICENSE file
 
 class Rebuild < ActiveRecord::Base
+  attr_accessible :group, :single_model, :single_action, :in_progress, :started, :finished, :run_time, :current_model, :current_action, :current_start
 
   ANALYTIC_IMPORTS = [{'Analytic' => 'import_analytics'}]
   CREATE_REBUILDS = ['Node','NodeGroup','Revision','NodeActivity','NodeMetacontribution']
-  DARMOK_REBUILDS = ['Page','Group','Tag','PageTagging','Contributor','ContributorGroup']
+  DARMOK_REBUILDS = ['Page','Tag','PageTagging']
+  PEOPLE_REBUILDS = ['Group','Contributor','ContributorGroup']
   INTERNAL_REBUILDS = ['PageStat','LandingStat','PageTotal','CollectedPageStat']
   AAE_REBUILDS = ['Question','QuestionAssignment','QuestionActivity']
+  LEARN_REBUILDS = ['EventActivity']
   CACHE_REBUILDS = [{'Node' => 'rebuild_activity_cache'}]
 
   def run_and_log(model,action)
@@ -56,11 +59,13 @@ class Rebuild < ActiveRecord::Base
   def list_of_rebuilds
     case self.group
     when 'all'
-      list = DARMOK_REBUILDS + CREATE_REBUILDS + ANALYTIC_IMPORTS + INTERNAL_REBUILDS + AAE_REBUILDS + CACHE_REBUILDS 
+      list = PEOPLE_REBUILDS + DARMOK_REBUILDS + CREATE_REBUILDS + ANALYTIC_IMPORTS + INTERNAL_REBUILDS + AAE_REBUILDS + CACHE_REBUILDS 
     when 'create'
       list = CREATE_REBUILDS
     when 'darmok'
       list = DARMOK_REBUILDS
+    when 'people'
+      list = PEOPLE_REBUILDS
     when 'internal'
       list = INTERNAL_REBUILDS
     when 'analytics'
@@ -69,6 +74,8 @@ class Rebuild < ActiveRecord::Base
       list = CACHE_REBUILDS
     when 'aae'
       list = AAE_REBUILDS
+    when 'learn'
+      list = LEARN_REBUILDS
     when 'single'
       list = [{self.single_model => self.single_action}]
     end

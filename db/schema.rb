@@ -41,6 +41,19 @@ ActiveRecord::Schema.define(:version => 20130603125905) do
   add_index "analytics", ["tag_id"], :name => "tag_id_ndx"
   add_index "analytics", ["year", "week", "page_id"], :name => "analytic_ndx"
 
+  create_table "blogs_activities", :force => true do |t|
+    t.integer  "person_id"
+    t.integer  "blog_id"
+    t.integer  "blog_name"
+    t.integer  "post_id"
+    t.integer  "item_id"
+    t.string   "compound_post_id"
+    t.string   "activity_category", :limit => 25
+    t.datetime "created_at"
+  end
+
+  add_index "blogs_activities", ["person_id", "compound_post_id", "activity_category", "created_at"], :name => "person_activity_ndx"
+
   create_table "collected_page_stats", :force => true do |t|
     t.integer  "statable_id"
     t.string   "statable_type",   :limit => 25, :null => false
@@ -131,6 +144,16 @@ ActiveRecord::Schema.define(:version => 20130603125905) do
   end
 
   add_index "downloads", ["label", "period"], :name => "download_ndx"
+
+  create_table "event_activities", :force => true do |t|
+    t.integer  "event_id"
+    t.integer  "person_id"
+    t.integer  "item_id"
+    t.string   "activity_category", :limit => 25
+    t.datetime "created_at"
+  end
+
+  add_index "event_activities", ["person_id", "event_id", "item_id", "activity_category", "created_at"], :name => "person_activity_ndx"
 
   create_table "geo_names", :force => true do |t|
     t.string  "feature_name",       :limit => 121

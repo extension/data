@@ -36,9 +36,11 @@ class Tag < ActiveRecord::Base
 
     # set groups
     DarmokTag.community_resource_tags.each do |community_tag|
-      group_id = community_tag.darmok_communities.first.id
-      update_sql = "UPDATE #{self.table_name} SET group_id = #{group_id} WHERE #{self.table_name}.id = #{community_tag.id}"
-      self.connection.execute(update_sql)
+      if(tag_group = community_tag.darmok_communities.first)
+        group_id = tag_group.id
+        update_sql = "UPDATE #{self.table_name} SET group_id = #{group_id} WHERE #{self.table_name}.id = #{community_tag.id}"
+        self.connection.execute(update_sql)
+      end
     end
     true
   end

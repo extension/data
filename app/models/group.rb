@@ -29,7 +29,7 @@ class Group < ActiveRecord::Base
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")
     insert_values = []
-    DarmokCommunity.where("drupal_node_id IS NOT NULL").each do |group|
+    PeopleCommunity.where("drupal_node_id IS NOT NULL").each do |group|
       insert_list = []
       insert_list << group.id
       insert_list << group.drupal_node_id

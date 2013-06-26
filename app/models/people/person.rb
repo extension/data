@@ -5,8 +5,8 @@
 #  BSD(-compatible)
 #  see LICENSE file
 
-class DarmokCommunity < ActiveRecord::Base
+class Person < ActiveRecord::Base
   # connects to the darmok database
-  self.establish_connection :darmok
-  self.table_name= 'communities'
+  self.establish_connection :people
+  self.table_name= 'people'
 end

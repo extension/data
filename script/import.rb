@@ -112,6 +112,14 @@ class DataImporter < Thor
     rebuild_group('aae')
   end
 
+  desc "people", "All People Rebuilds"
+  method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
+  method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"
+  def people
+    load_rails(options[:environment])
+    rebuild_group('people')
+  end
+
   desc "internal", "All Internal Rebuilds"
   method_option :environment,:default => 'production', :aliases => "-e", :desc => "Rails environment"
   method_option :verbose,:default => true, :aliases => "-v", :desc => "Show progress"

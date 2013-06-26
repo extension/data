@@ -13,10 +13,10 @@ class ContributorGroup < ActiveRecord::Base
   def self.rebuild
     self.connection.execute("truncate table #{self.table_name};")
     insert_values = []
-    DarmokCommunityconnection.joined.each do |community_connection|
+    PeopleCommunityConnection.joined.each do |community_connection|
       insert_list = []
       insert_list << community_connection.community_id
-      insert_list << community_connection.user_id
+      insert_list << community_connection.person_id
       insert_list << 'NOW()'
       insert_values << "(#{insert_list.join(',')})"
     end
