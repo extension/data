@@ -15,6 +15,8 @@ class Rebuild < ActiveRecord::Base
   INTERNAL_REBUILDS = ['PageStat','LandingStat','PageTotal','CollectedPageStat']
   AAE_REBUILDS = ['Question','QuestionAssignment','QuestionActivity']
   LEARN_REBUILDS = ['EventActivity']
+  BLOGS_REBUILDS = ['BlogsActivity']
+
   CACHE_REBUILDS = [{'Node' => 'rebuild_activity_cache'}]
 
   def run_and_log(model,action)
@@ -59,7 +61,9 @@ class Rebuild < ActiveRecord::Base
   def list_of_rebuilds
     case self.group
     when 'all'
-      list = PEOPLE_REBUILDS + DARMOK_REBUILDS + CREATE_REBUILDS + ANALYTIC_IMPORTS + INTERNAL_REBUILDS + AAE_REBUILDS + CACHE_REBUILDS 
+      list = PEOPLE_REBUILDS + DARMOK_REBUILDS + CREATE_REBUILDS + ANALYTIC_IMPORTS + INTERNAL_REBUILDS + AAE_REBUILDS + LEARN_REBUILDS + BLOGS_REBUILDS + CACHE_REBUILDS
+    when 'blogs'
+      list = BLOGS_REBUILDS 
     when 'create'
       list = CREATE_REBUILDS
     when 'darmok'
