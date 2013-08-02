@@ -21,6 +21,9 @@
               <%- if local_assigns.has_key?(:ymax) -%>
               max: <%= ymax %>,
               <%- end -%>
+              tickOptions:{
+               formatString:'%.1f'
+              },   
             }
           },
           seriesDefaults: {
