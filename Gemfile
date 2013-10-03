@@ -3,8 +3,8 @@ source 'https://systems.extension.org/rubygems/'
 
 gem 'rails', '3.2.14'
 
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
+# all things xml
+gem 'nokogiri', '1.5.10'
 
 # data
 gem 'mysql2'
@@ -77,6 +77,13 @@ gem 'geoip'
 
 #god
 gem "god", :require => false
+
+# readability scores
+gem 'lingua'
+
+# html scrubbing
+gem "loofah"
+
 
 group :development do
   # require the powder gem
