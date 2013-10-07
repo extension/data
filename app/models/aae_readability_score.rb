@@ -32,7 +32,7 @@ class AaeReadabilityScore < ActiveRecord::Base
   end
 
   def self.readability(content)
-    Lingua::EN::Readability.new(self.html_to_text(content))
+    Lingua::EN::Readability.new(self.html_to_text(content).gsub(/[[:space:]]/, ' '))
   end
 
   def self.rebuild
