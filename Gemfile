@@ -83,7 +83,7 @@ group :development do
   gem 'powder'
   gem 'net-http-spy'
   gem 'pry'
-  gem 'capistrano'
+  gem 'capistrano', '~> 2.15.5' 
   gem 'capatross'
 
   # moar advanced stats in dev only
