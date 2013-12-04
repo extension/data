@@ -56,9 +56,6 @@ gem 'thor'
 # legacy data support
 gem 'safe_attributes'
 
-# google visualization api integration
-gem "google_visualr", ">= 2.1"
-
 # jqplot
 gem 'outfielding-jqplot-rails'
 
