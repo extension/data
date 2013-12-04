@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 source 'https://systems.extension.org/rubygems/'
 
-gem 'rails', '3.2.15'
+gem 'rails', '3.2.16'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -22,7 +22,7 @@ group :assets do
 
   gem 'uglifier', '>= 1.0.3'
   # files for bootstrap-in-asset-pipeline integration
-  gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
+  gem 'anjlab-bootstrap-rails', '~> 2.0', :require => 'bootstrap-rails'
   gem 'jquery-ui-rails'
   gem 'jquery-migrate-rails'
   gem 'jquery-tablesorter'
@@ -56,9 +56,6 @@ gem 'thor'
 # legacy data support
 gem 'safe_attributes'
 
-# google visualization api integration
-gem "google_visualr", ">= 2.1"
-
 # jqplot
 gem 'outfielding-jqplot-rails'
 
@@ -74,9 +71,6 @@ gem 'useragent'
 # ip to geo mapping
 gem 'geocoder'
 gem 'geoip'
-
-#god
-gem "god", :require => false
 
 group :development do
   # require the powder gem
