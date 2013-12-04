@@ -22,7 +22,7 @@ group :assets do
 
   gem 'uglifier', '>= 1.0.3'
   # files for bootstrap-in-asset-pipeline integration
-  gem 'anjlab-bootstrap-rails', '>= 2.0', :require => 'bootstrap-rails'
+  gem 'anjlab-bootstrap-rails', '~> 2.0', :require => 'bootstrap-rails'
   gem 'jquery-ui-rails'
   gem 'jquery-migrate-rails'
   gem 'jquery-tablesorter'
