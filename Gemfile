@@ -75,9 +75,6 @@ gem 'useragent'
 gem 'geocoder'
 gem 'geoip'
 
-#god
-gem "god", :require => false
-
 group :development do
   # require the powder gem
   gem 'powder'
