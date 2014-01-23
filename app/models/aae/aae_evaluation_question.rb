@@ -7,6 +7,7 @@
 
 class AaeEvaluationQuestion < ActiveRecord::Base
   include CacheTools
+  extend YearWeek
 
   # connects to the aae database
   self.establish_connection :aae
@@ -43,6 +44,26 @@ class AaeEvaluationQuestion < ActiveRecord::Base
     response_rate
   end
 
+  def self.weekly_mean_response_rate
+    weeks = {}
+    earliest_date = Question.public_only.evaluation_eligible.minimum(:initial_response_at).to_date
+    latest_date = Date.today
+    year_weeks = self.year_weeks_between_dates(earliest_date,latest_date)
+    year_weeks.each do |year,week|
+      yearweek = self.yearweek(year,week)
+      response_rate = {}
+      limit_pool = Question.public_only.evaluation_eligible.where("YEARWEEK(initial_response_at) = #{yearweek}").pluck(:id).uniq
+      response_rate[:eligible] = limit_pool.size
+      if(limit_pool.size > 0)
+        limit_list = self.active.pluck(:id)
+        response_rate[:responses] = (AaeEvaluationAnswer.where("question_id IN (#{limit_pool.join(',')})").where("evaluation_question_id IN (#{limit_list.join(',')})").count / limit_list.size)
+      else
+        response_rate[:responses] = 0
+      end
+      weeks[yearweek] = response_rate
+    end
+    weeks
+  end
   
   def response_value(response)
     case self.responsetype
