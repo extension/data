@@ -2,7 +2,7 @@
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
-#  BSD(-compatible)
+#
 #  see LICENSE file
 
 class Contributor < ActiveRecord::Base
@@ -54,9 +54,9 @@ class Contributor < ActiveRecord::Base
        :secondword => words[1]
       }
       conditions = ["((first_name rlike :firstword AND last_name rlike :secondword) OR (first_name rlike :secondword AND last_name rlike :firstword))",findvalues]
-    elsif(sanitizedsearchterm.to_i != 0)
+    elsif(sanitizedsearchterm.cast_to_i != 0)
       # special case of an id search - needed in admin/colleague searches
-      conditions = ["id = #{sanitizedsearchterm.to_i}"]
+      conditions = ["id = #{sanitizedsearchterm.cast_to_i}"]
     else
       findvalues = {
        :findlogin => sanitizedsearchterm,

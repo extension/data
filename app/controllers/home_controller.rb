@@ -2,7 +2,7 @@
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
-#  BSD(-compatible)
+#
 #  see LICENSE file
 
 class HomeController < ApplicationController
@@ -39,9 +39,9 @@ class HomeController < ApplicationController
   def search
     @search_results_count = 0
     if(params[:q])
-      if(params[:q].to_i > 0)
+      if(params[:q].cast_to_i > 0)
         @search_type = 'numeric'
-        @id_number = params[:q].to_i
+        @id_number = params[:q].cast_to_i
         if(@page = Page.find_by_id(@id_number))
           @search_results_count += 1
         end

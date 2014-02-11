@@ -2,7 +2,7 @@
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
-#  BSD(-compatible)
+#
 #  see LICENSE file
 require 'csv'
 
@@ -166,6 +166,7 @@ class AaeQuestion < ActiveRecord::Base
     CSV.open(filename,'wb') do |csv|
       headers = []
       headers << 'question_id'
+      headers << 'question_submitted_at'
       headers << 'submitter_is_extension'
       headers << 'evaluation_count'
       eval_columns = []
@@ -186,6 +187,7 @@ class AaeQuestion < ActiveRecord::Base
         next if (eval_count == 0)
         row = []
         row << question.id
+        row << question.created_at.strftime("%Y-%m-%d %H:%M:%S")
         row << question.submitter.has_exid?
         row << eval_count
         question_data = {}

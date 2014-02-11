@@ -2,7 +2,7 @@
 #  Copyright (c) North Carolina State University
 #  Developed with funding for the National eXtension Initiative.
 # === LICENSE:
-#  BSD(-compatible)
+#
 #  see LICENSE file
 
 class Node < ActiveRecord::Base
@@ -202,7 +202,7 @@ class Node < ActiveRecord::Base
     stats = YearWeekStats.new
     yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
     contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
-    contributions_count =  "COUNT(node_activities.id) as contributions"
+    contributions_count =  "COUNT(DISTINCT(node_activities.id)) as contributions"
 
     scope = self.node_activities.group(yearweek_condition)
     if(activity != NodeActivity::ALL_ACTIVITY)
@@ -247,7 +247,7 @@ class Node < ActiveRecord::Base
     with_scope do
       yearweek_condition = "YEARWEEK(node_activities.created_at,3)"
       contributors_count =  "COUNT(DISTINCT(node_activities.contributor_id)) as contributors"
-      contributions_count =  "COUNT(node_activities.id) as contributions"
+      contributions_count =  "COUNT(DISTINCT(node_activities.id)) as contributions"
       items_count = "COUNT(DISTINCT(node_activities.node_id)) as items"
 
       scope = self.joins(:node_activities).group(yearweek_condition)
