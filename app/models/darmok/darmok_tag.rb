@@ -16,7 +16,7 @@ class DarmokTag < ActiveRecord::Base
 
 
   def self.community_resource_tags
-    includes(:darmok_taggings).where("taggings.tagging_kind = #{DarmokTagging::CONTENT} and taggable_type = 'PublishingCommunity'").order(:name)
+    includes(:darmok_taggings).where("taggings.taggable_type = 'PublishingCommunity'").order(:name)
   end
 
 end
