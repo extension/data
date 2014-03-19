@@ -19,13 +19,6 @@ Positronic::Application.routes.draw do
 
   resources :groups, :only => [:index, :show]
 
-  resources :aae, :only => [:index] do 
-    collection do
-      get :demographics
-      get :evaluations
-    end
-  end  
-
   # data routes
   scope "data" do
     match "/groups", to: "data#groups", :as => 'data_groups'
@@ -55,19 +48,9 @@ Positronic::Application.routes.draw do
     end
   end
 
-  # downloads routing
-  resources :downloads, :only => [:index] do 
-    collection do
-      get 'aae_demographics'
-      get 'aae_evaluation'
-      get 'aae_questions'
-    end
 
-    member do
-      get 'getfile'
-    end
-    
-  end  
+  # aae notice
+  match '/aae', to: 'home#aae', :as => 'aae_notice'
 
   # authentication
   match '/logout', to:'auth#end', :as => 'logout'
