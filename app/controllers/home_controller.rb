@@ -70,6 +70,10 @@ class HomeController < ApplicationController
         @search_results_count = @pagelist.count + @nodelist .count + @contributorlist.count
       end
     end
+
+    def aae
+
+    end
   end
 
 
