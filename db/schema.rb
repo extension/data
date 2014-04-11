@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130603125905) do
+ActiveRecord::Schema.define(:version => 20140319114529) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -365,74 +365,6 @@ ActiveRecord::Schema.define(:version => 20130603125905) do
   add_index "pages", ["migrated_id"], :name => "index_pages_on_migrated_id"
   add_index "pages", ["node_id"], :name => "node_ndx"
   add_index "pages", ["title"], :name => "index_pages_on_title", :length => {"title"=>255}
-
-  create_table "question_activities", :force => true do |t|
-    t.integer  "contributor_id"
-    t.integer  "question_id"
-    t.integer  "activity"
-    t.string   "activity_text"
-    t.datetime "activity_at"
-  end
-
-  add_index "question_activities", ["activity_at"], :name => "datetime_ndx"
-  add_index "question_activities", ["contributor_id", "activity"], :name => "contributor_activity_ndx"
-  add_index "question_activities", ["question_id"], :name => "question_ndx"
-
-  create_table "question_assignments", :force => true do |t|
-    t.integer  "contributor_id"
-    t.integer  "question_id"
-    t.integer  "assigned_by"
-    t.datetime "assigned_at"
-    t.integer  "time_since_submitted_at"
-    t.integer  "time_assigned"
-    t.string   "next_handled_result"
-    t.integer  "next_handled_by"
-    t.datetime "next_handled_at"
-    t.integer  "next_handled_id"
-    t.boolean  "handled_by_assignee"
-  end
-
-  add_index "question_assignments", ["assigned_at"], :name => "datetime_ndx"
-  add_index "question_assignments", ["contributor_id", "assigned_by", "next_handled_by"], :name => "people_nex"
-  add_index "question_assignments", ["question_id"], :name => "question_ndx"
-
-  create_table "questions", :force => true do |t|
-    t.string   "ip_address"
-    t.integer  "detected_location_id"
-    t.integer  "detected_county_id"
-    t.integer  "location_id"
-    t.integer  "county_id"
-    t.integer  "original_location_id"
-    t.integer  "original_county_id"
-    t.integer  "original_group_id"
-    t.string   "original_group_name"
-    t.integer  "assigned_group_id"
-    t.string   "assigned_group_name"
-    t.string   "status"
-    t.boolean  "submitted_from_mobile"
-    t.datetime "submitted_at"
-    t.integer  "submitter_id"
-    t.boolean  "submitter_is_extension"
-    t.integer  "aae_version"
-    t.string   "source"
-    t.integer  "comment_count"
-    t.integer  "submitter_response_count"
-    t.integer  "expert_response_count"
-    t.integer  "expert_responders"
-    t.datetime "initial_response_at"
-    t.integer  "initial_responder_id"
-    t.float    "initial_response_time"
-    t.float    "mean_response_time"
-    t.float    "median_response_time"
-    t.text     "tags"
-    t.boolean  "demographic_eligible"
-    t.boolean  "evaluation_eligible"
-  end
-
-  add_index "questions", ["detected_location_id", "detected_county_id", "location_id", "county_id"], :name => "location_ndx"
-  add_index "questions", ["initial_responder_id"], :name => "contributor_ndx"
-  add_index "questions", ["source", "aae_version", "status"], :name => "filter_ndx"
-  add_index "questions", ["submitted_at", "initial_response_at"], :name => "datetime_ndx"
 
   create_table "rebuilds", :force => true do |t|
     t.string   "group"

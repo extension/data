@@ -13,7 +13,6 @@ class Rebuild < ActiveRecord::Base
   DARMOK_REBUILDS = ['Page','Tag','PageTagging']
   PEOPLE_REBUILDS = ['Group','Contributor','ContributorGroup']
   INTERNAL_REBUILDS = ['PageStat','LandingStat','PageTotal','CollectedPageStat']
-  AAE_REBUILDS = ['Question','QuestionAssignment','QuestionActivity']
   LEARN_REBUILDS = ['EventActivity']
   BLOGS_REBUILDS = ['BlogsActivity']
 
@@ -61,7 +60,7 @@ class Rebuild < ActiveRecord::Base
   def list_of_rebuilds
     case self.group
     when 'all'
-      list = PEOPLE_REBUILDS + DARMOK_REBUILDS + CREATE_REBUILDS + ANALYTIC_IMPORTS + INTERNAL_REBUILDS + AAE_REBUILDS + LEARN_REBUILDS + BLOGS_REBUILDS + CACHE_REBUILDS
+      list = PEOPLE_REBUILDS + DARMOK_REBUILDS + CREATE_REBUILDS + ANALYTIC_IMPORTS + INTERNAL_REBUILDS + LEARN_REBUILDS + BLOGS_REBUILDS + CACHE_REBUILDS
     when 'blogs'
       list = BLOGS_REBUILDS 
     when 'create'
@@ -76,8 +75,6 @@ class Rebuild < ActiveRecord::Base
       list = ANALYTIC_IMPORTS
     when 'cache'
       list = CACHE_REBUILDS
-    when 'aae'
-      list = AAE_REBUILDS
     when 'learn'
       list = LEARN_REBUILDS
     when 'single'

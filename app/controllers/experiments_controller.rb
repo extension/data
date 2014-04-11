@@ -193,16 +193,6 @@ class ExperimentsController < ApplicationController
   def group_tagslists
   end
 
-  def aae_exploration
-    return redirect_to(aae_index_url)
-  end
-
-  # def aae_response_time
-  #   @stats = YearWeekStatsComparator.new
-  #   @stats['widgets'] = AaeQuestion.where("external_app_id = 'widget'").answered.stats_by_yearweek('responsetime')
-  #   @stats['website'] = AaeQuestion.where("external_app_id != 'widget'").answered.stats_by_yearweek('responsetime')
-  # end
-
 
   protected
 
