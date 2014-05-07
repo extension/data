@@ -1,7 +1,7 @@
 source 'https://rubygems.org'
 source 'https://engineering.extension.org/rubygems'
 
-gem 'rails', '3.2.17'
+gem 'rails', '3.2.18'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -77,7 +77,7 @@ group :development do
   gem 'powder'
   gem 'net-http-spy'
   gem 'pry'
-  gem 'capistrano', '~> 2.15.5' 
+  gem 'capistrano', '~> 2.15.5'
   gem 'capatross'
 
   # moar advanced stats in dev only
