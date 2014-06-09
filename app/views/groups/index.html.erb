@@ -8,7 +8,7 @@
 
 
 <div class="well">
-  <%= text_field_tag("groupfinder",'',{:class => 'input search-query span4', :placeholder => 'Type and select to jump to group'}) %>
+  <p><%= text_field_tag("groupfinder",'',{:class => 'input search-query span4', :placeholder => 'Type and select to jump to group'}) %>
   <script class="code" type="text/javascript">
     $('#groupfinder').autocomplete({
       source: "/data/groups",
@@ -18,6 +18,7 @@
       }
     });
   </script>
+  or <%= link_to('Browse all groups', list_groups_path) %></p>
 </div>
 
 

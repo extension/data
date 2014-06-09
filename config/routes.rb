@@ -17,8 +17,6 @@ Positronic::Application.routes.draw do
     end
   end
 
-  resources :groups, :only => [:index, :show]
-
   # data routes
   scope "data" do
     match "/groups", to: "data#groups", :as => 'data_groups'
@@ -41,6 +39,9 @@ Positronic::Application.routes.draw do
 
 
   resources :groups, :only => [:index, :show] do
+    collection do
+      get :list
+    end
     member do
       get :pagelist
       get :pages
