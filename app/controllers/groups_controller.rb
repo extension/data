@@ -8,13 +8,17 @@
 class GroupsController < ApplicationController
 
   def index
-    @grouplist = Group.launched.order(:name)
   end
 
-	def show
+  def show
     @group = Group.find(params[:id])
     return redirect_to(pages_group_path(@group))
   end
+
+  def list
+    @grouplist = Group.order(:name).page(params[:page])
+  end
+
 
   def pages
     @group = Group.find(params[:id])
