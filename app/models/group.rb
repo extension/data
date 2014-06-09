@@ -22,6 +22,7 @@ class Group < ActiveRecord::Base
 
   has_many :contributor_groups
   has_many :contributors, through: :contributor_groups
+  has_many :node_contributor_activities, through: :contributors, source: :node_activities
 
 
   scope :launched, where(:is_launched => true)

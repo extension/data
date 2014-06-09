@@ -1,0 +1,41 @@
+<%-  @page_title = "#{node_scope_label(@node_scope)} Activity for Group ##{@group.id}" -%>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= "#{node_scope_label(@node_scope)} Activity for #{@group.name}" %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<ul class="nav nav-tabs">
+  <%- NodeActivity::ACTIVITIES.each do |activity| -%>
+  <%= groups_node_activity_list_nav_li(activity) %>
+  <%- end -%>
+</ul>
+
+
+<div class="row">
+  <div class="span12">
+      <%= paginate(@node_activity) %>
+  <table class="table table-bordered">
+
+    <thead>
+      <tr>
+        <th>Node</th>
+        <th>Contributor</th>
+        <th>Type</th>
+        <th>Activity</th>
+        <th>When</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <%- @node_activity.each do |na| -%>
+      <tr>
+        <td><%= node_title_display(na.node) %></td>
+        <td><%= link_to(na.contributor.fullname, contributor_path(na.contributor))  %></td>
+        <td><%= na.node.node_type %></td>
+        <td><%= NodeActivity.event_to_s(na.event) %></td>
+        <td><%= na.created_at.to_s %></td>
+      </tr>
+      <%- end -%>
+    </tbody>
+  </table>
+  </div>

@@ -39,8 +39,6 @@ class NodeActivity < ActiveRecord::Base
     COMMENT => 'added comment'
   }
 
-  scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
-
   # event groups
   ALL_ACTIVITY = 'all'
   EDIT_ACTIVITY = 'edit'
@@ -51,6 +49,11 @@ class NodeActivity < ActiveRecord::Base
 
   # used as a sanitycheck list
   ACTIVITIES = ['all','edit','comment','review','publish','other']
+
+
+
+  scope :created_since, lambda {|date| where("#{self.table_name}.created_at >= ?",date)}
+
 
 
   def self.event_to_s(event)
@@ -142,20 +145,20 @@ class NodeActivity < ActiveRecord::Base
 
   def self.stats(activity)
     returnstats = {}
-    if(!(ACTIVITY_SCOPES.include?(activity)))
+    if(!(ACTIVITIES.include?(activity)))
       return returnstats
     end
     with_scope do
-      returnstats['contributions'] = self.send(activity).count
-      returnstats['contributors'] = self.send(activity).count(:contributor_id,:distinct => true)
-      returnstats['items'] = self.send(activity).count(:node_id,:distinct => true)
+      returnstats['contributions'] = self.where(activity: activity).count
+      returnstats['contributors'] = self.where(activity: activity).count(:contributor_id,:distinct => true)
+      returnstats['items'] = self.where(activity: activity).count(:node_id,:distinct => true)
     end
     returnstats
   end
 
   def self.stats_by_yearweek(activity)
     returnstats = {}
-    if(!(ACTIVITY_SCOPES.include?(activity)))
+    if(!(ACTIVITIES.include?(activity)))
       return returnstats
     end
     with_scope do
