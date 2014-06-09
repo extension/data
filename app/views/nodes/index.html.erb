@@ -63,7 +63,7 @@
   <%- Node::ADMINISTRATIVE_NODE_SCOPES.each do |node_scope| -%>
 
     <div class="span3">
-      <h3><%= Node::ADMINISTRATIVE_NODE_SCOPES_LABELS[node_scope] %> <%= link_to("details &raquo;".html_safe,
+      <h3><%= Node::ADMINISTRATIVE_NODE_SCOPES_LABELS[node_scope] %> <span><%= link_to("details &raquo;".html_safe,
                      details_nodes_path(node_scope: node_scope),:class => 'btn btn-small') %></span></h3>
       <hr/>
       <h4>Overall</h4>
@@ -85,6 +85,3 @@
                            datalabel: "administrative_contributors" }) -%>
   </div>
   </div>
-
-
-
