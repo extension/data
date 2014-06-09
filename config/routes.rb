@@ -45,6 +45,9 @@ Positronic::Application.routes.draw do
       get :pagelist
       get :pages
       get :pagetags
+      get :nodes
+      get :node_graphs
+      get :node_activity
     end
   end
 

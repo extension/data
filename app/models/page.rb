@@ -34,7 +34,7 @@ class Page < ActiveRecord::Base
   scope :faqs, where(:datatype => 'Faq')
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
-  scope :by_datatype, lambda{|datatype| 
+  scope :by_datatype, lambda{|datatype|
     if(datatype != 'All')
       where(:datatype => datatype)
     end
