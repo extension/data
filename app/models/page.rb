@@ -29,13 +29,12 @@ class Page < ActiveRecord::Base
   scope :not_ignored, where("indexed != ?",NOT_INDEXED )
   scope :indexed, where(:indexed => INDEXED)
   scope :articles, where(:datatype => 'Article')
-  scope :articles2, conditions: { :datatype => 'Article' }
 
   scope :news, where(:datatype => 'News')
   scope :faqs, where(:datatype => 'Faq')
   scope :created_since, lambda{|date| where("#{self.table_name}.created_at >= ?",date)}
   scope :from_create, where(:source => 'create')
-  scope :by_datatype, lambda{|datatype| 
+  scope :by_datatype, lambda{|datatype|
     if(datatype != 'All')
       where(:datatype => datatype)
     end

@@ -1,0 +1,26 @@
+<%-  @page_title = "#{node_scope_label(@node_scope)} Activity Graphs for Group ##{@group.id}" -%>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= "#{node_scope_label(@node_scope)} Activity Graphs for #{@group.name}" %></h1>
+  <p class="lead">Data for <%= year_week_for_last_week%> (<%= date_range_for_last_week%>) </p>
+</header>
+
+<ul class="nav nav-tabs">
+  <%- NodeActivity::ACTIVITIES.each do |activity| -%>
+  <%= groups_node_activity_graph_nav_li(activity) %>
+  <%- end -%>
+</ul>
+
+<%= link_to("<i class='icon-th'></i>Details".html_safe,node_activity_group_path(id: @group.id, node_scope: @node_scope, activity: @activity),:class => 'btn') %>
+
+
+
+<%- ['contributions','items','contributors'].each do |metric| -%>
+<div class="page-header">
+  <h1><%= activity_scope_label(@activity) %> - <%= metric.capitalize %></h1>
+</div>
+<div class="row">
+  <div class="span12">
+    <%= render(:partial => 'shared/line_plot', :locals => {:data => @group.nodes.send(@node_scope).stats_by_yearweek(@activity).to_graph_data(metric.to_sym), :datalabel => metric })%>
+  </div>
+</div>
+<%- end -%>

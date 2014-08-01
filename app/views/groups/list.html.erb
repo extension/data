@@ -1,0 +1,30 @@
+<% @page_title = "Browse Groups" %>
+<%= render(:partial => 'group_breadcrumbs', :locals => {:endpoint => 'List'}) %>
+<header class="jumbotron subhead" id="overview">
+  <h1><%= @page_title %></h1>
+</header>
+
+<div class="row">
+  <div class="span12">
+      <%= paginate(@grouplist) %>
+  <table class="table table-bordered">
+
+    <thead>
+      <tr>
+        <th>Group</th>
+        <th>Page Activity</th>
+        <th>Node Activity</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <%- @grouplist.each do |group| -%>
+      <tr>
+        <td><%= group.name %></td>
+        <td><%= link_to('Page Activity',pages_group_path(group)) %></td>
+        <td><%= link_to('Node Activity',nodes_group_path(group)) %></td>
+      </tr>
+      <%- end -%>
+    </tbody>
+  </table>
+  </div>
