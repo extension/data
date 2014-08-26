@@ -54,8 +54,8 @@ namespace :deploy do
     rm -rf #{release_path}/config/database.yml &&
     ln -nfs #{shared_path}/config/database.yml #{release_path}/config/database.yml &&
     ln -nfs #{shared_path}/config/settings.local.yml #{release_path}/config/settings.local.yml &&
-    ln -nfs #{shared_path}/omniauth #{release_path}/tmp/omniauth &&
-    ln -nfs #{shared_path}/downloads #{release_path}/tmp/downloads
+    ln -nfs #{shared_path}/tmpcache #{release_path}/tmp/cache &&
+    ln -nfs #{shared_path}/tmpauth  #{release_path}/tmp/auth
     CMD
   end
 

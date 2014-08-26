@@ -12,4 +12,3 @@ flat_percentage: 0.025
 # mysql group concat size for percentiles
 group_concat_max_len: 1048576
 geoip_data_file: 'notset'
-downloads_data_dir: 'notset'
