@@ -4,7 +4,6 @@ require 'capistrano/ext/multistage'
 require 'capatross'
 require "bundler/capistrano"
 require './config/boot'
-require "airbrake/capistrano"
 
 set :application, "positronic"
 set :repository,  "git@github.com:extension/positronic.git"

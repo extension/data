@@ -60,7 +60,7 @@ gem 'safe_attributes'
 gem 'outfielding-jqplot-rails'
 
 # exception handling
-gem 'airbrake'
+gem 'honeybadger'
 
 # caching
 gem 'redis-rails'

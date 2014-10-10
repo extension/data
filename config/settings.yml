@@ -1,4 +1,4 @@
-airbrake_api_key: 'notset'
+honeybadger_api_key: 'notset'
 googleapps_analytics_secret: 'notset'
 googleapps_analytics: 'notset'
 googleapps_analytics_limit: 10000
