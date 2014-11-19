@@ -5,8 +5,8 @@ require 'capatross'
 require "bundler/capistrano"
 require './config/boot'
 
-set :application, "positronic"
-set :repository,  "git@github.com:extension/positronic.git"
+set :application, "data"
+set :repository,  "git@github.com:extension/data.git"
 set :scm, "git"
 set :user, "pacecar"
 set :use_sudo, false
