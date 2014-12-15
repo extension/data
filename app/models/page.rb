@@ -24,7 +24,7 @@ class Page < ActiveRecord::Base
   NOT_GOOGLE_INDEXED = 2
 
   PERCENTILES = [99,95,90,75,50,25,10]
-  DATATYPES = ['Article','Faq','News']
+  DATATYPES = ['Article','Faq']
 
   scope :not_ignored, where("indexed != ?",NOT_INDEXED )
   scope :indexed, where(:indexed => INDEXED)
