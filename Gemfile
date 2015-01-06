@@ -72,6 +72,9 @@ gem 'useragent'
 gem 'geocoder'
 gem 'geoip'
 
+# cleaner log output
+gem 'lograge'
+
 group :development do
   # require the powder gem
   gem 'powder'
