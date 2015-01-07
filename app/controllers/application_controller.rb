@@ -33,4 +33,10 @@ class ApplicationController < ActionController::Base
     true
   end
 
+  def append_info_to_payload(payload)
+    super
+    payload[:ip] = request.remote_ip
+    payload[:auth_id] = session[:contributor_id] if session[:contributor_id]
+  end
+
 end
