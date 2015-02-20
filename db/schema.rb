@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140319114529) do
+ActiveRecord::Schema.define(:version => 20150220160819) do
 
   create_table "analytics", :force => true do |t|
     t.integer  "page_id"
@@ -44,7 +44,7 @@ ActiveRecord::Schema.define(:version => 20140319114529) do
   create_table "blogs_activities", :force => true do |t|
     t.integer  "person_id"
     t.integer  "blog_id"
-    t.integer  "blog_name"
+    t.string   "blog_name"
     t.integer  "post_id"
     t.integer  "item_id"
     t.string   "compound_post_id"
